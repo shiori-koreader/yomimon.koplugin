@@ -10,7 +10,7 @@ Duas versões, pelo formato do cartão:
                                balão da tela da Traça, e ela embaixo
   estante                      o balão já aparece num espaço mais estreito (a prateleira é alta), com a letra
                                menor se precisar, para ela não ocupar a prateleira inteira; ela fica em pé
-                               na prateleira
+                               na prateleira (na estante de capas, no meio da altura, como as capas)
 O balão tem a largura da fala. Ela fica do maior tamanho que couber; o balão pode descer até as antenas,
 porque o desenho tem margem vazia em cima. Num cartão largo baixo demais para os dois, ou na lista de
 módulos para adicionar, fica só ela. Fora da estante, o conjunto fica no meio da altura.
@@ -31,8 +31,20 @@ local Estado = require("traca_estado")
 
 local Bookshelf = {}
 
--- A Traça aberta agora (biblioteca ou leitor). O main.lua guarda a instância no Screensaver ao iniciar.
+-- O kit de módulos do Bookshelf (o Bookshelf já está carregado quando este arquivo é usado).
+local ok_kit, Kit = pcall(require, "lib/bookshelf_module_kit")
+if not ok_kit or type(Kit) ~= "table" then Kit = nil end
+
+-- A pasta bookshelf_modules da Traça (o Bookshelf a passa para bookshelf_modules/traca.lua).
+local pasta_modulos
+
+-- A Traça aberta agora (biblioteca ou leitor). O Bookshelf 6.1 acha a instância pela pasta do plugin
+-- (Kit.plugin); num Bookshelf mais antigo, fica a que o main.lua guarda no Screensaver ao iniciar.
 local function instancia()
+    if Kit and Kit.plugin and pasta_modulos then
+        local ok, traca = pcall(Kit.plugin, pasta_modulos)
+        if ok and traca then return traca end
+    end
     local ok, Screensaver = pcall(require, "ui/screensaver")
     return ok and Screensaver and Screensaver.traca_instancia or nil
 end
@@ -96,11 +108,16 @@ local function alturaDaLinha(face, largura)
     return ok and h or 1
 end
 
+-- O que, mudando, troca a fala: a fase, se ela está dormindo e as páginas lidas.
+local function marcaDe(s, agora)
+    local e = Estado.expressao(s, agora)
+    return table.concat({ Estado.fase(s).nome, tostring(e == "dormindo" or e == "casulo"), s.paginas or 0 }, ":")
+end
+
 -- Uma fala que caiba em `max_linhas`; guarda a escolhida e só troca quando a marca muda ou o tempo passa.
 local function textoDoBalao(traca, linhas, max_linhas)
     local s, agora = traca.estado, os.time()
-    local e = Estado.expressao(s, agora)
-    local marca = table.concat({ Estado.fase(s).nome, tostring(e == "dormindo" or e == "casulo"), s.paginas or 0 }, ":")
+    local marca = marcaDe(s, agora)
     if cache.texto and cache.marca == marca and agora - cache.t < TROCA_SEGUNDOS then
         local n = linhas(cache.texto)
         if n <= max_linhas then return cache.texto, n end
@@ -260,6 +277,15 @@ local function caixaDela(sprite)
     return { x = x0, y = y0, w = x1 - x0, h = y1 - y0 }
 end
 
+-- O que cada cartão na tela desenhou por último (desenho e fala), pela chave do cartão. O on_minute
+-- compara com o de agora e só redesenha o cartão quando algo mudou: sem mudança, a tela não pisca.
+local desenhado = {}
+
+local function chaveDo(ctx)
+    local id = ctx and ctx.entry and ctx.entry.id
+    return id and (tostring(ctx.surface) .. ":" .. tostring(id)) or nil
+end
+
 -- O cartão ----------------------------------------------------------------------------
 
 local Cartao = Widget:extend{
@@ -268,7 +294,9 @@ local Cartao = Widget:extend{
     altura = 0,
     forma = "largo",
     estante = false,    -- em pé na prateleira, no meio dos livros
+    capas = false,      -- na estante de capas: no meio da altura, como as capas, em vez de em pé
     so_desenho = false, -- na lista de módulos para adicionar: só ela, sem fala
+    chave = nil,        -- para o on_minute saber o que este cartão desenhou
 }
 
 function Cartao:init()
@@ -329,7 +357,11 @@ function Cartao:paintTo(bb, x, y)
     end
     local escala = math.max(1, escalaPara(h - reserva))
     local total = acima + caixa.h * escala
-    local topo = self.estante and (y + h - total) or (y + math.floor((h - total) / 2))
+    local em_pe = self.estante and not self.capas
+    local topo = em_pe and (y + h - total) or (y + math.floor((h - total) / 2))
+    if self.chave then
+        desenhado[self.chave] = { sprite = Desenho.resolver(sprite), fala = balao ~= nil, marca = cache.marca, t = cache.t }
+    end
 
     if balao then
         local bx = x + math.floor((w - balao.w) / 2)
@@ -348,12 +380,16 @@ require("traca_guarda").padrao:envolver(Cartao, { "paintTo" })
 
 -- O módulo para o Bookshelf (o formato está em bookshelf.koplugin/micromodules/README.md) ----------
 
-function Bookshelf.modulo()
+function Bookshelf.modulo(pasta)
+    pasta_modulos = pasta
     return {
         key = "silverfish",  -- fica gravado nos layouts das pessoas: nunca mudar
         title = T"Traça",
         summary = T"Sua traça. Funciona sem internet.",
         bare = true,          -- sem cartão por trás: ela e o balão direto no fundo, como no Simple UI
+        -- ela se ajusta sozinha ao tamanho do cartão (o desenho em passos inteiros): o Bookshelf 6.1 desenha
+        -- uma vez só, no tamanho do cartão, em vez de procurar um tamanho de letra
+        self_sized = true,
         tap_feedback = true,  -- tocar abre a tela dela
         -- ao ser adicionado, começa com 2 de largura e 1 de altura: a versão com balão. O Bookshelf não tem
         -- largura máxima; mais largo só sobra espaço em volta, o desenho não muda.
@@ -376,8 +412,26 @@ function Bookshelf.modulo()
                 altura = h,
                 forma = FORMAS[ctx.shape] or formaDe(w, h),
                 estante = ctx.surface == "shelf",
+                capas = ctx.shelf_view == "covers",
                 so_desenho = ctx.preview or ctx.surface == "picker",
+                chave = chaveDo(ctx),
             }
+        end,
+
+        -- Uma vez por minuto, com o cartão na tela: redesenha só quando o desenho dela muda (uma expressão sem
+        -- desenho próprio cai no da fase, e aí nada muda) ou quando a fala do balão trocaria (a marca mudou ou
+        -- passaram os 20 minutos).
+        on_minute = function(ctx)
+            local antes = desenhado[chaveDo(ctx)]
+            local traca = antes and instancia()
+            if not traca or type(ctx.refresh) ~= "function" then return end
+            local agora = os.time()
+            Estado.passarTempo(traca.estado, agora)
+            local mudou = Desenho.resolver(Estado.sprite(traca.estado, agora)) ~= antes.sprite
+            if not mudou and antes.fala then
+                mudou = marcaDe(traca.estado, agora) ~= antes.marca or agora - (antes.t or 0) >= TROCA_SEGUNDOS
+            end
+            if mudou then ctx.refresh() end
         end,
 
         on_tap = function(_ctx)
