@@ -16,4 +16,4 @@ if not ok then
     require("logger").warn("Traça: cartão do Bookshelf indisponível:", Bookshelf)
     return {}
 end
-return Bookshelf.modulo()
+return Bookshelf.modulo(pasta)
