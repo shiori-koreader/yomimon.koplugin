@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.1.0 (unreleased)
+
+- Fork of Silverfish 1.1.0, renamed to Yomimon: plugin folder `yomimon.koplugin`, state in `settings/yomimon.lua`,
+  data in `koreader/yomimon/`, settings keys `yomimon_*`. Existing Silverfish progress is not migrated.
+- README, CREDITS and art license updated with the modification notice, attribution and disclaimers.
+- The first screen is now a creature picker (329 evolution families, Pokédex 1-649, A-Z shortcut). Each species
+  evolves through its own line (1 to 3 forms) by pages read.
+- No egg, death or lineage: the final form stays for good. Hunger stays; after days without reading the creature
+  goes back to a ball.
+- Sprites are downloaded on the device from PokeAPI/sprites (pinned commit), converted to the 64x64 grayscale
+  grid and cached in `yomimon.koplugin/sprites/` (so they are lost if you replace the plugin folder; they download again). A generated ball is shown until then. The Silverfish sprites,
+  icons and screenshots were removed.
+- Text banks: lines about the old creature (egg, spine, antennae, molting...) were removed and 32 new base lines
+  about Pokémon life were added, in Portuguese and English. More adaptation is still needed.
+
+- Pokédex screen (ARCHIVE menu): every creature you picked keeps its own progress; tap one to switch back, or
+  pick another. Fixed a crash on the achievements screen. Files and folders renamed to English (`yomimon_*`,
+  `fonts/`, `icons/`, `yomimon_data/`); the Bookshelf module key is now `yomimon`, with a shelf option in setup.
+
+## Silverfish history (upstream)
+
 ## 1.1.0 (2026-10-31)
 
 - New: a Silverfish card for the [Bookshelf](https://github.com/AndyHazz/bookshelf.koplugin) plugin. Put it in

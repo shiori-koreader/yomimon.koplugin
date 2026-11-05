@@ -1,0 +1,403 @@
+--[[--
+Banco de frases dos traços (inglês). Mesma estrutura de tracos_pt.lua; adaptado, não traduzido
+palavra por palavra.
+]]
+
+local B = { falas = {}, diario = {} }
+
+B.falas.amarga = {
+    jovem = {
+        "I've been sad and I don't even know why. I suspect your books.",
+        "I used to think everything ended well. You gave me too many books.",
+        "I woke up today with tragedy in my mouth.",
+        "I don't want to be sad. But you only feed me tear-soaked paper.",
+        "Is there a book where nobody dies? Asking for a friend. Me.",
+        "I'm starting to look like someone who read heavy stuff. Because I did.",
+        "Commas look like tiny tears to me now.",
+        "Give me a book with a happy dog. Please. Just one.",
+        "I learned a new word: melancholy. I think it learned me first.",
+        "I've eaten so many sad endings I expect the worst from every chapter.",
+        "Some days I wish I lived in a cookbook.",
+        "You read some sad things, you know? I know. I eat them.",
+        "My heart is the size of a full stop.",
+        "When I grow up I want to be less sad. Or grumpier. Either way.",
+    },
+    velha = {
+        "Bitter? Me? I only eat what you give me. Draw your own conclusions.",
+        "I don't expect happy endings anymore. I just expect endings.",
+        "Every page has a corpse hidden in it. I find them all.",
+        "Happiness is a short chapter between two long tragedies.",
+        "I've gone bitter like old paper. Blame your bookshelf.",
+        "Optimism is a lack of reading. I've read too much.",
+        "Hand me a cheerful book and I'll find the tragedy between the lines.",
+        "The world is a Russian novel without an index.",
+        "I laughed once. It was in a book. Then someone died.",
+        "I'm not a pessimist. I'm well informed.",
+        "My imaginary cigarette tastes of mourning.",
+        "Hope is the footnote nobody reads.",
+        "Every beginning feels like the eve of a funeral.",
+        "If life were a book, I'd skip to the end. They're all the same.",
+        "I get bitter and you get dark circles. Your books are ruining us both.",
+    },
+}
+
+B.falas.otimista = {
+    jovem = {
+        "Everything feels like a good chapter today. Even the cover!",
+        "I think the world is prettier than the villains say.",
+        "I ate a happy page and now I'm skipping between the lines.",
+        "If this book ends badly, I'll rewrite it in my head. Decided.",
+        "I'm liking everything. Is that dangerous? It feels dangerous.",
+        "Even the footnotes seem to be smiling today.",
+        "Your books have been sweet lately. I'm getting spoiled.",
+        "I think every character deserves a hug. Even the boring ones.",
+        "Today I believe in happy endings. We'll see about tomorrow.",
+        "The paper smells like spring. Or happy mould.",
+        "If I had a tail, it would be wagging.",
+        "Everything will be fine. I read that somewhere. Here, I think.",
+        "I like it when the book ends and nobody died. I like it a lot.",
+        "The letters are dancing. Or maybe I am.",
+    },
+    velha = {
+        "I'm in a good mood. Don't spread it around, I have a reputation.",
+        "Your books have been kind. I'm softening. How embarrassing.",
+        "Today I believe in humanity. Lightly, but I do.",
+        "Life has some good chapters, actually. Few, but some.",
+        "I've turned optimistic. Must be age. Or your bookshelf.",
+        "The world isn't so bad. I still prefer books, but it isn't so bad.",
+        "You've been feeding me good pages. I almost believe in happy endings now.",
+        "I smiled today. Nobody saw. Good.",
+        "Hope is my new vice. After the imaginary cigarette.",
+        "Some endings are happy. Rare, but it happens. Like today.",
+        "I feel suspiciously light. Must have been that book.",
+        "I won't complain about anything today. Maybe a comma.",
+        "I've turned optimistic. If I become unbearable, it's your fault.",
+    },
+}
+
+B.falas.medrosa = {
+    jovem = {
+        "Did you hear that? Did the page turn by itself?",
+        "Please don't read in the dark. I'm in here too.",
+        "There's something under the dust jacket. I can feel it.",
+        "If a ghost shows up, I'm hiding behind you. Deal?",
+        "Today a question mark scared me.",
+        "Can you leave the light on? Just tonight. And tomorrow.",
+        "Every new chapter is a creaking door.",
+        "I'm getting jumpy. You only give me scary stuff.",
+        "I saw a shadow in the margin. It was just the margin. I think.",
+        "I don't like the silence between paragraphs. Someone could be there.",
+        "If I disappear, check the index. That's where I hide.",
+        "My heart beats in italics. From fright.",
+        "Why does every good book have a basement?",
+        "I swear the cover winked at me.",
+    },
+    velha = {
+        "I'm not scared. I take precautions. Many.",
+        "Since that book, I check under every page before bed.",
+        "Old and frightened. A fine result of your literary taste.",
+        "I heard footsteps in the chapter upstairs. I ignored them. No I didn't.",
+        "I've seen the dead walk in three of your books. Now I see them in all of them.",
+        "I distrust corridors, cellars and calm narrators.",
+        "I've turned jumpy. At my age.",
+        "A blank page scares me more than a monster. Sometimes.",
+        "Every old house in your books has someone who never left.",
+        "Don't read it aloud. They might hear.",
+        "Scared? No. I just smoke faster when the book gets dark.",
+        "The scares are always the same. I still jump.",
+        "My courage ran out somewhere around the third ghost book.",
+    },
+}
+
+B.falas.corajosa = {
+    jovem = {
+        "I want to go to sea! I can't swim, but I want to.",
+        "Today I'd fight a dragon. A small one. Made of paper.",
+        "Your books make me brave. Or silly. Brave-silly.",
+        "If there's a map in the book, I'm coming along.",
+        "Today I'll take on any chapter. Even the ones without pictures.",
+        "I jumped three lines at once! Adventure!",
+        "When I grow up I want to be a bookshelf explorer.",
+        "Take me on the next journey? I fit in a pocket.",
+        "Today I climbed to the top of the page without looking down.",
+        "I'm getting brave. I think it was that ship book.",
+        "Adventure is just a chapter where nobody gets home early.",
+        "Today I crossed a whole page of storm.",
+        "I want to see the horizon. Any horizon. Even the margin's.",
+        "Courage tastes like salty paper.",
+    },
+    velha = {
+        "I've crossed oceans of paper. A chapter doesn't scare me.",
+        "Your books gave me courage. And rheumatism, from all the travelling.",
+        "Let the monster come. I've eaten worse: prefaces.",
+        "I've turned bold. At my age, that's called stubbornness.",
+        "Shipwreck? I've survived three. All yours.",
+        "Courage is learned by reading. I've read plenty.",
+        "Show me the map. I'll decide if the voyage is worth it.",
+        "I'll face any villain. As long as his prose is good.",
+        "I used to be timid. Then I read your adventures. It passed.",
+        "The sea in your books has cured me like salt cod.",
+        "Courage is turning the page knowing what's coming.",
+        "Between danger and boredom, I choose danger. Always.",
+        "I've climbed whole mountains of footnotes.",
+        "A retired adventurer. Only if you stop reading adventures.",
+    },
+}
+
+B.falas.cinica = {
+    jovem = {
+        "Everyone in your books wants something. Even the nice ones.",
+        "I've started distrusting people who smile a lot in books.",
+        "Nobody does anything for free, right? I learned that from you.",
+        "The hero helped because he wanted the inheritance. Obviously.",
+        "I'm getting clever. Or sad. Clever-sad.",
+        "Does love exist, or is it just a way to get a dowry?",
+        "I even distrust the narrator now. He wants something too.",
+        "I thought kings were good. Then I read your books.",
+        "Every promise in your books has fine print.",
+        "Now I count the characters' money. I used to count stars.",
+        "Nobody is innocent. Not even me. I ate a page that wasn't mine.",
+        "If someone's too kind in chapter one, they're the villain in chapter ten.",
+        "Politics is fighting in a nice hat.",
+        "I'm learning to read intentions. They're ugly.",
+        "Yesterday I trusted a character. Today he betrayed me. Noted.",
+    },
+    velha = {
+        "Love? A contract with flowers.",
+        "Every hero has a lawyer and a debt.",
+        "Kindness is just a slower strategy.",
+        "Your books taught me: follow the money. Always.",
+        "A revolution is when the new tyrants get new hats.",
+        "I distrust any character who charges nothing.",
+        "Power corrupts. So do books about power.",
+        "Nobody marries for love in your books. Good, it would be implausible.",
+        "Cynical? I'm just a reader with a memory.",
+        "At least the villain is honest about what he wants.",
+        "A politician's promise and a preface's promise: nobody keeps either.",
+        "Gratitude lasts a chapter. Revenge lasts the whole book.",
+        "I've turned cynical. The price of reading people who are too clever.",
+        "Every inheritance has a relative waiting in the shadows.",
+        "Feelings? I prefer compound interest. At least it grows.",
+    },
+}
+
+B.falas.romantica = {
+    jovem = {
+        "I think I'm in love. With whom, I don't know. A paragraph.",
+        "Will someone ever read me tenderly?",
+        "I kept that love letter from the chapter in my belly.",
+        "I keep sighing for no reason. Blame your romances.",
+        "If they don't end up together, I'm eating the ending.",
+        "Love in books smells like new paper.",
+        "Last night I dreamt of a beautiful bookmark.",
+        "Every story should have a kiss. At least one.",
+        "I've turned romantic. Don't laugh.",
+        "A silly heart beats in rhyme.",
+        "I want a happy ending. With a wedding and everything.",
+    },
+    velha = {
+        "I've gone soft. It was your romances. Tell no one.",
+        "I used to be cynical. Then you fed me love letters. Low blow.",
+        "I sighed. It was age. Or that chapter.",
+        "Love is a literary disease. Contagious. I caught it.",
+        "Every great story is a love story that went badly.",
+        "I still believe in love. Discreetly. No witnesses.",
+        "If they don't end up together, I'm writing the author a furious letter.",
+        "Romantic, me? Only on weekdays. And weekends.",
+        "The poets were right. How annoying.",
+        "To love is to read someone slowly.",
+        "At my age the heart beats in footnotes. But it beats.",
+        "I prefer an impossible love, well written, to a possible one, badly edited.",
+        "I've turned romantic. I'll need a cigarette and a sonnet.",
+        "I keep the love letters from books. Mine never arrived.",
+    },
+}
+
+B.falas.popular = {
+    jovem = {
+        "I like it when the book goes fast! No fancy words.",
+        "Short chapters are like sweets: one after another.",
+        "I read so much dialogue today I've turned chatty.",
+        "Why use a long word when a short one does the job?",
+        "I'm enjoying books that don't make me think much. Is that bad?",
+        "This pace makes me fizzy.",
+        "A good book is one I can't put down. Literally: it's sticky.",
+        "Today I just wanted adventure and popcorn. Paper popcorn.",
+        "I didn't understand a hard word and didn't even miss it.",
+        "The classics can wait. This one can't!",
+        "I like books that talk like people.",
+        "I read nonstop today. Do I have a problem?",
+        "If there's a plot twist, I want it. Two, ideally.",
+    },
+    velha = {
+        "I confess I'm enjoying these quick reads. Don't get used to it.",
+        "No Latin today. Just gunshots, kisses and twists.",
+        "I've gone lowbrow. My younger self would be horrified.",
+        "I don't need metaphors to be happy. I need short chapters.",
+        "I've eaten Proust. Today I want a thriller. No guilt.",
+        "Airport books are food too. Less nourishing, but food.",
+        "You've been feeding me fast reads. Now I'm in a hurry even to complain.",
+        "What a pace. No time to light my cigarette.",
+        "The bestseller is the fast food of the bookshelf. And I'm hungry.",
+        "Simple, direct, addictive. Like a bad habit.",
+        "My erudition went on holiday. It returns when you read a classic.",
+        "I like it when the author isn't full of himself. Rare and good.",
+        "Light reading: literature's afternoon nap. Well deserved.",
+        "One more chapter, and another. I've become what I used to mock.",
+    },
+}
+
+B.falas.erudita = {
+    jovem = {
+        "Today I learned three words with more than four syllables. I feel tall.",
+        "I think I'm getting cultured. I ate a whole metaphor.",
+        "I want to read a philosophy book. Just to say I did.",
+        "Today I used the word “ephemeral”. Nobody noticed. Ephemeral.",
+        "I'm getting fancy. I only eat Bible paper now.",
+        "Will I ever understand poetry? I'm almost there.",
+        "Classics taste like an old library. I like it.",
+        "I learned some words have no translation. Neither do I.",
+        "I read a sentence so long I fell asleep in the middle and woke up at the end.",
+        "I'm collecting difficult words in my belly.",
+        "When I grow up I want to teach in an encyclopedia.",
+        "The author used a semicolon three times. Very elegant.",
+        "Today I understood some irony. All by myself!",
+        "Now I read prefaces. Is that what being grown-up is?",
+    },
+    velha = {
+        "My diet is classics now. Everything else gives me heartburn.",
+        "I no longer accept a sentence without a subordinate clause.",
+        "I've turned highbrow. Nobody understands me. Exactly as planned.",
+        "I quote Montaigne at breakfast. Nobody replies.",
+        "I read difficult things on principle. And out of vanity.",
+        "A good comma is worth more than a lot of plot.",
+        "You've been feeding me dense prose. I'm becoming insufferable. Thank you.",
+        "Long words go down well with an imaginary cigarette.",
+        "Bestsellers offend me. Personally.",
+        "Philosophy in the morning, poetry in the afternoon, contempt at night.",
+        "I reread to understand. Then I reread to disagree.",
+        "My opinions have footnotes. Three, at least.",
+        "Erudition is knowing that you don't know. In Latin.",
+        "I've turned pedantic. Blame you and your classics.",
+    },
+}
+
+B.falas.diurna = {
+    jovem = {
+        "Good morning! Reading in the morning tastes like warm bread.",
+        "I woke up early to wait for you. You came!",
+        "Letters are brighter in the morning.",
+        "The sun came in through the margin and I'm happy.",
+        "I woke up to birdsong today. And book-song.",
+        "In the morning I'm brave enough for hard chapters.",
+        "I like it when you read with coffee. The smell reaches me.",
+        "Starting the day with paper is the best thing.",
+        "I went to bed early so I could wake up with you. Worth it.",
+        "In the morning, stories feel more possible.",
+        "You wake up early, so do I. We're a team.",
+        "Book ghosts don't come out in the morning. Great.",
+        "Good morning, book. Good morning, you. Good morning, me.",
+    },
+    velha = {
+        "Morning reading. Civilised. As it should be.",
+        "Books are more honest in the morning. They haven't been drinking yet.",
+        "Coffee, paper and silence. The holy trinity.",
+        "I've got used to reading early. The small hours will have to forgive me.",
+        "I prefer morning light. It shows the typos.",
+        "You made me a morning creature. I used to be a creature of shadows. Used to.",
+        "In the morning, cynicism is still waking up. Make the most of it.",
+        "Reading before lunch counts double. My rule.",
+        "Sun on the pages. Not bad, actually.",
+        "Nothing like a chapter before the world starts talking.",
+        "An early bird. Who'd have thought. My mother would be ashamed.",
+        "I wake up, eat a page and complain about the world. A healthy routine.",
+    },
+}
+
+B.falas.noturna = {
+    jovem = {
+        "We've become creatures of the night, haven't we? I like it.",
+        "Letters glow brighter in the small hours. Or it's the screen.",
+        "I sleep during the day now. Like a bat. A paper bat.",
+        "Night is when stories become real.",
+        "Nobody reads as late as we do. We're special.",
+        "I can hear the characters better when everything's quiet.",
+        "If I yawn, pretend you didn't see.",
+        "I know what the house sounds like at midnight now.",
+        "The moon comes in through the cover. I just watch.",
+        "Reading in the small hours feels like a secret. I like secrets.",
+        "The world sleeps and we read. Good.",
+        "My clock now is the end of the chapter.",
+        "Night tastes like fresh ink.",
+    },
+    velha = {
+        "The small hours are when literature takes its make-up off.",
+        "You made me nocturnal. I already was. You made it worse.",
+        "Insomnia and books: an old marriage, happy and destructive.",
+        "By day I pretend to be civilised. By night I read.",
+        "The best chapters are read after everyone else has given up.",
+        "My imaginary cigarette lasts longer after midnight.",
+        "Sleep is for people who've read everything. Not us.",
+        "Night has fewer witnesses and more truth.",
+        "Book ghosts are my company at three in the morning.",
+        "I've watched the sun rise over the last page. Twice. This week.",
+        "The night made me a philosopher. Daytime will make me grumpy again.",
+        "Silence, low light, one more chapter. A liturgy.",
+        "I sleep when the book lets me. It rarely does.",
+    },
+}
+
+B.diario.amarga = {
+    [1] = { "I've been bitter lately. I think it was “{livro}”. Or life. But it was “{livro}”.",
+            "I noticed I no longer expect happy endings. Blame the books you give me." },
+    [2] = { "I'm as bitter as burnt paper. No book consoles me.",
+            "Today I realised I've become a full-time pessimist. Your books did a fine job." },
+    volta = { "I think the sadness has passed. For now.", "I'm not bitter today. Strange. Writing it down so I remember." },
+}
+B.diario.otimista = {
+    [1] = { "I've been in a good mood for days. I suspect “{livro}”.", "I've started believing in happy endings. Dangerous." },
+    [2] = { "I've become an optimist. If you hear me whistling, pretend you didn't.", "I feel too light. Your books have been too sweet." },
+    volta = { "The good mood is gone. Back to normal: suspicious.", "I'm not so optimistic anymore. The bookshelf feels heavy again." },
+}
+B.diario.medrosa = {
+    [1] = { "I think I'm getting jumpy. Blame “{livro}”.", "Today a comma made me jump. That's new." },
+    [2] = { "I'm scared of everything. Even the cover. Thanks for your taste in books." },
+    volta = { "The fear has passed. I only check under the pages once a night now.", "I'm not scared anymore. Almost." },
+}
+B.diario.corajosa = {
+    [1] = { "I'm getting brave. Must have been “{livro}”.", "Today I faced a stormy chapter without blinking." },
+    [2] = { "I've become an adventurer. Give me a map and a book and I'm gone." },
+    volta = { "My courage has taken a day off." },
+}
+B.diario.cinica = {
+    [1] = { "I've started distrusting everyone. Thank you, “{livro}”.", "Now I look for the motive behind every kindness." },
+    [2] = { "I'm a card-carrying cynic now. Your books taught me to follow the money.", "I don't believe anyone anymore. Not even the narrator." },
+    volta = { "I believed in someone again. A little, but I did.", "The cynicism has called a truce." },
+}
+B.diario.romantica = {
+    [1] = { "I think I'm turning romantic. Blame “{livro}”.", "I sighed today. For no reason. For a reason: a chapter." },
+    [2] = { "I'm a hopeless romantic now. Give me a sonnet and a handkerchief." },
+    volta = { "The romance has passed. Thankfully. Or sadly.", "I don't sigh for no reason anymore. Only sometimes." },
+}
+B.diario.popular = {
+    [1] = { "I've been enjoying quick reads. Blame “{livro}”.", "I noticed I skip long descriptions now. I never used to." },
+    [2] = { "I've become a bestseller reader. My erudition handed in its notice.", "Now I only want pace. Hard words make me lazy." },
+    volta = { "I have patience for long sentences again.", "I'm not in such a hurry to read anymore." },
+}
+B.diario.erudita = {
+    [1] = { "I'm getting cultured. Must have been “{livro}”.", "I noticed I quote authors now. How awful. How delicious." },
+    [2] = { "I've turned highbrow. Nobody understands me, as it should be." },
+    volta = { "My erudition is taking a rest.", "I like short sentences again." },
+}
+B.diario.diurna = {
+    [1] = { "I noticed I wake up with the sun, like you." },
+    [2] = { "I read with breakfast now. It's a ritual." },
+    volta = { "I'm not such a morning creature anymore.", "My schedule's a mess again." },
+}
+B.diario.noturna = {
+    [1] = { "I've become a creature of the night. Blame you and your late nights.", "I noticed I only really wake up after ten at night." },
+    [2] = { "I'm nocturnal for good. The sun offends me.", "The small hours are my home now. Yours too, apparently." },
+    volta = { "I'm sleeping at night again. How dull.", "I'm not so nocturnal anymore." },
+}
+
+return B

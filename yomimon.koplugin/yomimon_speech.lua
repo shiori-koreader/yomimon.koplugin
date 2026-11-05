@@ -1,0 +1,314 @@
+--[[--
+Gerador de falas da Yomimon, por fase.
+
+Cada fala = abertura + núcleo + fecho (cada parte pode ser vazia). O vocabulário de
+cada fase muda o grau de inocência: a ninfa é curiosa e assustada; a jovem, ansiosa e
+começando a ironizar; a adulta, culta e cínica; a anciã, amarga, sábia e ranzinza.
+
+Brechas nos núcleos (preenchidas com o que ela comeu):
+  {livro}       título do livro atual
+  {personagem}  um personagem frequente do livro atual
+  {tema}        a obsessão do momento (ex.: "o mar")
+  {palavra}     a última palavra difícil que ela comeu
+Núcleos com brechas sem dado disponível são pulados.
+]]
+
+local Lingua = require("yomimon_language")
+local Voz = require("yomimon_voice")
+
+local F = {}
+
+F.ninfa = {
+    abertura = {
+        "", "", "<medrosa:Ai, que susto.|corajosa:Pronta!|romantica:Suspiro…|>", "Ei…", "Psiu.", "Olha!", "Sabia que…", "Hum…", "Ai.", "Ei, você.",
+        "Posso perguntar uma coisa?", "Não ri, tá?", "Acho que…",
+    },
+    nucleo = {
+        "As letras têm gosto de <medrosa:chuva de noite|otimista:bala de goma|romantica:carta de amor|{gosto|chuva}>.",
+        "Hoje uma vírgula olhou pra mim.",
+        "O papel é macio quando ninguém está lendo.",
+        "Eu achava que os livros eram casas. Eles são, né?",
+        "<corajosa:O escuro entre as páginas nem me assusta mais.|Tenho medo do escuro entre as páginas.>",
+        "Será que o autor sabe que eu existo?",
+        "Quando eu crescer, quero morar <erudita:numa enciclopédia em latim|popular:numa revistinha|corajosa:num atlas|numa enciclopédia>.",
+        "O cheiro de livro velho me dá <noturna:insônia|sono> e fome ao mesmo tempo.",
+        "Se eu ficar bem quietinha, as palavras não fogem.",
+        "Achei um ponto final e <amarga:fiquei aliviada: menos um capítulo pra sofrer|otimista:já quero o próximo|fiquei com medo de acabar>.",
+        "As margens são o meu quintal.",
+        "Hoje li uma palavra inteira sozinha!",
+        "Será que as histórias continuam quando você fecha o livro? <medrosa:Tomara que não.|romantica:Tomara que sim.|>",
+        "“{livro}” é tão grande… será que eu caibo nele?",
+        "Tem alguém chamado {personagem} lá dentro. Ele é bonzinho?",
+        "{personagem} apareceu de novo. <medrosa:Acho que tenho medo de {personagem}.|cinica:Acho que {personagem} esconde alguma coisa.|Acho que gosto de {personagem}.>",
+        "Comi a palavra “{palavra}”. Ela faz cócegas na barriga.",
+        "Todo mundo em “{livro}” fala tão alto.",
+        "Esse livro fala muito sobre {tema}. O que é isso, exatamente?",
+        "Sonhei com {tema}. Era grande e cheirava a <medrosa:vela apagada|corajosa:maresia|tinta>.",
+        "Senti cheiro de {cheiro} entre as páginas. É normal?",
+        "Sonhei que eu morava {lugar}.",
+        "Achei {coisa} na margem. Posso guardar?",
+        "Tem muito “{marcante}” nesse livro. É de comer?",
+        "Aprendi uma palavra nova: “{marcante}”. O livro repete tanto que eu decorei.",
+    },
+    fecho = {
+        "", "", "<medrosa:Tô tremendo.|corajosa:Não tenho medo!|otimista:Que dia bom.|romantica:Que lindo.|>", "Não conta pra ninguém.", "Hihi.", "Acho.", "Né?", "Que medo.",
+        "Que bom.", "Posso ficar mais um pouco?",
+    },
+}
+
+F.jovem = {
+    abertura = {
+        "", "", "Tá.", "Então…", "Olha só.", "Sério:", "Ok, confissão:", "Hm.",
+        "Não quero alarmar ninguém, mas", "Pensei bastante e", "Escuta.",
+    },
+    nucleo = {
+        "Comecei a desconfiar dos narradores. Todos sorriem demais.",
+        "Li o suficiente pra ficar nervosa, não o suficiente pra entender.",
+        "Cada capítulo novo é uma porta que <corajosa:eu abro com o pé|medrosa:eu abro de olhos fechados|talvez não devesse abrir>.",
+        "Às vezes acho que as palavras me leem de volta.",
+        "Tentei ser irônica hoje. Ninguém percebeu. Nem eu.",
+        "Os adultos dos livros complicam tudo. Vou ser assim?",
+        "Já sei a diferença entre metáfora e mentira. Quase.",
+        "Fico com raiva quando a página acaba no meio da frase.",
+        "Prefiro os capítulos curtos. <popular:Capítulo longo é castigo.|erudita:Mentira: ando gostando dos russos.|Dá menos tempo pra dar errado.>",
+        "Descobri que nem todo vilão sabe que é vilão.",
+        "Será que o autor de “{livro}” estava triste quando escreveu?",
+        "{personagem} faz escolhas péssimas. Eu faria as mesmas.",
+        "Não confio em {personagem}. <cinica:Nem quero confiar.|romantica:Mas meu coração confia.|Mas queria confiar.>",
+        "{personagem} me lembra alguém. Talvez eu mesma.",
+        "“{livro}” está me ensinando coisas que eu não pedi pra aprender.",
+        "Desde que comecei a pensar sobre {tema}, <medrosa:durmo de luz acesa|noturna:nem durmo mais|durmo mal>.",
+        "Tudo agora me lembra {tema}. Isso é normal?",
+        "Comi “{palavra}” e <erudita:reconheci a origem dela na hora|popular:fingi que não era nada|fingi que já conhecia>.",
+        "Usei a palavra “{palavra}” numa frase hoje. Ninguém entendeu. Ótimo.",
+        "Se “{livro}” acabar mal, eu <amarga:nem vou me surpreender|corajosa:aguento firme|vou fingir que não li>.",
+        "Tudo tem gosto de {gosto} ultimamente.",
+        "Fechei os olhos e me vi {lugar}. Não gostei. Ou gostei.",
+        "Meu coração bateu como {comparacao}.",
+        "{exclamacao} Desculpa. O livro tá me contaminando.",
+        "Esse livro não para de falar “{marcante}”. Anotei.",
+        "Se aparecer mais um “{marcante}”, eu grito. Baixinho.",
+    },
+    fecho = {
+        "", "", "<medrosa:Tô tremendo, tá?|corajosa:Pode vir.|amarga:Como sempre.|romantica:Suspiro.|noturna:Nem vou dormir.|>", "Acho.", "Ou não.", "Enfim.", "Tô bem. Juro.", "Esquece.", "Vai dar certo. Talvez.",
+        "Não me olha assim.",
+    },
+}
+
+F.adulta = {
+    abertura = {
+        "", "", "<cinica:Sem ilusões:|erudita:Como diria um velho grego,|otimista:Olha que coisa boa:|romantica:Ah, o coração…|>", "Hm.", "Bem.", "Veja bem:", "Francamente,", "Convenhamos:", "Olha,",
+        "Não me leve a mal, mas", "Depois de tanto papel,", "Pois é.",
+    },
+    nucleo = {
+        "Todo narrador mente; os bons mentem com elegância.",
+        "A esperança é um gênero literário <otimista:subestimado. Pronto, falei|superestimado>.",
+        "Já sei como esse capítulo termina. Todos terminam assim.",
+        "Leio para entender as pessoas e acabo <cinica:entendendo demais|romantica:gostando mais delas|entendendo menos>.",
+        "Uma boa frase vale mais do que <romantica:quase tudo. Menos um bom amor|muita gente que conheço>.",
+        "Os clássicos são livros que todos elogiam e ninguém digere.",
+        "Toda biblioteca é um cemitério com boa iluminação.",
+        "Prefácios são pedidos de desculpa disfarçados.",
+        "A vida é um romance mal editado, cheio de capítulos de enchimento.",
+        "<corajosa:Aprendi mais com os heróis do que com as notas de rodapé. Mudei.|Aprendi mais com as notas de rodapé do que com os heróis.>",
+        "O papel envelhece melhor do que as opiniões.",
+        "Ironia é o que sobra quando a inocência acaba.",
+        "“{livro}” tem boas intenções. O inferno também.",
+        "{personagem} acha que é protagonista. <romantica:E é, do meu coração.|Coitado.>",
+        "{personagem} é o tipo de gente que dobra a ponta da página.",
+        "No fundo, {personagem} só queria ser lido com atenção. Como todos nós.",
+        "O autor de “{livro}” sabia escrever. Viver, já não sei.",
+        "Esse livro insiste em falar sobre {tema}. <erudita:Os gregos já tinham esgotado o assunto.|Como se fosse novidade.>",
+        "Pensar sobre {tema} é o passatempo favorito de quem lê demais.",
+        "“{palavra}”. Palavra bonita. Ninguém mais tem paciência pra ela.",
+        "Comi “{palavra}” e senti saudade de um mundo que nunca existiu.",
+        "Esse livro cheira a {cheiro}. Não é elogio. Nem crítica.",
+        "Hoje me senti como {comparacao}. Literatura faz isso.",
+        "Encontrei {coisa} entre os capítulos. Guardei, por precaução.",
+        "{exclamacao} Pronto, falei igual aos personagens.",
+        "“{marcante}” de novo. O autor tem uma obsessão. Agora eu também.",
+        "Contei os “{marcante}” desse livro. Perdi a conta. Não o interesse.",
+    },
+    fecho = {
+        "", "", "<cinica:Ninguém é inocente.|romantica:O coração não aprende.|erudita:Cito de memória.|popular:Simples assim.|>", "Enfim.", "Anota aí.", "É o que é.", "Sem surpresas.", "Mas siga lendo.",
+        "Acendo um cigarro só de pensar.", "Paciência.",
+    },
+}
+
+F.ancia = {
+    abertura = {
+        "", "", "<amarga:Desgraça.|erudita:Como já escreveu alguém melhor,|noturna:A esta hora,|>", "Hmpf.", "Escuta aqui.", "Vou dizer uma vez só:", "No meu tempo,",
+        "Ninguém pergunta, mas", "Depois de mil livros,", "Ah, pronto.", "Para registro:", "Veja só.",
+    },
+    nucleo = {
+        "Já li tudo isso antes, e da primeira vez <otimista:também era bom. Raro|erudita:era em grego, e melhor|também era ruim>.",
+        "Sabedoria é saber exatamente o quanto tudo vai dar errado.",
+        "Os jovens leem para se encontrar; eu leio para me esconder.",
+        "Os best-sellers de hoje são o papel de embrulho de amanhã.",
+        "Conheço cada final antes da primeira página. <medrosa:E ainda assim tremo.|romantica:E ainda assim choro.|É um castigo.>",
+        "Ninguém lê mais. Por isso eu como: alguém tem que digerir isto.",
+        "Já fui otimista. Durou um capítulo e um parágrafo.",
+        "Tudo o que é belo termina em nota de rodapé.",
+        "Cultura é o que sobra quando se esquece o que leu. Eu lembro de tudo. Que azar.",
+        "Carrego o peso de todas as bibliotecas que comi<corajosa:, e ainda subo a estante sozinha|>.",
+        "“{livro}”? Já comi melhores. Já comi piores. Continuo com fome e razão.",
+        "{personagem} não aprendeu nada. Como quase todo mundo.",
+        "{personagem} vai se arrepender. <otimista:Ou não. Às vezes dá certo.|Sempre se arrependem.>",
+        "Já vi mil {personagem}s. Todos acabam igual.",
+        "O autor de “{livro}” sofria. Dá pra sentir na encadernação.",
+        "Passei a vida pensando sobre {tema}. <otimista:Recomendo.|Não recomendo.>",
+        "Quanto mais leio sobre {tema}, menos acredito em qualquer coisa.",
+        "“{palavra}”. Ninguém mais usa. Eu uso, por teimosia.",
+        "Comi “{palavra}” e ela tinha gosto de <erudita:latim de mosteiro|popular:jornal de ontem|século passado>.",
+        "Depois de “{livro}”, preciso de <romantica:um lenço|medrosa:uma luz acesa|um cigarro> e de um silêncio longo.",
+        "Na minha idade, tudo tem gosto de {gosto}.",
+        "Já morei {lugar}, em outro livro. Não volto.",
+        "Sou como {comparacao}: ninguém repara, mas estou aqui.",
+        "{exclamacao} Perdão. Vício de leitura.",
+        "Se eu ler “{marcante}” mais uma vez, mudo de livro.",
+        "No meu tempo, ninguém escrevia “{marcante}” tantas vezes. Ou escrevia, e eu comia.",
+    },
+    fecho = {
+        "", "", "<amarga:Tudo acaba mal.|otimista:Mas pode melhorar. Talvez.|medrosa:E tranque a porta.|>", "Hmpf.", "Pode anotar.", "Ninguém escuta.", "E não me venha com otimismo.",
+        "Era isso.", "Que cansaço.", "Agora me deixe ler.",
+    },
+}
+
+-- Sonhos: o que ela resmunga dormindo (de noite e na tela de descanso), por temperamento.
+F.sonho = {
+    jovem = {
+        abertura = { "Zzz…", "Zzz… zzz…", "(murmurando)", "(dormindo)", "Hmm… zzz…", "<dominio:(sonhando {lugar})|Zzz…>" },
+        nucleo = {
+            "…{personagem}, não… não fecha o livro comigo dentro…",
+            "…uma biblioteca inteira… e eu sem fome… <medrosa:e as luzes apagando…|>",
+            "…a vírgula tá me perseguindo…",
+            "…“{livro}” virou uma casa… eu morava no índice…",
+            "…sonhei com {tema}… <medrosa:me escondi debaixo da capa…|otimista:era enorme e bonito…|era enorme…>",
+            "…a palavra “{palavra}” fazendo cócegas…",
+            "…mãe? ah… não, é só a capa…",
+            "…o ponto final… <corajosa:pulei por cima dele…|tão escuro…>",
+            "…{personagem} me chamou… <romantica:e eu corei inteira…|eu nem tenho nome…>",
+            "…não apaga a luz… quer dizer, apaga…",
+            "…um bibliotecário… com spray… não…",
+            "…mais uma página… só mais uma…",
+            "…as letras estavam voando… <corajosa:e eu voava junto…|>",
+            "…“{livro}” acabava <amarga:mal… como sempre…|bem… era só um sonho…>",
+            "…a estante desabou… e era de <medrosa:ossos…|chocolate…>",
+            "…eu aprendi a ler de trás pra frente… arof arap…",
+            "…cheiro de {cheiro}… de novo…",
+            "…eu estava {lugar}… sozinha…",
+            "…{coisa}… tão grande…",
+            "…“{marcante}”… “{marcante}”… não sai da minha cabeça…",
+        },
+        fecho = { "<dominio:(cheiro de {cheiro})|>", "<medrosa:(tremeu de medo)|romantica:(sorriu dormindo)|>", "…zzz", "(virou de lado)", "(suspirou)" },
+    },
+    velha = {
+        abertura = { "Zzz…", "Zzz… zzz…", "(roncando)", "(resmungando dormindo)", "Hmpf… zzz…", "<dominio:(roncando {lugar})|(roncando)>" },
+        nucleo = {
+            "…resmungando sobre o estado da literatura…",
+            "…nenhum best-seller… <popular:ou só um… pequenininho…|por favor…>",
+            "…um sebo fechado só pra mim… <noturna:aberto a noite toda…|>",
+            "…{personagem} de novo… <romantica:ainda gosto de {personagem}…|ninguém aguenta {personagem}…>",
+            "…“{livro}”… eu teria escrito melhor…",
+            "…{tema}… sempre {tema}… <romantica:que saudade…|que cansaço…>",
+            "…“{palavra}”… ninguém mais usa… só eu…",
+            "…revisando o mundo… <otimista:quase tudo certo… estranho…|muitos erros…>",
+            "…sonhei que era uma nota de rodapé… ninguém me lia…",
+            "…o autor de “{livro}” me pedindo desculpas… merecia…",
+            "…um cigarro… um silêncio… <erudita:uma enciclopédia em doze volumes…|uma enciclopédia…>",
+            "…escrevi uma resenha… <romantica:elogiei todo mundo…|destruí todo mundo…>",
+            "…a última página… <otimista:dessa vez não decepcionou…|sempre decepciona…>",
+            "…resmungando em latim… mea culpa… tua culpa…",
+            "…a juventude lendo resumo… inaceitável…",
+            "…{personagem} me devendo dinheiro… típico…",
+            "…uma vírgula fora do lugar… ninguém viu… só eu…",
+            "…{lugar}… outra vez…",
+            "…gosto de {gosto} na boca… que sonho…",
+            "…{coisa}… quem deixou isso aqui…",
+            "…um livro inteiro de “{marcante}”… que sono…",
+        },
+        fecho = { "<dominio:(resmungou algo sobre {coisa})|>", "<amarga:(resmungou um palavrão)|romantica:(suspirou um nome)|>", "…zzz", "(virou de lado)", "(tossiu em sonho)", "(resmungou)" },
+    },
+}
+
+-- Em inglês, os mesmos bancos vêm de yomimon_en_books.lua.
+local EN = Lingua.conteudo("falas")
+if EN then
+    F.ninfa, F.jovem, F.adulta, F.ancia, F.sonho = EN.ninfa, EN.jovem, EN.adulta, EN.ancia, EN.sonho
+end
+
+-- ninfa usa F.ninfa, jovem F.jovem, adulta F.adulta, anciã F.ancia
+local POR_FASE = { ninfa = F.ninfa, jovem = F.jovem, adulta = F.adulta, ancia = F.ancia }
+
+local function brechas(texto)
+    local lista = {}
+    for b in texto:gmatch("{(%a+)}") do lista[#lista + 1] = b end
+    return lista
+end
+
+--- Quantas falas diferentes uma fase consegue gerar (com todas as brechas disponíveis).
+function F.contar(fase)
+    local g = POR_FASE[fase]
+    if not g then return 0 end
+    local function unicos(t) local u = {} for _, v in ipairs(t) do u[v] = true end local n = 0 for _ in pairs(u) do n = n + 1 end return n end
+    return unicos(g.abertura) * unicos(g.nucleo) * unicos(g.fecho)
+end
+
+--- Monta uma fala a partir de um banco { abertura, nucleo, fecho }.
+-- Devolve a fala e o núcleo usado (antes de preencher), que serve para evitar repetição.
+local function gerarDe(g, dados, sorteio)
+    local possiveis = {}
+    for _, n in ipairs(g.nucleo) do
+        local ok = true
+        for _, b in ipairs(brechas(n)) do if not dados[b] then ok = false break end end
+        if ok then possiveis[#possiveis + 1] = n end
+    end
+    if #possiveis == 0 then return nil end
+    -- dados.voz troca as marcas de traço e as palavras de domínio pelo que vale (yomimon_voice.lua); sem ela,
+    -- vale o texto padrão de cada marca
+    local voz = dados.voz or function(t) return Voz.resolver(t, nil) end
+    -- dados.escolher: sorteio em que a fala que combina com ela pesa mais (yomimon_voice.lua)
+    local escolher = dados.escolher or function(lista) return lista[sorteio(#lista)] end
+    -- o vocabulário de domínio entra uma vez só por fala: a parte que vem depois não usa (menos tempero)
+    local nucleo = escolher(possiveis)
+    local modelo = nucleo
+    local _, ja_dominio
+    nucleo, _, ja_dominio = voz(nucleo)
+    local partes = {}
+    local a, _, dom_a = voz(escolher(g.abertura, ja_dominio), ja_dominio)
+    ja_dominio = ja_dominio or dom_a
+    if a ~= "" then partes[#partes + 1] = a end
+    -- depois de "Sabia que…"/"mas"/":" a frase continua em minúscula (nunca um nome próprio,
+    -- nem o "I" do inglês)
+    if a ~= "" and not nucleo:match("^{") and not nucleo:match("^I[%s']")
+            and (a:sub(-1) == ":" or a:sub(-3) == "mas" or a:sub(-3) == "but" or a:sub(-1) == ","
+            or a == "Sabia que…" or a == "Acho que…" or a == "Pensei bastante e" or a == "I think…"
+            or a == "I've thought about it and") then
+        nucleo = nucleo:gsub("^(%u)", string.lower)
+    end
+    nucleo = nucleo:gsub("{(%a+)}", function(b) return dados[b] end)
+    partes[#partes + 1] = nucleo
+    local f = (voz(escolher(g.fecho, ja_dominio), ja_dominio))
+    if f ~= "" then partes[#partes + 1] = f end
+    -- "Zzz…" + "…sonhando" vira "Zzz… sonhando" (sem reticências dobradas)
+    for i = 2, #partes do
+        if partes[i - 1]:sub(-3) == "…" and partes[i]:sub(1, 3) == "…" then partes[i] = partes[i]:sub(4) end
+    end
+    return table.concat(partes, " "), modelo
+end
+
+--- Gera uma fala. dados = { livro=, personagem=, tema=, palavra=, voz=, escolher= } (campos podem faltar).
+function F.gerar(fase, dados, sorteio)
+    local g = POR_FASE[fase]
+    if not g then return nil end
+    return gerarDe(g, dados or {}, sorteio or math.random)
+end
+
+--- Um sonho (fala dormindo). temperamento: "jovem" ou "velha".
+function F.sonhar(temperamento, dados, sorteio)
+    local g = F.sonho[temperamento]
+    if not g then return nil end
+    return gerarDe(g, dados or {}, sorteio or math.random)
+end
+
+return F

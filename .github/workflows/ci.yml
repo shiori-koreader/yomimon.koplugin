@@ -1,0 +1,12 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: "5.1"
+      - run: lua tests/yomimon_test.lua
+      - run: python3 scripts/package.py
