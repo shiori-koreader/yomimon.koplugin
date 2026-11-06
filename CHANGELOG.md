@@ -9,7 +9,13 @@
 - The sprite cache moved to `koreader/yomimon/sprites/`, so a plugin update no longer wipes it; sprites cached
   inside the plugin folder by earlier versions are moved there on first use.
 - About and disclaimer: a menu item under *Tools > Yomimon*, shown once after the first welcome.
-- Code comments and log messages of the main modules are in English; CI runs the tests, the locale check and a
+- The Portuguese voice no longer says gendered things about itself: about a hundred phrases and the trait and mood
+  labels were reworded ("fiquei nervosa" became "me deu um nervoso", "AMARGA" became "AMARGURA"). The English
+  phrases already had no gender for the creature.
+- Settings keys renamed to English (`yomimon_gesture`, `yomimon_open_at_startup`); the old values are carried over
+  on first start. The gesture action id, its event and the Simple UI ids keep their old names on purpose, because
+  Dispatcher and Simple UI save them in the user's settings.
+- Code comments and log messages of every module are in English; CI runs the tests, the locale check and a
   non-blocking luacheck.
 - The language menu lists the languages found, and "Automatic" follows the KOReader language (English when there
   is no locale for it). **To keep the Portuguese UI on an English KOReader, pick it once in *Yomimon > Language*.**

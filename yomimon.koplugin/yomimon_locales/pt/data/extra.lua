@@ -18,9 +18,9 @@ E.FALAS.ovo._todas = {
 }
 E.FALAS.jovem.feliz = {
     "Hoje o papel estava crocante na medida certa.<dominio: Com um fundinho de {gosto}.|>",
-    "Acho que entendi uma piada do autor. Ri sozinha.",
+    "Acho que entendi uma piada do autor. Ri sem ninguém.",
     "Comi tão bem que esqueci de ter medo.<medrosa: Por cinco minutos.|>",
-    "Estou tão cheia que vou ler deitada.",
+    "A barriga tá tão cheia que vou ler deitando.",
     "Hoje nenhum personagem morreu. Pelo menos não perto de mim.",
     "Um capítulo inteiro sem susto. Que luxo.",
     "Gostei tanto que reli a mesma página. Duas vezes. Comendo.",
@@ -32,7 +32,7 @@ E.FALAS.jovem.normal = {
     "Hoje tentei ler de cabeça pra baixo. Não recomendo.",
     "O índice é o mapa. Eu sou a exploradora<medrosa: que fica no acampamento|>.",
     "Às vezes acho que sou personagem secundária da minha própria vida.",
-    "Li a palavra “fim” e fiquei nervosa. Era só um capítulo.",
+    "Li a palavra “fim” e me deu um nervoso. Era só um capítulo.",
     "As notas de rodapé cochicham. Eu ouço tudo.",
     "Gosto do barulho da página virando. Parece <medrosa:passo no corredor|romantica:alguém suspirando|o vento chamando>.",
 }
@@ -40,7 +40,7 @@ E.FALAS.jovem.triste = {
     "A barriga ronca mais alto que a minha vontade de reclamar.",
     "Lambi a capa. Só tinha {gosto|poeira}.",
     "Se eu desmaiar, me ressuscite com um prefácio.",
-    "Estou tão fraca que uma vírgula me derrubaria.",
+    "Tô sem força nenhuma: uma vírgula me derrubaria.",
     "Sonhei com um banquete de dicionários. Acordei com fome.",
     "Você lembra que eu existo? Eu lembro que você existe.",
     "Uma frase. Meia frase. Um ponto e vírgula. Qualquer coisa.",
@@ -48,7 +48,7 @@ E.FALAS.jovem.triste = {
     "Prometo não reclamar do livro. Só me dá um.",
 }
 E.FALAS.jovem.casulo = {
-    "Escondida. Bata três vezes na página que eu saio.",
+    "Tô escondendo. Bata três vezes na página que eu saio.",
     "Aqui dentro tem cheiro de livro esquecido. Que medo.",
     "Fiz um ninho com as orelhas das páginas. Volta logo.",
     "Estou de greve de fome. Não por escolha.",
@@ -64,7 +64,7 @@ E.FALAS.jovem.repouso = {
 E.FALAS.velha.feliz = {
     "Uma boa página. Vou guardar o gosto<dominio: de {gosto}|> até amanhã.",
     "Hoje a literatura funcionou. Não conte a ninguém.",
-    "Satisfeita como quem achou uma primeira edição.",
+    "Barriga satisfeita como quem achou uma primeira edição.",
     "Até o meu cigarro imaginário está de bom humor.",
     "O mundo continua ruim, mas a prosa estava boa.",
     "Comi bem. Vou ser gentil por uns quinze minutos.",
@@ -89,7 +89,7 @@ E.FALAS.velha.triste = {
     "Me deixaram no escuro com meus pensamentos. Péssima companhia.",
     "Fome velha é a pior fome: tem memória.",
     "Uma página, por caridade. Ou por literatura.",
-    "Estou tão vazia quanto um prefácio de autor famoso.",
+    "Tô com o vazio de um prefácio de autor famoso.",
 }
 E.FALAS.velha.casulo = {
     "Me escondi. Não por medo: por princípio.",
@@ -107,7 +107,7 @@ E.FALAS_LIVRO = {
     jovem = {
         "“%s” faz barulho quando eu mordo. Isso é bom?",
         "Guardei um pedacinho de “%s” para mais tarde.",
-        "Será que o fim de “%s” é feliz? <otimista:Aposto que sim.|amarga:Duvido.|Fico nervosa só de pensar.>",
+        "Será que o fim de “%s” é feliz? <otimista:Aposto que sim.|amarga:Duvido.|Dá um nervoso só de pensar.>",
         "“%s” tem cheiro de <medrosa:porão|romantica:carta guardada|aventura>. Ou de estante velha.",
         "“%s” me deixou com sede de mais páginas.",
     },
@@ -121,7 +121,7 @@ E.FALAS_LIVRO = {
 }
 E.FALAS_PERSONAGEM = {
     jovem = {
-        "Toda vez que %s aparece, eu <romantica:suspiro|corajosa:fico mais atenta|prendo a respiração>.",
+        "Toda vez que %s aparece, eu <romantica:suspiro|corajosa:fico de orelha em pé|prendo a respiração>.",
         "Será que %s sabe que eu estou lendo?",
         "Fiz um desenho de %s na margem. Ficou feio.",
         "%s é corajoso ou só não pensa? Nunca sei.",
@@ -152,7 +152,7 @@ E.FALAS_MUDA_IMINENTE = {
 -- Contexto: dados da leitura ----------------------------------------------------------
 X.contexto.madrugada = {
     jovem = { "{hora}. Se a gente fizer silêncio, os fantasmas do livro não acordam.",
-              "Lendo às {hora}? Vou ficar acordada com você.<medrosa: De mãos dadas, se puder.|>", "{hora}. As letras estão com sono, mas eu <diurna:também. Bocejo…|não>." },
+              "Lendo às {hora}? Vou ficar de olhos abertos com você.<medrosa: De mãos dadas, se puder.|>", "{hora}. As letras estão com sono, mas eu <diurna:também. Bocejo…|não>." },
     velha = { "{hora}. O horário oficial dos leitores incorrigíveis.", "São {hora}. <noturna:A melhor hora do mundo.|A insônia e o livro se merecem.>",
               "{hora}. Até os vilões estão dormindo. <medrosa:Tomara.|Você não.>" },
 }
@@ -165,7 +165,7 @@ X.contexto.recorde = {
 X.contexto.maratona = {
     jovem = { "{n} páginas! <corajosa:Bora mais cinquenta?|Posso tirar um cochilo dentro do livro?>", "Já foram {n} páginas. Estou rolando pela estante.",
               "{n} páginas… minha barriga está do tamanho de um dicionário." },
-    velha = { "{n} páginas. <erudita:Até Tolstói pediria uma pausa.|A literatura agradece. A coluna, não.>", "{n} páginas hoje. Até eu estou cansada, e eu só como.",
+    velha = { "{n} páginas. <erudita:Até Tolstói pediria uma pausa.|A literatura agradece. A coluna, não.>", "{n} páginas hoje. Até eu tô sem fôlego, e eu só como.",
               "{n} páginas. Lembre-se de que existe vida fora do livro. Dizem." },
 }
 X.contexto.sumiu = {
@@ -183,11 +183,11 @@ X.contexto.tarde = {
 X.contexto.cedo = {
     jovem = { "{hora}! O sol mal acordou e você já está lendo. <diurna:Meu horário!|>", "Bom dia! Às {hora} as páginas têm cheiro de orvalho.",
               "{hora}. Café pra você, papel pra mim." },
-    velha = { "{hora}. Leitura antes do mundo começar a falar besteira.", "São {hora}. <noturna:Hora estranha pra estar acordada.|A melhor hora do dia: ninguém atrapalha.>",
+    velha = { "{hora}. Leitura antes do mundo começar a falar besteira.", "São {hora}. <noturna:Hora estranha pra estar de olhos abertos.|A melhor hora do dia: ninguém atrapalha.>",
               "{hora}. Ler cedo é um luxo que poucos se permitem." },
 }
 X.contexto.sessao = {
-    jovem = { "{n} páginas sem levantar! Seus pés estão bem?", "Já são {n} páginas seguidas. Estou tonta de tanto comer.",
+    jovem = { "{n} páginas sem levantar! Seus pés estão bem?", "Já são {n} páginas seguidas. Tô com a cabeça rodando de tanto comer.",
               "{n} páginas de uma vez. Esse livro grudou em você." },
     velha = { "{n} páginas sem pausa. O livro deve estar bom. Ou você está fugindo.", "{n} páginas seguidas. Respeito. Mas pisque.",
               "Uma sessão de {n} páginas. Os antigos copistas aprovariam." },
@@ -211,7 +211,7 @@ X.contexto.nada_hoje = {
               "Um dia inteiro sem ler. Que desperdício de luz." },
 }
 X.contexto.reta_final = {
-    jovem = { "{pct} de “{livro}”! Quase lá. Estou nervosa.", "Falta pouco de “{livro}”. Vou comer devagar.",
+    jovem = { "{pct} de “{livro}”! Quase lá. Que nervoso.", "Falta pouco de “{livro}”. Vou comer devagar.",
               "Reta final de “{livro}”. Prometo não chorar. Talvez." },
     velha = { "{pct} de “{livro}”. Agora não dá mais para o autor fugir.", "Reta final de “{livro}”. Prepare o coração. E o cigarro.",
               "Quase no fim de “{livro}”. Os finais revelam quem o autor é." },
@@ -225,7 +225,7 @@ X.contexto.metade = {
 X.contexto.comeco = {
     jovem = { "Começando “{livro}”! Ainda não sei de quem gostar.", "Primeiras páginas de “{livro}”. Estou de olho em todo mundo.",
               "“{livro}” começou. Já gosto do cheiro." },
-    velha = { "O começo de “{livro}”. Todo livro jura que vai ser diferente.", "Primeiras páginas de “{livro}”. Ainda estou sendo educada.",
+    velha = { "O começo de “{livro}”. Todo livro jura que vai ser diferente.", "Primeiras páginas de “{livro}”. Ainda estou me comportando.",
               "“{livro}” começou. Vamos ver quanto tempo dura a minha paciência." },
 }
 X.contexto.fim_de_semana = {
@@ -240,7 +240,7 @@ M.FALAS_EVENTO = {
     casamento = { "Casaram. Vou marcar no calendário quantos capítulos dura.", "Sinos, véu, promessas. Já vi esse filme." },
     viagem = { "Alguém foi embora. O livro ficou maior." },
     carta = { "Uma carta. Alguém vai chorar ou mentir.", "Cartas nos livros nunca chegam na hora certa." },
-    tempestade = { "Choveu no capítulo inteiro. Fiquei úmida de suspense.", "Raio, vento, drama. O céu do autor estava nervoso." },
+    tempestade = { "Choveu no capítulo inteiro. O suspense molhou até as minhas páginas.", "Raio, vento, drama. O céu do autor estava nervoso." },
     doenca = { "Doença no capítulo. Os livros adoram uma febre.", "Alguém de cama. Vou ler mais devagar, por respeito." },
     festa = { "Festa no capítulo. Alguém vai sair dela arrependido.", "Música e taças. Desconfio de tanta alegria." },
     briga = { "Brigaram feio. Pelo menos agora sabemos o que pensam.", "Discussão no capítulo. Eu tomaria um lado. O meu." },
@@ -337,7 +337,7 @@ C.geral = {
 }
 M.FALAS_CITACAO = {
     jovem = { "Guardei o que {nome} falou: “{fala}”.",
-              "“{fala}”. Foi {nome} quem disse. Fiquei impressionada." },
+              "“{fala}”. Foi {nome} quem disse. Fiquei de queixo caído." },
     velha = { "“{fala}”, disse {nome}. Eu teria editado.", "{nome} soltou um “{fala}”. Anotado, com desconfiança.",
               "Ainda estou digerindo “{fala}”, de {nome}." },
 }

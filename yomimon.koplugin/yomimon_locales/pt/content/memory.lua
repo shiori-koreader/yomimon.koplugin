@@ -50,7 +50,7 @@ T.FALAS_TEMA = {
                 "O silêncio entre duas páginas é o lugar mais solitário que existe." },
     arte = { "Poesia. Comi um verso e fiquei com a boca rimada.", 
              "Um quadro descrito em palavras. Arte dentro de arte. Indigesto." },
-    animais = { "Muito bicho nesse livro. Me sinto representada.", 
+    animais = { "Muito bicho nesse livro. Me sinto em casa.", 
                 "Os animais dos livros sempre são mais sensatos que as pessoas." },
     noite = { "Lua, vela, escuridão. O autor escreveu de madrugada, aposto.",
               "Nada bom acontece depois da meia-noite nos livros. Adoro." },

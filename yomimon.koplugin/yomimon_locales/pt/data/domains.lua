@@ -214,14 +214,14 @@ D._causa = {
         fuga = "aquela fuga", crime = "aquele crime",
     },
     jovem = {
-        "Acordei tristinha. Deve ser {evento} de “{livro}”.",
-        "Tô murcha hoje. Acho que foi {evento} de “{livro}”.",
+        "Acordei com a tristeza no ar. Deve ser {evento} de “{livro}”.",
+        "Tô sem pique hoje. Acho que foi {evento} de “{livro}”.",
         "Não sei por que tô assim. Ou sei: {evento} de “{livro}”.",
         "Não sai da minha cabeça: {evento} de “{livro}”.",
     },
     velha = {
         "Mau humor. Deve ser {evento} de “{livro}”. Nunca me recuperei.",
-        "Acordei azeda. Ainda é {evento} de “{livro}”, garanto.",
+        "Acordei com um azedume. Ainda é {evento} de “{livro}”, garanto.",
         "Se estou insuportável, foi {evento} de “{livro}”.",
         "Não me pergunte nada hoje. É {evento} de “{livro}” ainda.",
     },

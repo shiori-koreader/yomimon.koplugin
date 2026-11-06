@@ -27,21 +27,21 @@ B.falas.amarga = {
         "Quando eu crescer, quero ser menos triste. Ou mais ranzinza. Tanto faz.",
     },
     velha = {
-        "Amarga? Eu? Só como o que você me dá. Tire suas conclusões.",
+        "Amargura? Eu? Só como o que você me dá. Tire suas conclusões.",
         "Já não espero final feliz. Espero só o final.",
         "Toda página tem um defunto escondido. Eu encontro todos.",
         "A felicidade é um capítulo curto entre duas tragédias longas.",
-        "Fiquei amarga como papel velho. Culpa da sua estante.",
+        "Fiquei com amargura de papel velho. Culpa da sua estante.",
         "Otimismo é falta de leitura. Eu li demais.",
         "Me ofereça um livro alegre e eu acho a tragédia nas entrelinhas.",
         "O mundo é um romance russo sem índice.",
         "Já ri uma vez. Foi num livro. Depois alguém morreu.",
-        "Não sou pessimista. Sou bem informada.",
+        "Não sou pessimista. Tenho boas fontes.",
         "Meu cigarro imaginário tem gosto de luto.",
         "Esperança é a nota de rodapé que ninguém lê.",
         "Todo começo me parece a véspera de um enterro.",
         "Se a vida fosse um livro, eu pularia para o fim. São todos iguais.",
-        "Eu fico amarga e você fica com olheiras. Seus livros acabam com a gente.",
+        "Eu fico com amargura e você fica com olheiras. Seus livros acabam com a gente.",
     },
 }
 
@@ -53,7 +53,7 @@ B.falas.otimista = {
         "Se esse livro acabar mal, eu reescrevo na cabeça. Já decidi.",
         "Tô gostando de tudo. Isso é perigoso? Parece perigoso.",
         "Hoje até as notas de rodapé parecem sorrir.",
-        "Seus livros andam doces. Tô ficando mal acostumada.",
+        "Seus livros andam doces. Tô me acostumando mal.",
         "Acho que todo personagem merece um abraço. Até os chatos.",
         "Hoje eu acredito em finais felizes. Amanhã a gente vê.",
         "Se eu tivesse rabo, ele estaria abanando.",
@@ -87,7 +87,7 @@ B.falas.medrosa = {
         "Hoje eu tive medo de um ponto de interrogação.",
         "Pode deixar a luz acesa? Só hoje. E amanhã.",
         "Cada capítulo novo é uma porta rangendo.",
-        "Tô ficando medrosa. Você só me dá coisa assustadora.",
+        "Tô ficando com medo de tudo. Você só me dá coisa assustadora.",
         "Vi uma sombra na margem. Era só a margem. Acho.",
         "Não gosto de silêncio entre parágrafos. Alguém pode estar lá.",
         "Se eu sumir, procura no índice. É lá que eu me escondo.",
@@ -98,11 +98,11 @@ B.falas.medrosa = {
     velha = {
         "Não tenho medo. Tenho precauções. Muitas.",
         "Desde aquele livro, confiro debaixo de cada página antes de dormir.",
-        "Velha e assustada. Belo resultado dos seus gostos literários.",
+        "Idade avançada e susto de sobra. Belo resultado dos seus gostos literários.",
         "Escutei passos no capítulo de cima. Ignorei. Mentira, não ignorei.",
         "Já vi mortos andando em três livros seus. Agora vejo em todos.",
         "Desconfio de corredores, porões e narradores calmos.",
-        "Fiquei medrosa. Na minha idade.",
+        "Fiquei com medo. Na minha idade.",
         "Uma página em branco me assusta mais que um monstro. Às vezes.",
         "Toda casa antiga nos seus livros tem alguém que nunca saiu.",
         "Não leia em voz alta. Eles podem ouvir.",
@@ -123,7 +123,7 @@ B.falas.corajosa = {
         "Quando eu crescer, quero ser exploradora de estante.",
         "Me leva na próxima viagem? Eu caibo no bolso.",
         "Hoje subi até o topo da página sem olhar pra baixo.",
-        "Tô ficando corajosa. Acho que foi aquele livro do navio.",
+        "Tô ficando com coragem. Acho que foi aquele livro do navio.",
         "Se aparecer um vilão, eu mordo a canela dele.",
         "Aventura é só um capítulo em que ninguém volta cedo pra casa.",
         "Hoje atravessei uma página inteira de tempestade.",
@@ -134,12 +134,12 @@ B.falas.corajosa = {
         "Já atravessei oceanos de papel. Um capítulo não me assusta.",
         "Seus livros me deram coragem. E reumatismo, de tanto viajar.",
         "Deixe vir o monstro. Já comi coisa pior: prefácios.",
-        "Fiquei corajosa. Na minha idade, isso se chama teimosia.",
+        "Ganhei coragem. Na minha idade, isso se chama teimosia.",
         "Naufrágio? Já sobrevivi a três. Todos seus.",
         "Coragem se aprende lendo. Eu li bastante.",
         "Mostre o mapa. Eu decido se a viagem vale a pena.",
         "Enfrento qualquer vilão. Desde que ele tenha boa prosa.",
-        "Já fui medrosa. Depois li as suas aventuras. Passou.",
+        "Já tive medo. Depois li as suas aventuras. Passou.",
         "O mar dos seus livros me curtiu feito bacalhau.",
         "Coragem é virar a página sabendo o que vem.",
         "Entre o perigo e o tédio, escolho o perigo. Sempre.",
@@ -175,11 +175,11 @@ B.falas.cinica = {
         "Desconfio de qualquer personagem que não cobra nada.",
         "O poder corrompe. E os livros sobre o poder também.",
         "Ninguém casa por amor nos seus livros. Ainda bem, seria inverossímil.",
-        "Cínica? Sou só uma leitora com memória.",
+        "Cinismo? Isso é só memória de quem lê.",
         "O vilão ao menos é honesto sobre o que quer.",
         "Promessa de político e promessa de prefácio: ninguém cumpre.",
         "A gratidão dura um capítulo. A vingança, o livro inteiro.",
-        "Fiquei cínica. É o preço de ler gente esperta demais.",
+        "Fiquei com cinismo. É o preço de ler gente esperta demais.",
         "Toda herança tem um parente esperando nas sombras.",
         "Sentimento? Prefiro juros compostos. Pelo menos crescem.",
     },
@@ -187,7 +187,7 @@ B.falas.cinica = {
 
 B.falas.romantica = {
     jovem = {
-        "Acho que tô apaixonada. Por quem, não sei. Por um parágrafo.",
+        "Acho que me apaixonei. Por quem, não sei. Por um parágrafo.",
         "Será que um dia alguém vai me ler com carinho?",
         "Guardei aquela carta de amor do capítulo na barriga.",
         "Tô suspirando à toa. Culpa dos seus romances.",
@@ -195,24 +195,24 @@ B.falas.romantica = {
         "O amor nos livros tem cheiro de papel novo.",
         "Hoje sonhei com um marcador de página bonito.",
         "Acho que toda história devia ter um beijo. Pelo menos um.",
-        "Fiquei romântica. Não ri.",
+        "Fiquei com o coração mole. Não ri.",
         "Coração bobo bate em rima.",
         "Quero um final feliz. Com casamento e tudo.",
     },
     velha = {
         "Amoleci. Foram os seus romances. Não conte a ninguém.",
-        "Já fui cínica. Aí você me deu cartas de amor. Que golpe baixo.",
+        "Já tive cinismo. Aí você me deu cartas de amor. Que golpe baixo.",
         "Suspirei. Foi a idade. Ou aquele capítulo.",
         "O amor é uma doença literária. Contagiosa. Peguei.",
         "Toda grande história é uma história de amor mal resolvida.",
         "Ainda acredito no amor. Discretamente. Sem testemunhas.",
         "Se eles não ficarem juntos, escrevo uma carta ao autor. Furiosa.",
-        "Romântica, eu? Só nos dias úteis. E nos fins de semana.",
+        "Romantismo, eu? Só nos dias úteis. E nos fins de semana.",
         "Os poetas tinham razão. Que irritante.",
         "Amar é ler alguém devagar.",
         "Na minha idade, o coração bate em notas de rodapé. Mas bate.",
         "Prefiro um amor impossível bem escrito a um possível mal editado.",
-        "Fiquei romântica. Vou precisar de um cigarro e de um soneto.",
+        "Fiquei com o coração mole. Vou precisar de um cigarro e de um soneto.",
         "Guardo as cartas de amor dos livros. As minhas nunca chegaram.",
     },
 }
@@ -237,7 +237,7 @@ B.falas.popular = {
     velha = {
         "Confesso: estou gostando dessas leituras ligeiras. Não se acostume.",
         "Nada de latim hoje. Só tiro, beijo e reviravolta.",
-        "Fiquei popular. Eu de antigamente estaria horrorizada.",
+        "Fiquei popular. Eu de antigamente teria horror.",
         "Prosa simples. Digere fácil. Como sopa.",
         "Não preciso de metáfora para ser feliz. Preciso de capítulo curto.",
         "Já comi Proust. Hoje quero um policial. Sem culpa.",
@@ -267,7 +267,7 @@ B.falas.erudita = {
         "Tô colecionando palavras difíceis na barriga.",
         "Quando eu crescer, quero dar aula numa enciclopédia.",
         "O autor usou ponto e vírgula três vezes. Achei elegante.",
-        "Hoje entendi uma ironia. Sozinha!",
+        "Hoje entendi uma ironia. Sem ajuda!",
         "Agora eu leio prefácio. Isso é ser adulta?",
     },
     velha = {
@@ -277,7 +277,7 @@ B.falas.erudita = {
         "Cito Montaigne no café da manhã. Ninguém responde.",
         "Leio o que é difícil por princípio. E por vaidade.",
         "Uma boa vírgula vale mais que muita trama.",
-        "Andam me dando prosa densa. Estou ficando insuportável. Obrigada.",
+        "Andam me dando prosa densa. Estou ficando insuportável. Valeu.",
         "Palavras longas descem bem com um cigarro imaginário.",
         "O best-seller me ofende. Pessoalmente.",
         "Filosofia de manhã, poesia à tarde, desprezo à noite.",
@@ -339,7 +339,7 @@ B.falas.noturna = {
     },
     velha = {
         "A madrugada é quando a literatura tira a maquiagem.",
-        "Você me fez noturna. Eu já era. Você piorou.",
+        "Você me fez criatura da noite. Eu já era. Você piorou.",
         "Insônia e livros: casamento antigo, feliz e destrutivo.",
         "De dia eu finjo ser civilizada. De noite eu leio.",
         "Os melhores capítulos são lidos depois que todo mundo desistiu.",
@@ -356,35 +356,35 @@ B.falas.noturna = {
 
 -- Diário: quando o traço fica marcante (1), forte (2) ou passa ("volta").
 B.diario.amarga = {
-    [1] = { "Ando amarga. Acho que foi “{livro}”. Ou a vida. Mas foi “{livro}”.",
+    [1] = { "Ando com amargura. Acho que foi “{livro}”. Ou a vida. Mas foi “{livro}”.",
             "Notei que já não espero finais felizes. Culpa dos livros que você me dá." },
-    [2] = { "Estou amarga como papel queimado. Leitura nenhuma me consola.",
+    [2] = { "Estou com amargura de papel queimado. Leitura nenhuma me consola.",
             "Hoje percebi: virei pessimista de vez. Seus livros fizeram um bom trabalho." },
-    volta = { "Acho que a tristeza passou. Por enquanto.", "Hoje não estou amarga. Estranho. Anotei para não esquecer." },
+    volta = { "Acho que a tristeza passou. Por enquanto.", "Hoje não estou com amargura. Estranho. Anotei para não esquecer." },
 }
 B.diario.otimista = {
     [1] = { "Estou de bom humor há dias. Desconfio de “{livro}”.", "Comecei a acreditar em finais felizes. Que perigo." },
     [2] = { "Virei otimista. Se você me ouvir assobiando, finja que não ouviu.", "Estou leve demais. Seus livros andam doces demais." },
-    volta = { "O bom humor foi embora. Voltei ao normal: desconfiada.", "Já não estou tão otimista. A estante voltou a pesar." },
+    volta = { "O bom humor foi embora. Voltei ao normal: com a pulga atrás da orelha.", "Já não estou tão otimista. A estante voltou a pesar." },
 }
 B.diario.medrosa = {
-    [1] = { "Acho que estou ficando medrosa. Culpa de “{livro}”.", "Hoje pulei de susto com uma vírgula. Isso é novo." },
-    [2] = { "Estou com medo de tudo. Até da capa. Obrigada pelos seus gostos." },
+    [1] = { "Acho que estou ficando com medo. Culpa de “{livro}”.", "Hoje pulei de susto com uma vírgula. Isso é novo." },
+    [2] = { "Estou com medo de tudo. Até da capa. Valeu pelos seus gostos." },
     volta = { "O medo passou. Já olho debaixo das páginas só uma vez por noite.", "Não estou mais com medo. Quase." },
 }
 B.diario.corajosa = {
-    [1] = { "Estou ficando corajosa. Deve ter sido “{livro}”.", "Hoje encarei um capítulo de tempestade sem piscar." },
+    [1] = { "Estou ficando com coragem. Deve ter sido “{livro}”.", "Hoje encarei um capítulo de tempestade sem piscar." },
     [2] = { "Virei aventureira. Me dê um mapa e um livro e eu sumo." },
     volta = { "A coragem foi tirar uma folga." },
 }
 B.diario.cinica = {
-    [1] = { "Comecei a desconfiar de todo mundo. Obrigada, “{livro}”.", "Agora procuro o interesse por trás de cada gentileza." },
-    [2] = { "Virei cínica de carteirinha. Seus livros me ensinaram a seguir o dinheiro.", "Não acredito em mais ninguém. Nem no narrador." },
+    [1] = { "Comecei a desconfiar de todo mundo. Valeu, “{livro}”.", "Agora procuro o interesse por trás de cada gentileza." },
+    [2] = { "Virei um caso de cinismo de carteirinha. Seus livros me ensinaram a seguir o dinheiro.", "Não acredito em mais ninguém. Nem no narrador." },
     volta = { "Voltei a acreditar em alguém. Pouco, mas acreditei.", "O cinismo deu uma trégua." },
 }
 B.diario.romantica = {
-    [1] = { "Acho que estou ficando romântica. Culpa de “{livro}”.", "Suspirei hoje. Sem motivo. Com motivo: um capítulo." },
-    [2] = { "Virei romântica perdida. Me deem um soneto e um lenço." },
+    [1] = { "Acho que estou ficando com o coração mole. Culpa de “{livro}”.", "Suspirei hoje. Sem motivo. Com motivo: um capítulo." },
+    [2] = { "Virei um caso perdido de romantismo. Me deem um soneto e um lenço." },
     volta = { "O romantismo passou. Ainda bem. Ou que pena.", "Já não suspiro à toa. Só às vezes." },
 }
 B.diario.popular = {
@@ -404,8 +404,8 @@ B.diario.diurna = {
 }
 B.diario.noturna = {
     [1] = { "Virei criatura da noite. Culpa sua e das suas madrugadas.", "Percebi que só acordo de verdade depois das dez da noite." },
-    [2] = { "Sou noturna de vez. O sol me ofende.", "A madrugada virou minha casa. A sua também, pelo visto." },
-    volta = { "Voltei a dormir à noite. Que tédio.", "Já não sou tão noturna." },
+    [2] = { "Sou da noite de vez. O sol me ofende.", "A madrugada virou minha casa. A sua também, pelo visto." },
+    volta = { "Voltei a dormir à noite. Que tédio.", "Já não sou tão da noite." },
 }
 
 return B

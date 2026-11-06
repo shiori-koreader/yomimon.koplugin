@@ -3,7 +3,7 @@ local F = {}
 
 F.ninfa = {
     abertura = {
-        "", "", "<medrosa:Ai, que susto.|corajosa:Pronta!|romantica:Suspiro…|>", "Ei…", "Psiu.", "Olha!", "Sabia que…", "Hum…", "Ai.", "Ei, você.",
+        "", "", "<medrosa:Ai, que susto.|corajosa:Bora!|romantica:Suspiro…|>", "Ei…", "Psiu.", "Olha!", "Sabia que…", "Hum…", "Ai.", "Ei, você.",
         "Posso perguntar uma coisa?", "Não ri, tá?", "Acho que…",
     },
     nucleo = {
@@ -15,10 +15,10 @@ F.ninfa = {
         "Será que o autor sabe que eu existo?",
         "Quando eu crescer, quero morar <erudita:numa enciclopédia em latim|popular:numa revistinha|corajosa:num atlas|numa enciclopédia>.",
         "O cheiro de livro velho me dá <noturna:insônia|sono> e fome ao mesmo tempo.",
-        "Se eu ficar bem quietinha, as palavras não fogem.",
-        "Achei um ponto final e <amarga:fiquei aliviada: menos um capítulo pra sofrer|otimista:já quero o próximo|fiquei com medo de acabar>.",
+        "Se eu não fizer barulho nenhum, as palavras não fogem.",
+        "Achei um ponto final e <amarga:senti alívio: menos um capítulo pra sofrer|otimista:já quero o próximo|fiquei com medo de acabar>.",
         "As margens são o meu quintal.",
-        "Hoje li uma palavra inteira sozinha!",
+        "Hoje li uma palavra inteira sem ajuda!",
         "Será que as histórias continuam quando você fecha o livro? <medrosa:Tomara que não.|romantica:Tomara que sim.|>",
         "“{livro}” é tão grande… será que eu caibo nele?",
         "Tem alguém chamado {personagem} lá dentro. Ele é bonzinho?",
@@ -46,7 +46,7 @@ F.jovem = {
     },
     nucleo = {
         "Comecei a desconfiar dos narradores. Todos sorriem demais.",
-        "Li o suficiente pra ficar nervosa, não o suficiente pra entender.",
+        "Li o suficiente pra me dar um nervoso, não o suficiente pra entender.",
         "Cada capítulo novo é uma porta que <corajosa:eu abro com o pé|medrosa:eu abro de olhos fechados|talvez não devesse abrir>.",
         "Às vezes acho que as palavras me leem de volta.",
         "Tentei ser irônica hoje. Ninguém percebeu. Nem eu.",
@@ -133,7 +133,7 @@ F.ancia = {
         "Já fui otimista. Durou um capítulo e um parágrafo.",
         "Tudo o que é belo termina em nota de rodapé.",
         "Cultura é o que sobra quando se esquece o que leu. Eu lembro de tudo. Que azar.",
-        "Carrego o peso de todas as bibliotecas que comi<corajosa:, e ainda subo a estante sozinha|>.",
+        "Carrego o peso de todas as bibliotecas que comi<corajosa:, e ainda subo a estante sem ajuda|>.",
         "“{livro}”? Já comi melhores. Já comi piores. Continuo com fome e razão.",
         "{personagem} não aprendeu nada. Como quase todo mundo.",
         "{personagem} vai se arrepender. <otimista:Ou não. Às vezes dá certo.|Sempre se arrependem.>",
@@ -178,7 +178,7 @@ F.sonho = {
             "…a estante desabou… e era de <medrosa:ossos…|chocolate…>",
             "…eu aprendi a ler de trás pra frente… arof arap…",
             "…cheiro de {cheiro}… de novo…",
-            "…eu estava {lugar}… sozinha…",
+            "…eu estava {lugar}… sem ninguém…",
             "…{coisa}… tão grande…",
             "…“{marcante}”… “{marcante}”… não sai da minha cabeça…",
         },

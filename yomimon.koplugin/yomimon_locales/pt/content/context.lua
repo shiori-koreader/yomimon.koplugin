@@ -50,13 +50,13 @@ return {
     tarde = {
         jovem = {
             "Já são {hora}. Só mais um capítulo, né? Eu sei como isso termina.",
-            "<noturna:{hora}… tô bem acordadinha. Continua.|{hora}… meus olhinhos tão pesando, mas continua.>",
+            "<noturna:{hora}… tô de olhos bem abertos. Continua.|{hora}… meus olhinhos tão pesando, mas continua.>",
             "Ler às {hora} é tipo contar segredo. Baixinho.",
         },
         velha = {
             "{hora}. A hora em que todo leitor jura que dorme depois deste capítulo.",
             "São {hora}. O livro não vai fugir. Você vai, de sono.",
-            "{hora}. Ainda acordada <noturna:por gosto. A noite é minha|por sua causa. Não que eu me importe>.",
+            "{hora}. Ainda de olhos abertos <noturna:por gosto. A noite é minha|por sua causa. Não que eu me importe>.",
         },
     },
     cedo = {
@@ -84,7 +84,7 @@ return {
     },
     sequencia = {
         jovem = {
-            "{n} dias seguidos lendo! Tô ficando mal acostumada.",
+            "{n} dias seguidos lendo! Tô me acostumando mal.",
             "Dia {n} seguido de comida. Acho que você gosta de mim.<dominio: Hoje teve {gosto}.|>",
             "{n} dias sem falhar. <romantica:Isso já é namoro.|otimista:Vai virar cem.|Não para agora, tá?>",
         },
@@ -96,7 +96,7 @@ return {
     },
     bom_dia = {
         jovem = {
-            "{n} páginas hoje. Tô ficando cheinha.",
+            "{n} páginas hoje. Tô ficando com a barriga cheinha.",
             "{n} páginas hoje. <amarga:Pelo menos isso.|Tá sendo um bom dia, né?>",
         },
         velha = {
@@ -142,7 +142,7 @@ return {
     comeco = {
         jovem = {
             "Começando “{livro}”… cheira a {cheiro|papel novo}. Ou a problema.",
-            "Primeiras páginas de “{livro}”. <corajosa:Já tô animada.|Já tô nervosa.>",
+            "Primeiras páginas de “{livro}”. <corajosa:Já tô com energia.|Já tô com frio na barriga.>",
         },
         velha = {
             "Começo de “{livro}”. Toda capa promete. Vamos ver o que cumpre.",

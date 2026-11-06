@@ -1164,7 +1164,7 @@ function YomimonScreen:menuDev(fechar_anterior)
                 { text = s.hibernando and T"Leave the ball" or T"Back to the ball", callback = acao(function() s.hibernando = not s.hibernando end) },
             },
             {
-                { text = T"What she noticed", callback = function()
+                { text = T"What it noticed", callback = function()
                     UIManager:close(dialogo)
                     self:entrar("percepcao")
                 end },

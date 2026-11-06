@@ -13,7 +13,7 @@ T.FALAS = {
         feliz = {
             "Comi uma página inteira e nada de ruim aconteceu. <medrosa:Ainda. Tô de olho.|otimista:E nem vai acontecer.|Ainda.>",
             "Tá… isso foi gostoso. Vai dar errado depois?",
-            "Hoje eu entendi uma metáfora. Sozinha. Acho.",
+            "Hoje eu entendi uma metáfora. Sem ajuda. Acho.",
             "{exclamacao|} Comi um parágrafo inteiro sem engasgar. Estou crescendo.",
             "Esse livro é bom ou eu que estou com fome?",
             "Se eu soubesse ler tão rápido quanto como…",
@@ -24,7 +24,7 @@ T.FALAS = {
         },
         normal = {
             "Será que esse livro acaba bem? Livros nunca acabam bem.",
-            "Tô aqui. <corajosa:Firme e pronta.|medrosa:Tremendo, mas tô.|Meio nervosa, mas tô.>",
+            "Tô aqui. <corajosa:Firme e a postos.|medrosa:Tremendo, mas tô.|Com um friozinho, mas tô.>",
             "Se você parar de ler, eu… tudo bem. Acho.",
             "Ouvi dizer que os livros grossos têm mais recheio.<dominio: Esse tem recheio de {gosto}.|>",
             "Quando eu crescer, quero ler o dicionário. Inteiro.",
@@ -33,7 +33,7 @@ T.FALAS = {
             "Por que os livros têm cheiro de {cheiro|chuva velha}?",
             "<corajosa:Antes eu tinha medo do fim dos livros. Agora corro até ele.|amarga:Tenho medo do fim dos livros. Com razão.|Tenho medo do fim dos livros. E do começo. E do meio.>",
             "Se eu morder o nome do autor, ele sente?",
-            "<corajosa:Hoje sou corajosa. Amanhã também.|Hoje decidi ser corajosa. Amanhã a gente vê.>",
+            "<corajosa:Hoje tenho coragem. Amanhã também.|Hoje decidi ter coragem. Amanhã a gente vê.>",
             "Às vezes leio a mesma linha três vezes. Para ter certeza que ela existe.",
         },
         triste = {
@@ -47,7 +47,7 @@ T.FALAS = {
             "Até o índice parece um banquete agora.",
         },
         dormindo = {
-            "Zzz… sonhando que a estante desabou… <corajosa:e eu segurei sozinha…|>",
+            "Zzz… sonhando que a estante desabou… <corajosa:e eu segurei sem ajuda…|>",
             "Zzz… não apaga a luz… <medrosa:deixa acesa…|quer dizer, apaga…>",
             "Zzz… um bibliotecário… com spray… não…",
             "Zzz… mais uma página… só mais uma… <noturna:a noite é nossa…|>",
@@ -61,17 +61,17 @@ T.FALAS = {
             "Zzz… sonhando com uma biblioteca sem fim… <medrosa:e sem saída…|corajosa:e eu explorando tudo…|>",
             "Zzz… a capa é tão quentinha… <romantica:parece um abraço…|>",
         },
-        palavra = "Comi a palavra “%s”. <otimista:Tinha gosto de domingo.|medrosa:Acho que estava assombrada.|erudita:Vou guardar pra um soneto.|Acho que me fez mal.>",
+        palavra = "Comi a palavra “%s”. <otimista:Tinha gosto de domingo.|medrosa:Acho que tinha assombração.|erudita:Vou guardar pra um soneto.|Acho que me fez mal.>",
     },
     velha = {
         feliz = {
             "Hm. Até que não era um livro ruim.",
-            "Comi. Satisfeita. Não se acostume.",
+            "Comi. Barriga satisfeita. Não se acostume.",
             "{exclamacao|} Uma página decente. Raro, hoje em dia.",
             "Esse parágrafo merecia um cigarro depois.",
             "Bom livro. Vou sentir falta de odiá-lo.",
             "Hoje a literatura me poupou. Amanhã veremos.",
-            "Satisfeita. <otimista:É assim que começam as comédias.|É assim que começam as tragédias.>",
+            "Barriga satisfeita. <otimista:É assim que começam as comédias.|É assim que começam as tragédias.>",
             "Que prosa. <otimista:Me faz acreditar na humanidade. Sem quase.|Quase me faz acreditar na humanidade. Quase.>",
             "Um livro decente. Vou anotar a data, para lembrar quando o mundo valia a pena.",
             "Esse autor sabia o que fazia. Odeio quando acontece.",
@@ -106,7 +106,7 @@ T.FALAS = {
             "Estante vazia, alma vazia. Barriga também.",
             "Fome e lucidez. <otimista:Pelo menos a lucidez.|A pior combinação.>",
             "Ninguém lê. Ninguém me alimenta. A civilização acabou.",
-            "Estou tão faminta que consideraria <erudita:um manual de instruções. Em alemão|popular:uma revista de fofoca. Com prazer|um manual de instruções>.",
+            "Estou com tanta fome que consideraria <erudita:um manual de instruções. Em alemão|popular:uma revista de fofoca. Com prazer|um manual de instruções>.",
         },
         dormindo = {
             "Zzz… resmungando sobre <dominio:{coisa}|o estado da literatura>…",
@@ -140,14 +140,14 @@ T.FALAS_LIVRO = {
 }
 
 T.FALAS_PERSONAGEM = {
-    jovem = { "Gosto de %s. <romantica:Gosto muito.|cinica:Por enquanto.|Isso é perigoso?>", "%s apareceu de novo. Fiquei nervosa." },
+    jovem = { "Gosto de %s. <romantica:Gosto muito.|cinica:Por enquanto.|Isso é perigoso?>", "%s apareceu de novo. Me deu um nervoso." },
     velha = { "%s de novo. Esse livro não tem mais ninguém?", "Já conheço o tipo de %s. <otimista:Termina bem, por incrível que pareça.|Termina mal.>",
               "%s fala como quem nunca leu um livro." },
 }
 
 T.FALAS_MUDA_PERTO = {  -- até ~60 páginas: às vezes
     jovem = {
-        "Mais %d páginas e eu cresço. E se eu ficar feia?",
+        "Mais %d páginas e eu cresço. E se eu mudar pra pior?",
         "Daqui a %d páginas eu viro outra. Promete que me reconhece?",
     },
     velha = {

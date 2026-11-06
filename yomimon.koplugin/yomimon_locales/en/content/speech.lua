@@ -180,10 +180,10 @@ F.sonho = {
             "…{coisa}… so big…",
             "…“{marcante}”… “{marcante}”… it won't leave my head…",
         },
-        fecho = { "<dominio:(a smell of {cheiro})|>", "<medrosa:(shivered with fear)|romantica:(smiled in her sleep)|>", "…zzz", "(rolled over)", "(sighed)" },
+        fecho = { "<dominio:(a smell of {cheiro})|>", "<medrosa:(shivered with fear)|romantica:(smiled in its sleep)|>", "…zzz", "(rolled over)", "(sighed)" },
     },
     velha = {
-        abertura = { "Zzz…", "Zzz… zzz…", "(snoring)", "(grumbling in her sleep)", "Hmph… zzz…", "<dominio:(snoring {lugar})|(snoring)>" },
+        abertura = { "Zzz…", "Zzz… zzz…", "(snoring)", "(grumbling in its sleep)", "Hmph… zzz…", "<dominio:(snoring {lugar})|(snoring)>" },
         nucleo = {
             "…grumbling about the state of literature…",
             "…no bestsellers… <popular:or just one… a little one…|please…>",

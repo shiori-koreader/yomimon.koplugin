@@ -27,7 +27,7 @@ B.dia.normal = {
 B.dia.banquete = {
     "{n} páginas de “{livro}”. Banquete.",
     "Hoje teve festa: {n} páginas de “{livro}”.",
-    "{n} páginas de “{livro}” de uma vez. Estou cheia.",
+    "{n} páginas de “{livro}” de uma vez. Tô de barriga cheia.",
     "Comi {n} páginas de “{livro}”. Nem lembro de respirar.",
     "Um dia gordo: {n} páginas de “{livro}”.",
     "{n} páginas de “{livro}”. Minha barriga pediu arrego.",
@@ -57,12 +57,12 @@ B.dia.fala = {
 }
 B.dia.novo = {
     "Conheci {nome}.", "Apareceu {nome}. Ainda não sei o que acho.", "Entrou em cena {nome}.",
-    "Fui apresentada a {nome}. Sem muito entusiasmo.", "Um tal de {nome} chegou. <romantica:Gostei logo.|medrosa:Me escondi.|Vou ficar de olho.>",
+    "Me apresentaram {nome}. Sem muito entusiasmo.", "Um tal de {nome} chegou. <romantica:Gostei logo.|medrosa:Me escondi.|Vou ficar de olho.>",
     "{nome} apareceu. Vai dar trabalho.",
 }
 B.dia.novos2 = {
     "Conheci {nome} e {nome2}.", "Apareceram {nome} e {nome2}. Gente demais.",
-    "{nome} e {nome2} entraram em cena. Um dos dois vai me irritar.", "Fui apresentada a {nome} e {nome2}. Anotei os dois.",
+    "{nome} e {nome2} entraram em cena. Um dos dois vai me irritar.", "Me apresentaram {nome} e {nome2}. Anotei os dois.",
 }
 B.dia.evento = {
     morte = { "Alguém morreu.", "Teve morte. <romantica:Chorei de verdade.|medrosa:Dormi de luz acesa.|Fiquei de luto por educação.>", "Enterraram alguém. Cheiro de vela." },
@@ -71,7 +71,7 @@ B.dia.evento = {
     carta = { "Chegou uma carta.", "Teve carta. <romantica:Li duas vezes.|otimista:Era boa notícia, pra variar.|Nunca é boa notícia.>", "Alguém escreveu o que não devia." },
     tempestade = { "Choveu no livro.", "Teve tempestade." },
     doenca = { "Alguém adoeceu.", "Teve febre e médico.", "Gente de cama. Mau sinal." },
-    festa = { "Teve festa.", "Teve baile. <romantica:Dancei sozinha na margem.|Ninguém me chamou.>", "Música e vinho. Para eles." },
+    festa = { "Teve festa.", "Teve baile. <romantica:Dancei na margem, sem par.|Ninguém me chamou.>", "Música e vinho. Para eles." },
     briga = { "Teve briga.", "Alguém finalmente disse o que pensava." },
     fuga = { "Alguém fugiu.", "Teve fuga.", "Gente correndo do próprio destino." },
     crime = { "Teve crime.", "Sangue e polícia." },
@@ -148,12 +148,12 @@ B.fim.serie = {
     "{ordinal} vez que um livro seu me fala {de_tema}. Anotado.",
 }
 B.fim.traco = {
-    amarga = { "Saí mais amarga do que entrei.", "Esse livro me tirou um pouco de esperança." },
+    amarga = { "Saí com mais amargura do que entrei.", "Esse livro me tirou um pouco de esperança." },
     otimista = { "Saí mais leve do que entrei.", "Esse livro me devolveu um pouco de fé." },
-    medrosa = { "Saí mais medrosa do que entrei.", "Esse livro me ensinou a olhar debaixo das páginas." },
-    corajosa = { "Saí mais corajosa do que entrei." },
-    cinica = { "Saí mais desconfiada do que entrei.", "Esse livro me ensinou a seguir o dinheiro." },
-    romantica = { "Saí mais romântica do que entrei.", "Esse livro me amoleceu. Que vergonha." },
+    medrosa = { "Saí com mais medo do que entrei.", "Esse livro me ensinou a olhar debaixo das páginas." },
+    corajosa = { "Saí com mais coragem do que entrei." },
+    cinica = { "Saí com mais desconfiança do que entrei.", "Esse livro me ensinou a seguir o dinheiro." },
+    romantica = { "Saí com mais romantismo do que entrei.", "Esse livro me amoleceu. Que vergonha." },
     popular = { "Saí com pressa de ler. Mau sinal.", "Esse livro me acostumou mal com o ritmo." },
     erudita = { "Saí mais culta do que entrei. Insuportável.", "Esse livro me deixou citando autores." },
 }
@@ -211,7 +211,7 @@ B.lembranca.personagem = {
     "{nome} outra vez. “{livro}” não foi suficiente, pelo visto.",
 }
 B.lembranca.recorde_longo = {
-    "“{livro}”: {n} páginas. O mais longo que você já leu comigo. Estou estufada.",
+    "“{livro}”: {n} páginas. O mais longo que você já leu comigo. Tô de barriga estufada.",
     "Recorde: “{livro}” foi o livro mais comprido que a gente comeu junto.",
     "Nunca comemos nada tão grande quanto “{livro}”. Preciso deitar.",
 }
