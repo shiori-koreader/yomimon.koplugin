@@ -89,8 +89,8 @@ function BoasVindas:init()
     self.letras_com = {}
     for _, it in ipairs(self.itens) do self.letras_com[it.nome:sub(1, 1)] = true end
     self.op = {
-        iniciar = G_reader_settings:isTrue("yomimon_abrir_ao_iniciar"),
-        gesto = G_reader_settings:isTrue("yomimon_gesto"),
+        iniciar = G_reader_settings:isTrue("yomimon_open_at_startup"),
+        gesto = G_reader_settings:isTrue("yomimon_gesture"),
         cartao = self.traca:cartaoSimpleUI(),
         estante = tem_bookshelf and Kit.onHomeShelf and Kit.onHomeShelf(MODULO_BOOKSHELF) or false,
     }
@@ -309,8 +309,8 @@ end
 function BoasVindas:terminar()
     local s = self.traca.estado
     s.boasvindas = true
-    G_reader_settings:saveSetting("yomimon_abrir_ao_iniciar", self.op.iniciar or nil)
-    G_reader_settings:saveSetting("yomimon_gesto", self.op.gesto or nil)
+    G_reader_settings:saveSetting("yomimon_open_at_startup", self.op.iniciar or nil)
+    G_reader_settings:saveSetting("yomimon_gesture", self.op.gesto or nil)
     self.traca:aplicarGesto()
     if self.traca:temSimpleUI() then self.traca:cartaoSimpleUI(self.op.cartao) end
     if tem_bookshelf then pcall(Kit.setOnHomeShelf, MODULO_BOOKSHELF, self.op.estante) end

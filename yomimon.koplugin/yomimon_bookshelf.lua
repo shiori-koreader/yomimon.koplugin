@@ -46,7 +46,7 @@ local function instancia()
         if ok and traca then return traca end
     end
     local ok, Screensaver = pcall(require, "ui/screensaver")
-    return ok and Screensaver and Screensaver.yomimon_instancia or nil
+    return ok and Screensaver and Screensaver.yomimon_instance or nil
 end
 
 -- Card shape by aspect ratio (the same limits as Bookshelf).

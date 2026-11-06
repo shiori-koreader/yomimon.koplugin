@@ -49,17 +49,29 @@ local Yomimon = WidgetContainer:extend{
 -- KOReader shows the sleep screen before telling plugins it is going to sleep (Screensaver:setup and show,
 -- then the Suspend event). So that the phrase is chosen when the Kindle goes to sleep, Yomimon draws the image
 -- here, right before KOReader picks the image up from the folder. Wrapped once, even if the plugin reloads.
-if not Screensaver.yomimon_setup_original then
-    Screensaver.yomimon_setup_original = Screensaver.setup
+if not Screensaver.yomimon_original_setup then
+    Screensaver.yomimon_original_setup = Screensaver.setup
     Screensaver.setup = function(...)
-        local traca = Screensaver.yomimon_instancia
+        local traca = Screensaver.yomimon_instance
         if traca then pcall(traca.aoDormir, traca) end
-        return Screensaver.yomimon_setup_original(...)
+        return Screensaver.yomimon_original_setup(...)
+    end
+end
+
+-- Settings keys renamed in 1.0.0: carry the old values over so nobody has to set them again.
+local function migrarConfiguracoes()
+    for velho, novo in pairs({ yomimon_gesto = "yomimon_gesture", yomimon_abrir_ao_iniciar = "yomimon_open_at_startup" }) do
+        local valor = G_reader_settings:readSetting(velho)
+        if valor ~= nil then
+            if G_reader_settings:readSetting(novo) == nil then G_reader_settings:saveSetting(novo, valor) end
+            G_reader_settings:delSetting(velho)
+        end
     end
 end
 
 function Yomimon:init()
-    Screensaver.yomimon_instancia = self  -- the Yomimon open right now (library or reader)
+    migrarConfiguracoes()
+    Screensaver.yomimon_instance = self  -- the Yomimon open right now (library or reader)
     self.pasta = DataStorage:getDataDir() .. "/yomimon"
     self.imagem = self.pasta .. "/yomimon.png"
     self.db = LuaSettings:open(DataStorage:getSettingsDir() .. "/yomimon.lua")
@@ -86,6 +98,8 @@ function Yomimon:init()
     end
 end
 
+-- The action id and the event name below stay as they are: the Dispatcher saves them in the user's gesture
+-- settings, and renaming would unbind a gesture someone already set.
 function Yomimon:onDispatcherRegisterActions()
     Dispatcher:registerAction("yomimon_mostrar", {
         category = "none", event = "MostrarTraca", title = T"Yomimon: show the creature", general = true,
@@ -171,7 +185,7 @@ function Yomimon:aoIniciar()
     local s = self.estado
     if not s.boasvindas or not s.especie then
         UIManager:scheduleIn(1, function() self:mostrarBoasVindas() end)
-    elseif G_reader_settings:isTrue("yomimon_abrir_ao_iniciar") then
+    elseif G_reader_settings:isTrue("yomimon_open_at_startup") then
         UIManager:scheduleIn(1, function() self:onMostrarTraca() end)
     end
 end
@@ -180,11 +194,11 @@ end
 function Yomimon:aplicarGesto()
     if not (self.ui and self.ui.registerTouchZones) then return end
     if self.ui.unregisterTouchZones then
-        pcall(self.ui.unregisterTouchZones, self.ui, { { id = "yomimon_gesto" } })
+        pcall(self.ui.unregisterTouchZones, self.ui, { { id = "yomimon_gesture" } })
     end
-    if G_reader_settings:isTrue("yomimon_gesto") then
+    if G_reader_settings:isTrue("yomimon_gesture") then
         self.ui:registerTouchZones({{
-            id = "yomimon_gesto",
+            id = "yomimon_gesture",
             ges = "hold",
             screen_zone = { ratio_x = 0.85, ratio_y = 0, ratio_w = 0.15, ratio_h = 0.1 },
             handler = function() return self:onMostrarTraca() end,
