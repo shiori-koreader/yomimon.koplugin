@@ -7,6 +7,8 @@
 - Removed the three non-interactive squares at the bottom of the picker.
 - Sprites of every registered species are downloaded again when missing, not only the current one.
 - The Pokémon you just picked now shows up in the Pokédex right away.
+- The picker's confirmation screen shows the Pokédex description (English only: PokeAPI has no Portuguese text)
+  under the ball, downloaded on the device with the sprites.
 - Clearer menu captions, and "pages read with you" in the Pokédex.
 - The critter image has one fixed height, so the Simple UI decorations keep the same size for every species; its
   background is white in light mode and transparent in night mode.

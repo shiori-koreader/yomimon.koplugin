@@ -193,6 +193,28 @@ function BoasVindas:pintarLista(bb)
     self:texto(bb, string.format("%d/%d", self.pagina, self:totalPaginas()), 0, self.so_escolha and ny + 62 or ny + 16, false, 16, PRETO, LARG / 2)
 end
 
+--- Descrição da Pokédex num cartão, quebrada em até 4 linhas (a última termina em "..." se não couber).
+function BoasVindas:pintarDescricao(bb, texto, y)
+    local largura, linhas, atual = 510, {}, ""
+    for palavra in texto:gmatch("%S+") do
+        local candidata = atual == "" and palavra or atual .. " " .. palavra
+        if atual ~= "" and self:larguraTexto(candidata, false, 11) > largura then
+            linhas[#linhas + 1], atual = atual, palavra
+        else
+            atual = candidata
+        end
+    end
+    if atual ~= "" then linhas[#linhas + 1] = atual end
+    if #linhas > 4 then
+        linhas[4] = linhas[4]:gsub("%s*%S+$", "") .. "..."
+        for i = #linhas, 5, -1 do linhas[i] = nil end
+    end
+    self:cartao(bb, 20, y, 578, 20 + #linhas * 16, false)
+    for i, linha in ipairs(linhas) do
+        self:texto(bb, linha, 40, y + 10 + (i - 1) * 16, false, 11, PRETO)
+    end
+end
+
 function BoasVindas:pintarConfirmacao(bb)
     local it = self.escolha
     local forma = Especies.nomes[it.base]
@@ -200,7 +222,13 @@ function BoasVindas:pintarConfirmacao(bb)
     local nome = baixado and "p" .. it.base or "bola"
     local fala = baixado and string.format(T"%s! Boa escolha. Vou ficar de olho na sua leitura.", forma)
         or string.format(T"(%s ainda não chegou: o desenho é baixado com o Wi-Fi ligado)", forma)
-    self:sprite(bb, nome, fala, 430, 295)
+    local descricao = Baixar.descricao(it.base)
+    if descricao then
+        self:sprite(bb, nome, fala, 375, 230)
+        self:pintarDescricao(bb, descricao, 500)
+    else
+        self:sprite(bb, nome, fala, 430, 295)
+    end
     if not baixado then
         self:botao(bb, T"BAIXAR (WI-FI)", 590, function() self:baixarSprites() end)
     end
@@ -238,6 +266,7 @@ function BoasVindas:escolher()
     local it = self.escolha
     Estado.trocarEspecie(self.traca.estado, it.base)
     if not self:spriteBaixado(it) and NetworkMgr:isOnline() then self:baixar(it.linha) end
+    if NetworkMgr:isOnline() then pcall(Baixar.baixarDescricao, it.base) end
     pcall(function() require("yomimon_simpleui").sincronizarCritter(self.traca) end)
     if self.so_escolha then
         self.traca:salvar(true)

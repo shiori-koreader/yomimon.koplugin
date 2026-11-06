@@ -42,13 +42,15 @@ function Baixar.tem(dex)
     return Baixar.carregar(dex) ~= nil
 end
 
-local function buscar(dex)
+local URL_ESPECIE = "https://pokeapi.co/api/v2/pokemon-species/%d"
+
+local function buscar(dex, url)
     local https = require("ssl.https")
     local ltn12 = require("ltn12")
     local socketutil = require("socketutil")
     local partes = {}
     socketutil:set_timeout(10, 30)
-    local ok, status = https.request{ url = string.format(URL, dex), sink = ltn12.sink.table(partes) }
+    local ok, status = https.request{ url = string.format(url or URL, dex), sink = ltn12.sink.table(partes) }
     socketutil:reset_timeout()
     if not ok or status ~= 200 then return nil, "HTTP " .. tostring(status) end
     return table.concat(partes)
@@ -67,8 +69,48 @@ local function decodificar(dados)
     return linhas, err
 end
 
+local function caminhoDescricao(dex)
+    return string.format("%s/%d.desc.txt", Baixar.pasta(), dex)
+end
+
+--- Descrição da Pokédex em inglês (o PokeAPI não tem português), já guardada, ou nil.
+function Baixar.descricao(dex)
+    local arq = io.open(caminhoDescricao(dex), "rb")
+    if not arq then return nil end
+    local texto = arq:read("*a")
+    arq:close()
+    return texto ~= "" and texto or nil
+end
+
+-- A resposta do PokeAPI traz dezenas de textos; guarda só o inglês mais recente, numa linha só e sem acento
+-- (a fonte pixel da tela não tem o "é" de "Pokémon").
+local function extrairDescricao(dados)
+    local entradas = require("json").decode(dados).flavor_text_entries or {}
+    for i = #entradas, 1, -1 do
+        local e = entradas[i]
+        if e.language and e.language.name == "en" then
+            local t = e.flavor_text:gsub("94{", ""):gsub("é", "e"):gsub("—", "-"):gsub("[’‘]", "'"):gsub("[“”]", '"'):gsub("[%c]+", " "):gsub("%s+", " ")
+            return (t:gsub("^ ", ""):gsub(" $", ""))
+        end
+    end
+end
+
+function Baixar.baixarDescricao(dex)
+    if Baixar.descricao(dex) then return true end
+    local ok, dados = pcall(buscar, dex, URL_ESPECIE)
+    if not ok or not dados then return nil end
+    local okd, texto = pcall(extrairDescricao, dados)
+    if not okd or not texto or texto == "" then return nil end
+    lfs.mkdir(Baixar.pasta())
+    local arq = io.open(caminhoDescricao(dex), "wb")
+    if not arq then return nil end
+    arq:write(texto)
+    arq:close()
+    return true
+end
+
 --- Baixa, converte e guarda o sprite. Bloqueia até terminar (arquivos de ~1 KB). Devolve true ou nil, motivo.
-function Baixar.baixar(dex)
+local function baixarSprite(dex)
     if Baixar.tem(dex) then return true end
     local ok, dados, err = pcall(buscar, dex)
     if not ok then dados, err = nil, dados end
@@ -89,6 +131,13 @@ function Baixar.baixar(dex)
     arq:close()
     carregados[dex] = linhas
     return true
+end
+
+--- Baixa o sprite e a descrição. A descrição é um extra: não conta no resultado.
+function Baixar.baixar(dex)
+    local ok, err = baixarSprite(dex)
+    if ok then pcall(Baixar.baixarDescricao, dex) end
+    return ok, err
 end
 
 --- Baixa todas as formas de uma linha ({ dex, dex, … }). Devolve true se todas estão guardadas.
