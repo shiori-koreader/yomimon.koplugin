@@ -1,74 +1,145 @@
 --[[--
-Idioma do Yomimon: português ou inglês.
+Language support. Every language is a folder, locales/<code>/, found by scanning that folder, so adding a
+language is adding a folder (see locales/README.md). The code is the English UI text itself: Lingua.t"Back"
+returns the translation of "Back" from locales/<code>/ui.lua, or the English text when there is none.
 
-Escolha: a opção "yomimon_language" ("auto", "pt" ou "en"). Em "auto", segue o idioma do
-KOReader (pt* = português, qualquer outro = inglês). Fora do KOReader (testes), português.
+A locale folder holds:
+  locale.lua        name and formats (clock, months, ordinals, thousands separator)
+  ui.lua            { ["English text"] = "translation" }; English needs none
+  content/<m>.lua   the phrase banks of module <m> (state, context, speech, memory)
+  data/<bank>.lua   cards, diary, domains, extra, influences, traits, vector
 
-O idioma é decidido quando os módulos carregam: trocar pede reiniciar o KOReader.
+Whatever a locale does not provide falls back to English.
 
-Textos da interface: a frase em português é a chave (Lingua.t"BARRIGA"); a tradução fica
-em yomimon_en.lua. Falas e comentários: cada módulo troca suas listas pelas de
-Lingua.conteudo(nome).
+Choice: the "yomimon_language" setting ("auto" or a code). "auto" follows the KOReader language when a locale
+for it exists (pt_BR uses "pt"), English otherwise. The language is decided when the modules load, so changing
+it asks for a restart.
 ]]
 
 local Lingua = {}
 
-local codigo, ui
+local FALLBACK = "en"
+local PLUGIN_DIR = debug.getinfo(1, "S").source:match("^@(.*)/[^/]*$") or "plugins/yomimon.koplugin"
 
-local function config()
+local current, translations
+local manifests = {}
+
+local function settings()
     return rawget(_G, "G_reader_settings")
 end
 
---- "auto", "pt" ou "en", como está salvo.
-function Lingua.escolha()
-    local g = config()
+local function load(name)
+    local ok, mod = pcall(require, name)
+    return ok and type(mod) == "table" and mod or nil
+end
+
+local function manifest(code)
+    if manifests[code] == nil then
+        manifests[code] = load("locales." .. code .. ".locale") or false
+    end
+    return manifests[code] or nil
+end
+
+--- The locale codes found in locales/, sorted. Without lfs (unit tests) only English and Portuguese are known.
+function Lingua.codes()
+    local ok, lfs = pcall(require, "libs/libkoreader-lfs")
+    if not ok then return { "en", "pt" } end
+    local codes = {}
+    local listing, dir = pcall(lfs.dir, PLUGIN_DIR .. "/locales")
+    if not listing then return { FALLBACK } end
+    for entry in dir do
+        if entry:sub(1, 1) ~= "." and lfs.attributes(string.format("%s/locales/%s/locale.lua", PLUGIN_DIR, entry), "mode") == "file" then
+            codes[#codes + 1] = entry
+        end
+    end
+    table.sort(codes)
+    return codes
+end
+
+--- { code, name } of every available language, sorted by name.
+function Lingua.available()
+    local list = {}
+    for _, code in ipairs(Lingua.codes()) do
+        local m = manifest(code)
+        if m then list[#list + 1] = { code = code, name = m.name or code } end
+    end
+    table.sort(list, function(a, b) return a.name < b.name end)
+    return list
+end
+
+--- "auto" or a locale code, as saved.
+function Lingua.choice()
+    local g = settings()
     return g and g:readSetting("yomimon_language") or "auto"
 end
 
-function Lingua.salvarEscolha(e)
-    local g = config()
+function Lingua.saveChoice(value)
+    local g = settings()
     if not g then return end
-    if e == "auto" then g:delSetting("yomimon_language") else g:saveSetting("yomimon_language", e) end
+    if value == "auto" then g:delSetting("yomimon_language") else g:saveSetting("yomimon_language", value) end
 end
 
---- "pt" ou "en".
-function Lingua.codigo()
-    if codigo then return codigo end
-    local e, g = Lingua.escolha(), config()
-    if e == "pt" or e == "en" then
-        codigo = e
-    else
-        codigo = "pt"
+local function fromKOReader()
+    local g = settings()
+    local lang = g and g:readSetting("language")
+    if not lang then return nil end
+    lang = tostring(lang):lower()
+    for _, candidate in ipairs({ lang, lang:match("^(%a+)") }) do
+        if manifest(candidate) then return candidate end
     end
-    return codigo
 end
 
-function Lingua.ingles()
-    return Lingua.codigo() == "en"
+--- The language in use.
+function Lingua.code()
+    if current then return current end
+    local choice = Lingua.choice()
+    if choice ~= "auto" and manifest(choice) then
+        current = choice
+    elseif not settings() then
+        current = "pt"
+    else
+        current = fromKOReader() or FALLBACK
+    end
+    return current
 end
 
---- Só para testes: força um idioma (os módulos precisam ser recarregados depois).
-function Lingua.forcar(c)
-    codigo, ui = c, nil
+--- Tests only: forces a language (the modules must be reloaded afterwards).
+function Lingua.force(code)
+    current, translations = code, nil
 end
 
---- Texto da interface traduzido (ou o próprio texto, em português ou sem tradução).
-function Lingua.t(s)
-    if not Lingua.ingles() then return s end
-    ui = ui or require("yomimon_en").ui
-    return ui[s] or s
+--- Translated UI text, or the English text itself.
+function Lingua.t(text)
+    if Lingua.code() == FALLBACK then return text end
+    translations = translations or load("locales." .. Lingua.code() .. ".ui") or {}
+    return translations[text] or text
 end
 
---- Conteúdo traduzido de um módulo (listas de falas etc.), ou nil em português.
-function Lingua.conteudo(nome)
-    if not Lingua.ingles() then return nil end
-    local arquivo = (nome == "falas" or nome == "memoria") and "yomimon_en_books" or "yomimon_en"
-    return require(arquivo)[nome]
+local function pick(code, name)
+    return load(string.format("locales.%s.%s", code, name))
 end
 
---- Soma listas de frases extras às de um módulo: onde `extra` tem uma lista, ela é anexada
--- à lista de mesmo nome em `base` (criando se faltar); onde tem uma tabela, desce nela.
-function Lingua.anexar(base, extra)
+--- The phrase banks of a module ("state", "context", "speech", "memory") in the current language, falling back
+-- to English.
+function Lingua.content(name)
+    return pick(Lingua.code(), "content." .. name) or pick(FALLBACK, "content." .. name)
+end
+
+--- A data bank ("cards", "diary", ...) in the current language, falling back to English; nil when neither has it.
+function Lingua.data(name)
+    return pick(Lingua.code(), "data." .. name) or pick(FALLBACK, "data." .. name)
+end
+
+--- Formats of the current language (see locale.lua), falling back to English.
+function Lingua.format()
+    local own = manifest(Lingua.code())
+    local base = manifest(FALLBACK)
+    return setmetatable(own and own.format or {}, { __index = base and base.format })
+end
+
+--- Appends the extra phrases of a module (locales/<code>/data/extra.lua) to its lists: where `extra` has a list it
+-- is added to the list of the same name in `base`, and nested tables are followed.
+function Lingua.append(base, extra)
     if type(base) ~= "table" or type(extra) ~= "table" then return end
     for k, v in pairs(extra) do
         if type(v) == "table" and v[1] ~= nil then
@@ -76,15 +147,15 @@ function Lingua.anexar(base, extra)
             for _, item in ipairs(v) do table.insert(base[k], item) end
         elseif type(v) == "table" then
             base[k] = base[k] or {}
-            Lingua.anexar(base[k], v)
+            Lingua.append(base[k], v)
         end
     end
 end
 
---- Frases extras (lotes novos) de um módulo, no idioma atual, ou nil.
-function Lingua.extra(nome)
-    local ok, banco = pcall(require, "yomimon_data.extra_" .. Lingua.codigo())
-    return ok and banco[nome] or nil
+--- The extra phrases of a module in the current language, or nil.
+function Lingua.extra(name)
+    local bank = Lingua.data("extra")
+    return bank and bank[name] or nil
 end
 
 return Lingua

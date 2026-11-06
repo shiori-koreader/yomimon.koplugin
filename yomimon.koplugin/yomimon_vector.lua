@@ -102,9 +102,9 @@ end
 
 local bancos = {}
 local function banco()
-    local c = Lingua.codigo()
+    local c = Lingua.code()
     if bancos[c] == nil then
-        local ok, b = pcall(require, "yomimon_data.vector_" .. c)
+        local ok, b = pcall(Lingua.data, "vector")
         bancos[c] = ok and type(b) == "table" and b or false
     end
     return bancos[c] or nil

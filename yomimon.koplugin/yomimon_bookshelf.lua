@@ -348,7 +348,7 @@ function Bookshelf.modulo(pasta)
     return {
         key = "yomimon",  -- fica gravado nos layouts das pessoas: nunca mudar
         title = T"Yomimon",
-        summary = T"Seu Pokémon. Funciona sem internet.",
+        summary = T"Your Pokémon. Works offline.",
         bare = true,          -- sem cartão por trás: ela e o balão direto no fundo, como no Simple UI
         -- ela se ajusta sozinha ao tamanho do cartão (o desenho em passos inteiros): o Bookshelf 6.1 desenha
         -- uma vez só, no tamanho do cartão, em vez de procurar um tamanho de letra

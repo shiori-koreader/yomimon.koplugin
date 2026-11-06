@@ -1,5 +1,5 @@
 --[[--
-Caixa de cartões: falas escritas por você para momentos certos (yomimon_data/cards_pt.lua e _en.lua).
+Caixa de cartões: falas escritas por você para momentos certos (locales/<code>/data/cards.lua).
 
 Quando um capítulo fala de um assunto (yomimon_memory.lua, M.cartaoDoCapitulo), o primeiro cartão que serve
 fica guardado em s.cartao_pendente. Ele vira a próxima fala da Home por até 24 horas (Estado.fala). Se não
@@ -18,7 +18,7 @@ local caixa
 --- Os cartões no idioma atual (lista, na ordem do arquivo).
 function Cartoes.caixa()
     if caixa == nil then
-        local ok, b = pcall(require, "yomimon_data.cards_" .. Lingua.codigo())
+        local ok, b = pcall(Lingua.data, "cards")
         caixa = ok and type(b) == "table" and b or false
     end
     return caixa or {}

@@ -42,16 +42,16 @@ Infl.POR_ID = {}
 for _, I in ipairs(Infl.LISTA) do Infl.POR_ID[I.id] = I end
 
 local bancos = {}
---- Frases no idioma atual (yomimon_data/influences_pt.lua), ou nil.
+--- Frases no idioma atual (locales/<code>/data/influences.lua), ou nil.
 function Infl.banco()
-    local c = Lingua.codigo()
+    local c = Lingua.code()
     if bancos[c] == nil then
-        local ok, b = pcall(require, "yomimon_data.influences_" .. c)
+        local ok, b = pcall(Lingua.data, "influences")
         bancos[c] = ok and type(b) == "table" and b.base and b.influencias and b or false
     end
     return bancos[c] or nil
 end
-function Infl.usarBanco(b) bancos[Lingua.codigo()] = b end  -- (para testes)
+function Infl.usarBanco(b) bancos[Lingua.code()] = b end  -- (para testes)
 
 local function sat(x, k)
     if not x or x <= 0 then return 0 end

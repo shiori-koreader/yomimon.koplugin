@@ -18,7 +18,7 @@ Etapa 2, vocabulário do que ela comeu (os domínios de Caves of Qud):
     "Lambi a capa. Só tinha {gosto|poeira}."         → "Só tinha sal." (quem anda lendo sobre o mar)
     "Ainda mastigando “%s”.<dominio: Tem gosto de {gosto}.|>"
 
-- Cada tema tem um vocabulário (yomimon_data/domains_pt.lua e _en.lua) com seis tipos de palavra:
+- Cada tema tem um vocabulário (locales/<code>/data/domains.lua) com seis tipos de palavra:
   gosto, cheiro, comparacao, exclamacao, lugar e coisa.
 - O domínio de uma fala é o do livro atual ou o da vida, a obsessão dela (s.tema_dominante); quando os dois
   existem e são diferentes, o do livro vale 6 em cada 10 vezes. O do livro, depois de algumas páginas, é o
@@ -59,9 +59,9 @@ Voz.BASE_TEMAS = okB and type(BASE_TEMAS) == "table" and BASE_TEMAS or nil
 local bancos = {}
 --- Vocabulário dos domínios no idioma atual (ou nil).
 function Voz.banco()
-    local c = Lingua.codigo()
+    local c = Lingua.code()
     if bancos[c] == nil then
-        local ok, b = pcall(require, "yomimon_data.domains_" .. c)
+        local ok, b = pcall(Lingua.data, "domains")
         bancos[c] = ok and type(b) == "table" and b or false
     end
     return bancos[c] or nil

@@ -167,8 +167,8 @@ local function textoCentrado(bb, texto, face, largura_tela, y, largura_max)
     return tam.h
 end
 
-local function milhar(n)  -- 1.234 em português, 1,234 em inglês
-    local sep = require("yomimon_language").ingles() and "," or "."
+local function milhar(n)  -- 1.234 or 1,234, by language
+    local sep = require("yomimon_language").format().thousands
     local s = tostring(math.floor(n))
     local r = s:reverse():gsub("(%d%d%d)", "%1" .. sep):reverse()
     return (r:gsub("^%p", ""))

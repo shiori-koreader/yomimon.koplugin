@@ -15,7 +15,7 @@ livro tem acima (ou abaixo) do normal molda ela. O que você NÃO lê só desfaz
 nada para um traço puxa para o neutro, nunca para o polo oposto (não ler romance não deixa cínica).
 Cada página empurra um pouco e tudo volta devagar para o meio: o que você leu por último
 pesa mais. Quando um traço fica marcante, ela escreve no diário e ganha falas próprias
-(em yomimon_data/traits_pt.lua e tracos_en.lua).
+(em locales/<code>/data/traits.lua).
 
 Lógica pura (sem KOReader), testável fora dele.
 ]]
@@ -39,9 +39,9 @@ Tracos.FORTE = 60
 Tracos.FOLGA = 5            -- para descer de nível precisa cair 5 abaixo do limite (sem pisca-pisca)
 
 local ROTULO = {
-    amarga = "AMARGA", otimista = "OTIMISTA", medrosa = "MEDROSA", corajosa = "CORAJOSA",
-    cinica = "CÍNICA", romantica = "ROMÂNTICA", popular = "POPULAR", erudita = "ERUDITA",
-    diurna = "DIURNA", noturna = "NOTURNA",
+    amarga = "BITTER", otimista = "HOPEFUL", medrosa = "JUMPY", corajosa = "BOLD",
+    cinica = "CYNICAL", romantica = "ROMANTIC", popular = "LOWBROW", erudita = "HIGHBROW",
+    diurna = "EARLY BIRD", noturna = "NIGHT OWL",
 }
 
 -- O que cada sinal da página empurra (positivo = polo "pos" do eixo).
@@ -84,7 +84,7 @@ Tracos.BASE = okB and type(BASE) == "table" and BASE or nil
 local banco
 --- Falas e anotações de diário dos traços, no idioma atual.
 function Tracos.banco()
-    banco = banco or require("yomimon_data.traits_" .. Lingua.codigo())
+    banco = banco or Lingua.data("traits")
     return banco
 end
 
@@ -169,7 +169,7 @@ local function notaDiario(tr, antes, depois, livro)
     lista = lista and lista[chave]
     if not lista or #lista == 0 then return nil end
     local texto = lista[math.random(#lista)]
-    return (texto:gsub("{livro}", livro or T"esse livro"))
+    return (texto:gsub("{livro}", livro or T"this book"))
 end
 
 --- Digere uma página: mexe nos traços e devolve as anotações de diário de quem mudou de nível.
@@ -220,12 +220,12 @@ function Tracos.marcantes(tracos)
     return lista
 end
 
---- Rótulo traduzido de um polo ("AMARGA", "NIGHT OWL"…).
+--- Rótulo traduzido de um polo ("BITTER", "NIGHT OWL"…).
 function Tracos.rotulo(polo)
     return T(ROTULO[polo] or polo)
 end
 
---- Até `max` rótulos dos traços marcantes ("AMARGA", "NOTURNA"…), já traduzidos.
+--- Até `max` rótulos dos traços marcantes ("BITTER", "NIGHT OWL"…), já traduzidos.
 function Tracos.rotulos(tracos, max)
     local out = {}
     for i, m in ipairs(Tracos.marcantes(tracos)) do

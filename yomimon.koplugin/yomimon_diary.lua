@@ -7,7 +7,7 @@ Diário da Yomimon: o que ela escreve sobre a sua leitura, com coisas concretas.
 - Ao terminar um livro: resenha curta (protagonista, comparação com outros livros, série de
   temas, o traço que o livro mexeu, nota) — e a resenha completa vai para s.resenhas.
 
-As frases ficam em yomimon_data/diary_pt.lua e diario_en.lua. Lógica pura, testável fora do KOReader.
+As frases ficam em locales/<code>/data/diary.lua. Lógica pura, testável fora do KOReader.
 ]]
 
 local Lingua = require("yomimon_language")
@@ -67,7 +67,7 @@ end
 
 local banco
 function Diario.banco()
-    banco = banco or require("yomimon_data.diary_" .. Lingua.codigo())
+    banco = banco or Lingua.data("diary")
     return banco
 end
 
@@ -267,8 +267,6 @@ local function tracoDoLivro(s, L)
     return melhor
 end
 
-local ORDINAIS_PT = { "Segundo", "Terceiro", "Quarto", "Quinto", "Sexto" }
-
 --- Fecha um livro terminado: escreve a resenha curta no diário e guarda a completa em s.resenhas.
 function Diario.fimLivro(s, M, livro, agora)
     local L = s.livros and s.livros[livro]
@@ -315,8 +313,7 @@ function Diario.fimLivro(s, M, livro, agora)
             { outro = anterior.livro })
     end
     if tema and serie == 1 then  -- 3º seguido em diante vira lembrança garantida (yomimon_memories)
-        local ordinal = Lingua.ingles() and ({ "Second", "Third", "Fourth", "Fifth", "Sixth" })[math.min(serie, 5)]
-            or ORDINAIS_PT[math.min(serie, 5)]
+        local ordinal = Lingua.format().ordinals[math.min(serie, 5)]
         opcionais[#opcionais + 1] = preencher(sorteia(B.serie), { ordinal = ordinal, tema = M.tema(tema), de_tema = M.tema(tema, "de") })
     end
     if traco and B.traco[traco] then opcionais[#opcionais + 1] = sorteia(B.traco[traco]) end

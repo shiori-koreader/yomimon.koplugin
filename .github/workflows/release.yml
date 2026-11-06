@@ -13,6 +13,7 @@ jobs:
         with:
           luaVersion: "5.1"
       - run: lua tests/yomimon_test.lua
+      - run: lua scripts/check_locales.lua
       - run: python3 scripts/package.py "$GITHUB_REF_NAME"
       - name: Publish
         env:

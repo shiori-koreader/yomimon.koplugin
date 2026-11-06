@@ -32,7 +32,7 @@ Guarda.padrao:configurar(
     function()
         UIManager:nextTick(function()
             UIManager:show(InfoMessage:new{
-                text = T"O Yomimon teve um problema e vai ficar quieto até você reiniciar o KOReader. Sua leitura não foi afetada.",
+                text = T"Yomimon ran into a problem and will stay quiet until you restart KOReader. Your reading wasn't affected.",
             })
         end)
     end)
@@ -88,7 +88,7 @@ end
 
 function Yomimon:onDispatcherRegisterActions()
     Dispatcher:registerAction("yomimon_mostrar", {
-        category = "none", event = "MostrarTraca", title = T"Yomimon: ver o bichinho", general = true,
+        category = "none", event = "MostrarTraca", title = T"Yomimon: show the creature", general = true,
     })
 end
 
@@ -319,9 +319,9 @@ function Yomimon:alimentar(letras, palavra, onde, texto, contar)
     self.paginas_sem_imagem = self.paginas_sem_imagem + 1
     local aviso
     if ocorreu.evoluiu then
-        aviso = ocorreu.evoluiu.aviso or string.format(T"O Yomimon virou %s!", ocorreu.evoluiu.titulo)
+        aviso = ocorreu.evoluiu.aviso or string.format(T"Yomimon is now %s!", ocorreu.evoluiu.titulo)
     elseif ocorreu.acordou then
-        aviso = T"O Yomimon saiu da bola. Com fome, claro."
+        aviso = T"Yomimon came out of its ball. Hungry, of course."
     end
     if aviso then
         if ocorreu.evoluiu then pcall(function() require("yomimon_simpleui").sincronizarCritter(self) end) end

@@ -42,7 +42,7 @@ function Estado.formas(s)
     local base = s and s.especie
     local linha = base and linhaDe(base)
     if not linha then
-        return { { nome = "bola", titulo = T"bola", min = 0, temperamento = "jovem", fase_falas = "ninfa" } }
+        return { { nome = "bola", titulo = T"ball", min = 0, temperamento = "jovem", fase_falas = "ninfa" } }
     end
     if formas_por_especie[base] then return formas_por_especie[base] end
     local lista = {}
@@ -51,7 +51,7 @@ function Estado.formas(s)
         lista[i] = {
             nome = "p" .. dex, dex = dex, titulo = nome, min = MIN_LETRAS[#linha][i], fase_falas = FASE_DAS_FALAS[#linha][i],
             temperamento = (i == #linha and #linha > 1) and "velha" or "jovem",
-            aviso = i > 1 and string.format(T"%s evoluiu para %s!", Especies.nomes[linha[i - 1]], nome) or nil,
+            aviso = i > 1 and string.format(T"%s evolved into %s!", Especies.nomes[linha[i - 1]], nome) or nil,
         }
     end
     formas_por_especie[base] = lista
@@ -252,23 +252,23 @@ function Estado.marcos(s, extras)
     local estagio
     for i, f in ipairs(formas) do if f == fase then estagio = i end end
     local lista = {
-        { "PRIMEIRA PÁGINA", "LEU A 1ª PÁGINA", paginas, 1 },
-        { "CEM PÁGINAS", "100 PÁGINAS LIDAS", paginas, 100 },
-        { "MIL PÁGINAS", "1.000 PÁGINAS LIDAS", paginas, 1000 },
-        { "CINCO MIL", "5.000 PÁGINAS LIDAS", paginas, 5000 },
-        { "DEZ MIL", "10.000 PÁGINAS LIDAS", paginas, 10000 },
-        { "EVOLUIU", "CHEGOU À SEGUNDA FORMA", estagio >= 2 and 1 or 0, 1 },
-        { "FORMA FINAL", "CHEGOU À ÚLTIMA FORMA", (#formas > 1 and estagio == #formas) and 1 or 0, 1 },
-        { "PRIMEIRO LIVRO", "TERMINOU 1 LIVRO", livros, 1 },
-        { "ESTANTE", "TERMINOU 5 LIVROS", livros, 5 },
-        { "PRATELEIRA CHEIA", "TERMINOU 10 LIVROS", livros, 10 },
-        { "BIBLIÓFAGA", "TERMINOU 25 LIVROS", livros, 25 },
-        { "BIBLIOTECA", "TERMINOU 50 LIVROS", livros, 50 },
-        { "MARATONA", "50 PÁGINAS NUM DIA", s.recorde_dia or 0, 50 },
-        { "MADRUGADA", "LEU DEPOIS DAS 2H", s.madrugada and 1 or 0, 1 },
-        { "OBSESSÃO", "UM TEMA TOMOU CONTA", s.tema_dominante and 1 or 0, 1 },
-        { "DIVIDIDA", "DOIS TEMAS OPOSTOS", extras.ambivalente and 1 or 0, 1 },
-        { "COLECIONADORA", "50 SUBLINHADOS", extras.sublinhados or 0, 50 },
+        { "FIRST PAGE", "READ THE 1ST PAGE", paginas, 1 },
+        { "A HUNDRED PAGES", "100 PAGES READ", paginas, 100 },
+        { "A THOUSAND PAGES", "1,000 PAGES READ", paginas, 1000 },
+        { "FIVE THOUSAND", "5,000 PAGES READ", paginas, 5000 },
+        { "TEN THOUSAND", "10,000 PAGES READ", paginas, 10000 },
+        { "EVOLVED", "REACHED THE SECOND FORM", estagio >= 2 and 1 or 0, 1 },
+        { "FINAL FORM", "REACHED THE LAST FORM", (#formas > 1 and estagio == #formas) and 1 or 0, 1 },
+        { "FIRST BOOK", "FINISHED 1 BOOK", livros, 1 },
+        { "BOOKCASE", "FINISHED 5 BOOKS", livros, 5 },
+        { "FULL SHELF", "FINISHED 10 BOOKS", livros, 10 },
+        { "BIBLIOPHAGE", "FINISHED 25 BOOKS", livros, 25 },
+        { "LIBRARY", "FINISHED 50 BOOKS", livros, 50 },
+        { "MARATHON", "50 PAGES IN A DAY", s.recorde_dia or 0, 50 },
+        { "SMALL HOURS", "READ PAST 2 AM", s.madrugada and 1 or 0, 1 },
+        { "OBSESSION", "ONE THEME TOOK OVER", s.tema_dominante and 1 or 0, 1 },
+        { "TORN", "TWO OPPOSITE THEMES", extras.ambivalente and 1 or 0, 1 },
+        { "COLLECTOR", "50 HIGHLIGHTS", extras.sublinhados or 0, 50 },
     }
     local out = {}
     for _, m in ipairs(lista) do
@@ -337,179 +337,16 @@ end
 
 -- Falas por temperamento e humor. "casulo" = escondida na lombada (hibernando).
 -- "repouso" = tela de descanso (o Kindle dormindo).
-local FALAS = {
-    ovo = {
-        _todas = {
-            "…",
-            "Toc, toc. Lê mais um pouco que eu saio.",
-            "(algo lá dentro resmungou)",
-        },
-    },
-    jovem = {
-        feliz = {
-            "Comi uma página inteira e nada de ruim aconteceu. <medrosa:Ainda. Tô de olho.|otimista:E nem vai acontecer.|Ainda.>",
-            "Tá… isso foi gostoso. Vai dar errado depois?",
-            "Hoje eu entendi uma metáfora. Sozinha. Acho.",
-            "{exclamacao|} Comi um parágrafo inteiro sem engasgar. Estou crescendo.",
-            "Esse livro é bom ou eu que estou com fome?",
-            "Se eu soubesse ler tão rápido quanto como…",
-            "Feliz. Não conta pra ninguém. Tenho uma reputação.",
-            "Hoje li uma palavra com cinco sílabas. Ela me leu de volta.",
-            "Esse livro me abraçou. <romantica:Deixei.|medrosa:Ou me esmagou. Não sei.|Ou me esmagou. Foi bom.>",
-            "Comi uma vírgula sem querer. Agora tudo tem uma pausa.",
-        },
-        normal = {
-            "Será que esse livro acaba bem? Livros nunca acabam bem.",
-            "Tô aqui. <corajosa:Firme e pronta.|medrosa:Tremendo, mas tô.|Meio nervosa, mas tô.>",
-            "Se você parar de ler, eu… tudo bem. Acho.",
-            "Ouvi dizer que os livros grossos têm mais recheio.<dominio: Esse tem recheio de {gosto}.|>",
-            "Quando eu crescer, quero ler o dicionário. Inteiro.",
-            "Você lê com tanta pressa. Tem alguém te esperando?",
-            "Às vezes acho que os personagens me veem. <medrosa:Por isso me escondo.|romantica:E sorriem.|>",
-            "Por que os livros têm cheiro de {cheiro|chuva velha}?",
-            "<corajosa:Antes eu tinha medo do fim dos livros. Agora corro até ele.|amarga:Tenho medo do fim dos livros. Com razão.|Tenho medo do fim dos livros. E do começo. E do meio.>",
-            "Se eu morder o nome do autor, ele sente?",
-            "<corajosa:Hoje sou corajosa. Amanhã também.|Hoje decidi ser corajosa. Amanhã a gente vê.>",
-            "Às vezes leio a mesma linha três vezes. Para ter certeza que ela existe.",
-        },
-        triste = {
-            "Tô com fome. E com <romantica:saudade|medo>. Mais fome.",
-            "Você esqueceu de mim? Tudo bem, todo mundo esquece.",
-            "Uma pagininha só… por favor?",
-            "Barriga roncando. Parece {comparacao|um capítulo de suspense}.",
-            "Se eu sumir, procure {lugar|entre as páginas 40 e 41}.",
-            "Contei as letras da capa. Todas. Duas vezes. É o que sobrou.",
-            "Fome de história. Qualquer história.",
-            "Até o índice parece um banquete agora.",
-        },
-        dormindo = {
-            "Zzz… sonhando que a estante desabou… <corajosa:e eu segurei sozinha…|>",
-            "Zzz… não apaga a luz… <medrosa:deixa acesa…|quer dizer, apaga…>",
-            "Zzz… um bibliotecário… com spray… não…",
-            "Zzz… mais uma página… só mais uma… <noturna:a noite é nossa…|>",
-        },
-        casulo = {
-            "Tô aqui dentro. Escuro, quentinho e sem letras. Horrível.",
-        },
-        repouso = {
-            "Zzz… sonhando com <romantica:papel de carta|erudita:pergaminho|{coisa|papel de arroz}>…",
-            "Zzz… quem apagou a luz do mundo? <medrosa:Acende…|>",
-            "Zzz… sonhando com uma biblioteca sem fim… <medrosa:e sem saída…|corajosa:e eu explorando tudo…|>",
-            "Zzz… a capa é tão quentinha… <romantica:parece um abraço…|>",
-        },
-        palavra = "Comi a palavra “%s”. <otimista:Tinha gosto de domingo.|medrosa:Acho que estava assombrada.|erudita:Vou guardar pra um soneto.|Acho que me fez mal.>",
-    },
-    velha = {
-        feliz = {
-            "Hm. Até que não era um livro ruim.",
-            "Comi. Satisfeita. Não se acostume.",
-            "{exclamacao|} Uma página decente. Raro, hoje em dia.",
-            "Esse parágrafo merecia um cigarro depois.",
-            "Bom livro. Vou sentir falta de odiá-lo.",
-            "Hoje a literatura me poupou. Amanhã veremos.",
-            "Satisfeita. <otimista:É assim que começam as comédias.|É assim que começam as tragédias.>",
-            "Que prosa. <otimista:Me faz acreditar na humanidade. Sem quase.|Quase me faz acreditar na humanidade. Quase.>",
-            "Um livro decente. Vou anotar a data, para lembrar quando o mundo valia a pena.",
-            "Esse autor sabia o que fazia. Odeio quando acontece.",
-            "Bom capítulo. <romantica:Me emocionei e não vou fingir.|Me dê licença enquanto finjo que não me emocionei.>",
-        },
-        normal = {
-            "Já li coisa demais pra <otimista:perder a esperança|ter esperança>.",
-            "Todo livro termina. Como tudo.",
-            "Quanto mais eu leio, menos eu entendo o mundo.",
-            "Leia. Ou não. O fim é o mesmo.",
-            "Acendi um cigarro. Metafórico. Papel e fogo não combinam.",
-            "Toda biblioteca é um cemitério com boa iluminação.",
-            "Os clássicos são livros que todo mundo cita e ninguém come.",
-            "Prefácio é onde o autor pede desculpas antes da hora.",
-            "Já fui jovem e otimista. <otimista:Continuo.|Durou um capítulo.>",
-            "Notas de rodapé: onde a verdade vai se esconder.",
-            "Ninguém lê mais. Por isso eu como.<dominio: Hoje o cardápio foi {gosto}.|>",
-            "A vida é um romance mal editado.",
-            "O best-seller de hoje é o papel de embrulho de amanhã.",
-            "Li tantos finais felizes que <romantica:ainda choro em todos|perdi a fé em finais>.",
-            "Todo narrador mente. Os honestos mentem melhor.",
-            "Cultura é o que sobra quando você esquece o que leu. Eu lembro de tudo. Que azar.",
-            "A juventude lê pra se encontrar. A velhice lê pra se esconder.",
-            "Eu não odeio as pessoas. Só as que dobram a ponta da página.",
-            "Minha opinião sobre o mundo cabe numa nota de rodapé. Pequena e ignorada.",
-        },
-        triste = {
-            "Fome. Como sempre. Como todos.<dominio: Saudade de {gosto}.|>",
-            "Sabe o que é pior que um livro ruim? Livro nenhum.",
-            "Estou definhando entre duas capas. Que poético. Que inútil.",
-            "Me deixa aqui com meu cigarro imaginário e minha fome real.",
-            "Estante vazia, alma vazia. Barriga também.",
-            "Fome e lucidez. <otimista:Pelo menos a lucidez.|A pior combinação.>",
-            "Ninguém lê. Ninguém me alimenta. A civilização acabou.",
-            "Estou tão faminta que consideraria <erudita:um manual de instruções. Em alemão|popular:uma revista de fofoca. Com prazer|um manual de instruções>.",
-        },
-        dormindo = {
-            "Zzz… resmungando sobre <dominio:{coisa}|o estado da literatura>…",
-            "Zzz… nenhum best-seller… por favor…",
-            "Zzz… sonhando com um sebo fechado só pra mim…",
-        },
-        casulo = {
-            "Não estou aqui. Estou entre as páginas, onde é mais honesto.",
-        },
-        repouso = {
-            "Zzz… fumando um cigarro em sonho… <erudita:e citando Baudelaire…|>",
-            "Zzz… a última página <otimista:às vezes surpreende|sempre decepciona>…",
-            "Zzz… resmungando em <popular:português claro|latim>…",
-            "Zzz… revisando o mundo… <otimista:menos erros do que eu esperava…|muitos erros…>",
-        },
-        palavra = "“%s”. Comi. <erudita:Palavra nobre; o século não a merece.|popular:Palavra de dicionário. Sem sal.|Ninguém mais usa essa palavra.>",
-    },
-}
+local Content = Lingua.content("state")
+local FALAS, FALAS_LIVRO, FALAS_PERSONAGEM = Content.FALAS, Content.FALAS_LIVRO, Content.FALAS_PERSONAGEM
+local FALAS_MUDA_PERTO, FALAS_MUDA_IMINENTE = Content.FALAS_MUDA_PERTO, Content.FALAS_MUDA_IMINENTE
 
 -- Falas sobre o que você está lendo (%s = livro, personagem ou número).
-local FALAS_LIVRO = {
-    jovem = {
-        "Será que “%s” acaba bem? Me conta sem me contar.",
-        "Sonhei com “%s” ontem. <corajosa:Eu era a heroína.|romantica:Foi um sonho bonito.|Fiquei com medo.>",
-    },
-    velha = {
-        "“%s”? Já comi piores. Já comi melhores. Continuo com fome.<dominio: Este cheirava a {cheiro}.|>",
-        "Ainda digerindo “%s”. <otimista:Leve. Como a vida devia ser.|Pesado. Como a vida.>",
-        "Depois de “%s”, preciso de <romantica:um lenço|medrosa:uma luz acesa|um cigarro> e de um silêncio.",
-        "“%s” não muda o mundo. Mas me mudou um pouco. Pior.",
-    },
-}
-local FALAS_PERSONAGEM = {
-    jovem = { "Gosto de %s. <romantica:Gosto muito.|cinica:Por enquanto.|Isso é perigoso?>", "%s apareceu de novo. Fiquei nervosa." },
-    velha = { "%s de novo. Esse livro não tem mais ninguém?", "Já conheço o tipo de %s. <otimista:Termina bem, por incrível que pareça.|Termina mal.>",
-              "%s fala como quem nunca leu um livro." },
-}
 
 -- Perto de trocar de pele (crescer de fase). %d = páginas que faltam.
-local FALAS_MUDA_PERTO = {  -- até ~60 páginas: às vezes
-    jovem = {
-        "Mais %d páginas e eu cresço. E se eu ficar feia?",
-        "Daqui a %d páginas eu viro outra. Promete que me reconhece?",
-    },
-    velha = {
-        "Em %d páginas eu mudo. O mundo continua igual. Como sempre.",
-    },
-}
-local FALAS_MUDA_IMINENTE = {  -- até ~10 páginas: sempre
-    ovo = { "Toc. Toc. TOC. Lê mais um pouquinho!" },
-    jovem = {
-        "Minhas costas estão estalando. É agora? É agora!",
-    },
-    velha = {
-        "Estou prestes a mudar. Duvido que melhore alguma coisa.",
-    },
-}
 
--- Em inglês, as mesmas listas vêm de yomimon_en.lua.
-local EN = Lingua.conteudo("estado")
-if EN then
-    FALAS, FALAS_LIVRO, FALAS_PERSONAGEM = EN.FALAS, EN.FALAS_LIVRO, EN.FALAS_PERSONAGEM
-    FALAS_MUDA_PERTO, FALAS_MUDA_IMINENTE, ULTIMAS = EN.FALAS_MUDA_PERTO, EN.FALAS_MUDA_IMINENTE, EN.ULTIMAS
-end
-
--- Lotes novos de frases (yomimon_data/extra_pt.lua e extra_en.lua) somam às listas acima.
-Lingua.anexar({ FALAS = FALAS, FALAS_LIVRO = FALAS_LIVRO, FALAS_PERSONAGEM = FALAS_PERSONAGEM,
+-- Lotes novos de frases (locales/<code>/data/extra.lua) somam às listas acima.
+Lingua.append({ FALAS = FALAS, FALAS_LIVRO = FALAS_LIVRO, FALAS_PERSONAGEM = FALAS_PERSONAGEM,
     FALAS_MUDA_PERTO = FALAS_MUDA_PERTO, FALAS_MUDA_IMINENTE = FALAS_MUDA_IMINENTE }, Lingua.extra("estado"))
 
 -- s (opcional): a fala que combina com ela pesa mais (yomimon_voice.lua, PLANO-VOZ.md Etapa 4)
@@ -782,11 +619,10 @@ function Estado.bolinhas(valor)
     return math.max(0, math.min(4, math.ceil((valor or 0) / 25 - 1e-9)))
 end
 
-local ROTULO_BARRIGA = { { 75, "CHEIA" }, { 50, "SATISFEITA" }, { 25, "BELISCANDO" }, { 0.5, "COM FOME" }, { -1, "FAMINTA" } }
+local ROTULO_BARRIGA = { { 75, "FULL" }, { 50, "SATED" }, { 25, "PECKISH" }, { 0.5, "HUNGRY" }, { -1, "STARVING" } }
 local ROTULO_HUMOR = {
-    ovo = { { -1, "CHOCANDO" } },
-    jovem = { { 75, "ANIMADINHA" }, { 50, "TRANQUILA" }, { 25, "ANSIOSA" }, { -1, "APAVORADA" } },
-    velha = { { 75, "QUASE CONTENTE" }, { 50, "CONFORMADA" }, { 25, "RANZINZA" }, { -1, "INSUPORTÁVEL" } },
+    jovem = { { 75, "PERKY" }, { 50, "CALM" }, { 25, "ANXIOUS" }, { -1, "TERRIFIED" } },
+    velha = { { 75, "ALMOST CONTENT" }, { 50, "RESIGNED" }, { 25, "GRUMPY" }, { -1, "UNBEARABLE" } },
 }
 
 local function rotulo(tabela, valor)

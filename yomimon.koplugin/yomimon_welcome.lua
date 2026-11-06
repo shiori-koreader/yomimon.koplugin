@@ -154,7 +154,7 @@ function BoasVindas:filtrarLetra(letra)
 end
 
 function BoasVindas:pintarLista(bb)
-    self:texto(bb, T"ESCOLHA SEU POKÉMON", 0, 22, true, 24, PRETO, LARG / 2)
+    self:texto(bb, T"PICK YOUR POKÉMON", 0, 22, true, 24, PRETO, LARG / 2)
     for i, letra in ipairs(LETRAS) do
         local col, lin = (i - 1) % 13, math.floor((i - 1) / 13)
         local lx, ly = 21 + col * 44, 70 + lin * 44
@@ -181,7 +181,7 @@ function BoasVindas:pintarLista(bb)
     local ny = 730
     if self.so_escolha then
         self:cartao(bb, 250, ny, 118, 52, true)
-        self:texto(bb, T"SAIR", 0, ny + 14, true, 16, PRETO, 309)
+        self:texto(bb, T"EXIT", 0, ny + 14, true, 16, PRETO, 309)
         self:alvo(244, ny - 6, 130, 64, function() self:onClose(); if self.ao_terminar then self.ao_terminar() end end)
     end
     self:cartao(bb, 20, ny, 90, 52, true)
@@ -220,8 +220,8 @@ function BoasVindas:pintarConfirmacao(bb)
     local forma = Especies.nomes[it.base]
     local baixado = self:spriteBaixado(it)
     local nome = baixado and "p" .. it.base or "bola"
-    local fala = baixado and string.format(T"%s! Boa escolha. Vou ficar de olho na sua leitura.", forma)
-        or string.format(T"(%s ainda não chegou: o desenho é baixado com o Wi-Fi ligado)", forma)
+    local fala = baixado and string.format(T"%s! Good pick. I'll keep an eye on your reading.", forma)
+        or string.format(T"(%s hasn't arrived yet: the picture downloads when Wi-Fi is on)", forma)
     local descricao = Baixar.descricao(it.base)
     if descricao then
         self:sprite(bb, nome, fala, 375, 230)
@@ -230,11 +230,11 @@ function BoasVindas:pintarConfirmacao(bb)
         self:sprite(bb, nome, fala, 430, 295)
     end
     if not baixado then
-        self:botao(bb, T"BAIXAR (WI-FI)", 590, function() self:baixarSprites() end)
+        self:botao(bb, T"DOWNLOAD (WI-FI)", 590, function() self:baixarSprites() end)
     end
-    self:botao(bb, T"ESCOLHER ESTE", 690, function() self:escolher() end)
+    self:botao(bb, T"PICK THIS ONE", 690, function() self:escolher() end)
     self:cartao(bb, 20, 760, 120, 40, true)
-    self:texto(bb, T"VOLTAR", 0, 770, true, 14, PRETO, 80)
+    self:texto(bb, T"BACK", 0, 770, true, 14, PRETO, 80)
     self:alvo(14, 754, 132, 52, function() self.passo = 1 end)
 end
 
@@ -247,7 +247,7 @@ end
 
 -- Mostra "Baixando…" antes de bloquear a tela com o download (arquivos de ~1 KB, mas a conexão pode demorar).
 function BoasVindas:baixar(linha)
-    local aviso = InfoMessage:new{ text = T"Baixando o desenho…" }
+    local aviso = InfoMessage:new{ text = T"Downloading the picture…" }
     UIManager:show(aviso)
     UIManager:forceRePaint()
     pcall(Baixar.linha, linha)
@@ -292,17 +292,17 @@ function BoasVindas:paintTo(bb, x, y)
         local s = self.traca.estado
         local f = Estado.fase(s)
         self:sprite(bb, self:spriteBaixado({ linha = { f.dex or 0 } }) and f.nome or "bola",
-            T"Onde você vai me achar? Escolha. Eu espero.", 245, 170)
-        self:opcao(bb, 360, T"ABRIR AO INICIAR", T"O YOMIMON APARECE QUANDO O KOREADER ABRE",
+            T"Where will you find me? Choose. I'll wait.", 245, 170)
+        self:opcao(bb, 360, T"OPEN AT STARTUP", T"YOMIMON APPEARS WHEN KOREADER OPENS",
             self.op.iniciar, function() self.op.iniciar = not self.op.iniciar end)
-        self:opcao(bb, 440, T"ATALHO POR GESTO", T"SEGURE O DEDO NO CANTO SUPERIOR DIREITO",
+        self:opcao(bb, 440, T"GESTURE SHORTCUT", T"HOLD YOUR FINGER ON THE TOP RIGHT CORNER",
             self.op.gesto, function() self.op.gesto = not self.op.gesto end)
         local tem_sui = self.traca:temSimpleUI()
-        self:opcao(bb, 520, T"CARTÃO NA HOME", tem_sui and T"NO LUGAR DO CRITTER DO SIMPLE UI" or T"SIMPLE UI NÃO INSTALADO",
+        self:opcao(bb, 520, T"HOME SCREEN CARD", tem_sui and T"IN PLACE OF SIMPLE UI'S CRITTER" or T"SIMPLE UI NOT INSTALLED",
             tem_sui and self.op.cartao, function() self.op.cartao = not self.op.cartao end, not tem_sui)
-        self:opcao(bb, 600, T"CARTÃO NO BOOKSHELF", tem_bookshelf and T"NA PRIMEIRA PRATELEIRA COM LIVROS" or T"BOOKSHELF NÃO INSTALADO",
+        self:opcao(bb, 600, T"BOOKSHELF CARD", tem_bookshelf and T"ON THE FIRST SHELF WITH BOOKS" or T"BOOKSHELF NOT INSTALLED",
             tem_bookshelf and self.op.estante, function() self.op.estante = not self.op.estante end, not tem_bookshelf)
-        self:botao(bb, T"PRONTO", 696, function() self:terminar() end)
+        self:botao(bb, T"DONE", 696, function() self:terminar() end)
     end
 end
 
