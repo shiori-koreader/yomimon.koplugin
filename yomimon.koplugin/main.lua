@@ -112,9 +112,32 @@ function Yomimon:addToMainMenu(menu_items)
         sorting_hint = "tools",
         sub_item_table = {
             { text = T"Open Yomimon", callback = function() self:onMostrarTraca() end },
+            {
+                -- Bilingual on purpose: someone on the wrong language must be able to find it.
+                text = "Language / Idioma",
+                sub_item_table_func = function() return self:itensIdioma() end,
+            },
             { text = T"About and disclaimer", callback = function() self:mostrarSobre() end },
         },
     }
+end
+
+function Yomimon:itensIdioma()
+    local Lingua = require("yomimon_language")
+    local function item(texto, valor)
+        return {
+            text = texto,
+            radio = true,
+            checked_func = function() return Lingua.choice() == valor end,
+            callback = function()
+                Lingua.saveChoice(valor)
+                UIManager:show(require("ui/widget/infomessage"):new{ text = T"Restart KOReader to change the language." })
+            end,
+        }
+    end
+    local itens = { item(T"Automatic (KOReader language)", "auto") }
+    for _, idioma in ipairs(Lingua.available()) do itens[#itens + 1] = item(idioma.name, idioma.code) end
+    return itens
 end
 
 function Yomimon:mostrarSobre()

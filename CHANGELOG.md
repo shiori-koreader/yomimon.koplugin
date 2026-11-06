@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.1 (2026-11-06)
+
+- The language can now be changed from *Tools > Yomimon > Language / Idioma* and from the Yomimon screen's menu
+  (*LANGUAGE*). Before, it was only reachable by holding a finger on the creature.
+
 ## 1.0.0 (2026-11-06)
 
 - Languages are extensible: one folder per language in `yomimon_locales/<code>/` (UI texts, phrase banks, data banks and

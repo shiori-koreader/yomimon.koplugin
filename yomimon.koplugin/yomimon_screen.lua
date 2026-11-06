@@ -321,6 +321,7 @@ local ITENS_MENU = {
     { "diario", T"DIARY", T"WHAT IT REMEMBERS OF YOUR READING" },
     { "conquistas", T"ACHIEVEMENTS", T"MILESTONES AND BOOKS READ" },
     { "pokedex", T"POKÉDEX", T"YOUR REGISTERED POKÉMON" },
+    { "idioma", T"LANGUAGE", T"CHANGE THE LANGUAGE" },
 }
 
 function YomimonScreen:pintarMenu(bb)
@@ -341,6 +342,7 @@ function YomimonScreen:pintarMenu(bb)
         local modo = item[1]
         self:alvo(x, iy - 6, w, 48, function()
             self.menu_aberto = false
+            if modo == "idioma" then return self:menuIdioma() end
             self:entrar(modo)
         end)
         iy = iy + 48
