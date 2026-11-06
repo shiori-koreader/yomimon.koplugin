@@ -337,8 +337,12 @@ end
 function Yomimon:garantirSprites()
     if self.ui.document then return end
     local faltam = {}
-    for _, f in ipairs(Estado.formas(self.estado)) do
-        if f.dex and not Baixar.tem(f.dex) then faltam[#faltam + 1] = f.dex end
+    local especies = { self.estado.especie }
+    for base in pairs(self.estado.colecao or {}) do especies[#especies + 1] = base end
+    for _, base in ipairs(especies) do
+        for _, f in ipairs(Estado.formas({ especie = base })) do
+            if f.dex and not Baixar.tem(f.dex) then faltam[#faltam + 1] = f.dex end
+        end
     end
     if #faltam > 0 and require("ui/network/manager"):isOnline() then Baixar.linha(faltam) end
     pcall(function() require("yomimon_simpleui").sincronizarCritter(self) end)

@@ -316,11 +316,11 @@ end
 -- Menu ARQUIVO ------------------------------------------------------------------
 
 local ITENS_MENU = {
-    { "casa", T"YOMIMON", T"A CRIATURA" },
-    { "caderno", T"CADERNO", T"SEUS SUBLINHADOS" },
-    { "diario", T"DIÁRIO", T"MEMÓRIAS DELA" },
+    { "casa", T"YOMIMON", T"SEU POKÉMON ATUAL" },
+    { "caderno", T"CADERNO", T"OS TRECHOS QUE VOCÊ MARCOU" },
+    { "diario", T"DIÁRIO", T"O QUE ELE LEMBRA DA LEITURA" },
     { "conquistas", T"CONQUISTAS", T"MARCOS E LIVROS LIDOS" },
-    { "pokedex", T"POKÉDEX", T"SEUS POKÉMON E O PROGRESSO DE CADA UM" },
+    { "pokedex", T"POKÉDEX", T"SEUS POKÉMON REGISTRADOS" },
 }
 
 function YomimonScreen:pintarMenu(bb)
@@ -824,7 +824,7 @@ function YomimonScreen:pintarPokedex(bb, s)
             self:texto(bb, maiusculas(e.forma.titulo), 130, y + 16, true, 15)
             self:texto(bb, string.format(T"FORMA %d DE %d", e.estagio, e.total), 130, y + 42, false, 10, CINZA_55)
             local paginas = math.floor(e.letras / Estado.letrasPorPagina(s))
-            self:texto(bb, string.format(T"%s PÁG. COM VOCÊ", Desenho.milhar(paginas)), 130, y + 62, false, 10, CINZA_55)
+            self:texto(bb, string.format(T"%s PÁGINAS LIDAS COM VOCÊ", Desenho.milhar(paginas)), 130, y + 62, false, 10, CINZA_55)
             if e.atual then
                 self:texto(bb, T"COM VOCÊ AGORA", 130, y + 80, true, 10)
             else

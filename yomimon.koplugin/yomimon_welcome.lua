@@ -86,6 +86,8 @@ function BoasVindas:init()
     self.fator_fonte = Screen:scaleBySize(1000) / 1000
     self.faces = {}
     self.itens = listaOrdenada()
+    self.letras_com = {}
+    for _, it in ipairs(self.itens) do self.letras_com[it.nome:sub(1, 1)] = true end
     self.op = {
         iniciar = G_reader_settings:isTrue("yomimon_abrir_ao_iniciar"),
         gesto = G_reader_settings:isTrue("yomimon_gesto"),
@@ -131,19 +133,24 @@ function BoasVindas:opcao(bb, y, titulo, detalhe, ligada, acao, desativada)
     if not desativada then self:alvo(14, y - 4, 590, 82, acao) end
 end
 
-function BoasVindas:totalPaginas()
-    return math.ceil(#self.itens / POR_PAGINA)
+--- As espécies da letra escolhida (todas, quando nenhuma está escolhida).
+function BoasVindas:visiveis()
+    if not self.letra then return self.itens end
+    local lista = {}
+    for _, it in ipairs(self.itens) do
+        if it.nome:sub(1, 1) == self.letra then lista[#lista + 1] = it end
+    end
+    return lista
 end
 
---- Pula para a primeira espécie que começa com a letra (ou a próxima letra que tenha alguma).
-function BoasVindas:irParaLetra(letra)
-    for i, it in ipairs(self.itens) do
-        if it.nome:sub(1, 1) >= letra then
-            self.pagina = math.ceil(i / POR_PAGINA)
-            return
-        end
-    end
-    self.pagina = self:totalPaginas()
+function BoasVindas:totalPaginas()
+    return math.max(1, math.ceil(#self:visiveis() / POR_PAGINA))
+end
+
+--- Mostra só a letra tocada; tocar de novo nela volta à lista toda.
+function BoasVindas:filtrarLetra(letra)
+    self.letra = self.letra ~= letra and letra or nil
+    self.pagina = 1
 end
 
 function BoasVindas:pintarLista(bb)
@@ -151,13 +158,17 @@ function BoasVindas:pintarLista(bb)
     for i, letra in ipairs(LETRAS) do
         local col, lin = (i - 1) % 13, math.floor((i - 1) / 13)
         local lx, ly = 21 + col * 44, 70 + lin * 44
+        local tem = self.letras_com[letra]
+        local escolhida = self.letra == letra
         self:cartao(bb, lx, ly, 40, 38, false)
-        self:texto(bb, letra, 0, ly + 8, true, 18, PRETO, lx + 20)
-        self:alvo(lx - 2, ly - 2, 44, 42, function() self:irParaLetra(letra) end)
+        if escolhida then self:ret(bb, lx + 2, ly + 2, 36, 34, PRETO) end
+        self:texto(bb, letra, 0, ly + 8, true, 18, escolhida and BRANCO or (tem and PRETO or CINZA_BB), lx + 20)
+        if tem then self:alvo(lx - 2, ly - 2, 44, 42, function() self:filtrarLetra(letra) end) end
     end
+    local itens = self:visiveis()
     local primeiro = (self.pagina - 1) * POR_PAGINA
     for n = 1, POR_PAGINA do
-        local it = self.itens[primeiro + n]
+        local it = itens[primeiro + n]
         if not it then break end
         local y = 170 + (n - 1) * 68
         self:cartao(bb, 20, y, 578, 58, true)
@@ -242,11 +253,6 @@ function BoasVindas:paintTo(bb, x, y)
     bb:paintRect(x, y, self.dimen.w, self.dimen.h, BRANCO)
     self.alvos = {}
     self.camada = "conteudo"
-    -- pontinhos de progresso no rodapé (3 passos)
-    for i = 1, 3 do
-        self:ret(bb, LARG / 2 - 30 + (i - 1) * 24, 806, 12, 12, i == self.passo and PRETO or CINZA_BB)
-    end
-
     if self.passo == 1 then
         self:pintarLista(bb)
 

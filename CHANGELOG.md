@@ -1,6 +1,19 @@
 # Changelog
 
-## 0.1.0 (unreleased)
+## 0.1.1 (2026-11-05)
+
+- The A-Z bar in the picker now shows only the species of the chosen letter (tap it again for the full list);
+  letters without species are greyed out.
+- Removed the three non-interactive squares at the bottom of the picker.
+- Sprites of every registered species are downloaded again when missing, not only the current one.
+- The Pokémon you just picked now shows up in the Pokédex right away.
+- Clearer menu captions, and "pages read with you" in the Pokédex.
+- The critter image has one fixed height, so the Simple UI decorations keep the same size for every species; its
+  background is white in light mode and transparent in night mode.
+- The Simple UI and Bookshelf cards use the UI font.
+- Module and data files renamed to English; the UI defaults to Portuguese unless English is chosen in the menu.
+
+## 0.1.0 (2026-11-05)
 
 - Fork of Silverfish 1.1.0, renamed to Yomimon: plugin folder `yomimon.koplugin`, state in `settings/yomimon.lua`,
   data in `koreader/yomimon/`, settings keys `yomimon_*`. Existing Silverfish progress is not migrated.
