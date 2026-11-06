@@ -1,12 +1,12 @@
 --[[--
-Assuntos do capítulo, para os cartões (Lote 1, 28/10/2026). As listas são as do lote, nas duas línguas
-juntas: quem decide a palavra é a língua do livro, não a da Yomimon.
+Chapter subjects, for the cards (Batch 1, 28/10/2026). The lists are those of the batch, both languages
+together: what decides the word is the book's language, not Yomimon's.
 
-A página conta como os eventos (yomimon_memory.lua): 2+ palavras diferentes do assunto, ou 3+ da mesma.
-O capítulo "fala de" um assunto quando ele aparece bem mais que no resto do livro (o dobro, como os
-eventos) ou quando o título do capítulo tem uma palavra da lista. O plural com -s ou -es entra sozinho;
-expressão de várias palavras ("coat of arms") conta como sequência, e a que contém uma palavra da própria
-lista ("great-grandfather") conta como essa palavra.
+The page counts like the events (yomimon_memory.lua): 2+ different words of the subject, or 3+ of the same one.
+The chapter "talks about" a subject when it appears much more than in the rest of the book (double, like the
+events) or when the chapter title has a word of the list. The plural with -s or -es enters on its own;
+a multi-word expression ("coat of arms") counts as a sequence, and one that contains a word of the list
+itself ("great-grandfather") counts as that word.
 ]]
 
 return {

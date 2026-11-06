@@ -1,21 +1,21 @@
 --[[--
-Caixa de cartões: falas escritas por você para momentos certos (yomimon_locales/<code>/data/cards.lua).
+Card box: phrases written by you for the right moments (yomimon_locales/<code>/data/cards.lua).
 
-Quando um capítulo fala de um assunto (yomimon_memory.lua, M.cartaoDoCapitulo), o primeiro cartão que serve
-fica guardado em s.cartao_pendente. Ele vira a próxima fala da Home por até 24 horas (Estado.fala). Se não
-couber nas 2 linhas da Home, espera a tela da Yomimon (Estado.falaQueCabe marca `nao_coube`). Quando ela diz a
-fala, o cartão grava o que tiver de gravar (s.gravado) e, se for de uma vez só, entra em s.cartoes_ditos.
-Os dois vivem a vida dela: o ovo novo começa sem eles.
+When a chapter talks about a subject (yomimon_memory.lua, M.cartaoDoCapitulo), the first card that fits
+is stored in s.cartao_pendente. It becomes the next Home phrase for up to 24 hours (Estado.fala). If it does
+not fit in the Home's 2 lines, it waits for the Yomimon screen (Estado.falaQueCabe marks `nao_coube`). When it says the
+phrase, the card records what it has to record (s.gravado) and, if it is one-time, enters s.cartoes_ditos.
+Both live its life: a fresh start begins without them.
 ]]
 
 local Lingua = require("yomimon_language")
 
 local Cartoes = {}
 
-Cartoes.VALIDADE = 24 * 3600  -- quanto tempo o cartão guardado espera para ser dito
+Cartoes.VALIDADE = 24 * 3600  -- how long the stored card waits to be said
 
 local caixa
---- Os cartões no idioma atual (lista, na ordem do arquivo).
+--- The cards in the current language (list, in the file's order).
 function Cartoes.caixa()
     if caixa == nil then
         local ok, b = pcall(Lingua.data, "cards")
@@ -24,7 +24,7 @@ function Cartoes.caixa()
     return caixa or {}
 end
 
---- Troca a caixa (para testes); nil volta a ler o arquivo.
+--- Swaps the box (for tests); nil goes back to reading the file.
 function Cartoes.usarCaixa(b) caixa = b end
 
 local function serve(s, c, assuntos, dados)
@@ -37,10 +37,10 @@ local function serve(s, c, assuntos, dados)
     return true
 end
 
---- Um capítulo falou de `assuntos` ({ pressagio = true, … }): guarda o primeiro cartão que serve.
--- dados: { personagem = nome de quem mais aparece no capítulo (ou nil), fase = "jovem"… }. Cartão com
--- {personagem} sem personagem não serve. Enquanto um cartão guardado não foi dito, não entra outro.
--- Devolve true se guardou.
+--- A chapter talked about `assuntos` ({ pressagio = true, … }): stores the first card that fits.
+-- dados: { personagem = name of who appears most in the chapter (or nil), fase = "jovem"… }. A card with
+-- {personagem} without a character does not fit. While a stored card has not been said, no other enters.
+-- Returns true if it stored one.
 function Cartoes.capitulo(s, assuntos, dados, agora, livro)
     local p = s.cartao_pendente
     if p and not p.usado and agora - (p.t or 0) < Cartoes.VALIDADE then return false end
@@ -62,8 +62,8 @@ function Cartoes.capitulo(s, assuntos, dados, agora, livro)
     return false
 end
 
---- O cartão guardado que pode ser dito agora nesta tela, ou nil: na Home; na tela da Yomimon só depois de
--- não caber na Home.
+--- The stored card that can be said now on this screen, or nil: on the Home; on the Yomimon screen only after
+-- not fitting on the Home.
 function Cartoes.pendente(s, agora, tela)
     local p = s.cartao_pendente
     if not p or p.usado or agora - (p.t or 0) >= Cartoes.VALIDADE then return nil end
@@ -71,7 +71,7 @@ function Cartoes.pendente(s, agora, tela)
     return nil
 end
 
---- Ela disse o cartão guardado: grava o que ele grava e, se for de uma vez só, guarda o id.
+--- It said the stored card: records what it records and, if it is one-time, stores the id.
 function Cartoes.dito(s, p, agora)
     p.usado = true
     if p.grava then

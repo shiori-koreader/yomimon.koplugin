@@ -1,38 +1,38 @@
 --[[--
-Contagem de páginas: duas perguntas separadas.
+Page counting: two separate questions.
 
-1. A página conta? Igual às estatísticas do KOReader, para os números baterem com o que o leitor vê:
-   cada página conta UMA vez por livro (também depois de reiniciar o KOReader), se ficou aberta pelo
-   menos o tempo mínimo das estatísticas (statistics.min_sec, 5 s por padrão). Se o total de páginas do
-   livro muda (fonte, margens), a lista recomeça, porque os números das páginas mudam.
+1. Does the page count? Like KOReader's statistics, so the numbers match what the reader sees:
+   each page counts ONCE per book (also after restarting KOReader), if it stayed open for at
+   least the statistics' minimum time (statistics.min_sec, 5 s by default). If the book's total
+   of pages changes (font, margins), the list starts again, because the page numbers change.
 
-2. A página molda o Yomimon? Só leitura de verdade (o princípio: ela vira quem é pelo que você leu):
-   - não é matéria inicial ou final (sumário, ficha catalográfica, prefácio, notas, sobre o autor…);
-   - tem texto de verdade (página de título e dedicatória não);
-   - ficou aberta um tempo plausível para o tanto de texto, pelo ritmo do próprio leitor: pelo menos
-     35% do tempo que ele costuma levar por letra (mínimo de 8 s). Folhear não molda.
+2. Does the page shape Yomimon? Only real reading (the principle: it becomes who it is by what you read):
+   - it is not front or back matter (contents, catalogue card, preface, notes, about the author…);
+   - it has real text (title page and dedication do not);
+   - it stayed open a plausible time for the amount of text, by the reader's own pace: at least
+     35% of the time they usually take per letter (minimum 8 s). Flipping through does not shape it.
 
-Lógica pura (sem KOReader), testável fora dele.
+Pure logic (no KOReader), testable outside it.
 ]]
 
 local C = {}
 
-C.MIN_PADRAO = 5             -- mesmo padrão das estatísticas do KOReader
-C.FRACAO_RITMO = 0.35        -- tempo mínimo = 35% do ritmo do leitor para aquele tanto de texto
-C.MIN_ABSOLUTO = 8           -- nunca menos que isso para moldar a traça
-C.RITMO_PADRAO = 0.03        -- segundos por letra antes de conhecer o leitor (~33 letras/s, leitor rápido)
-C.RITMO_AMOSTRAS = 30        -- quantas páginas recentes formam o ritmo
-C.MAX_ABERTA = 600           -- página aberta mais que isso (dormiu?) não entra no ritmo
-C.LETRAS_MINIMAS = 150       -- menos que isso é título, dedicatória, epígrafe
-C.LIVROS_LEMBRADOS = 30      -- de quantos livros guarda as páginas já contadas
+C.MIN_PADRAO = 5             -- same default as KOReader's statistics
+C.FRACAO_RITMO = 0.35        -- minimum time = 35% of the reader's pace for that amount of text
+C.MIN_ABSOLUTO = 8           -- never less than this to shape Yomimon
+C.RITMO_PADRAO = 0.03        -- seconds per letter before knowing the reader (~33 letters/s, a fast reader)
+C.RITMO_AMOSTRAS = 30        -- how many recent pages make up the pace
+C.MAX_ABERTA = 600           -- a page open longer than this (fell asleep?) does not enter the pace
+C.LETRAS_MINIMAS = 150       -- less than this is a title, dedication, epigraph
+C.LIVROS_LEMBRADOS = 30      -- how many books it keeps the already counted pages of
 
---- Tempo mínimo por página das estatísticas do KOReader (configuração do leitor), ou o padrão.
+--- Minimum time per page of KOReader's statistics (the reader's setting), or the default.
 function C.minimoSegundos(estatisticas)
     local v = type(estatisticas) == "table" and tonumber(estatisticas.min_sec)
     return v and v >= 0 and v or C.MIN_PADRAO
 end
 
--- Páginas já contadas de um livro, em faixas compactas: "11-27,30,35-40".
+-- Pages already counted of a book, in compact ranges: "11-27,30,35-40".
 local function lerFaixas(txt)
     local out = {}
     for a, b in (txt or ""):gmatch("(%d+)%-?(%d*)") do out[#out + 1] = { tonumber(a), tonumber(b ~= "" and b or a) } end
@@ -58,7 +58,7 @@ local function incluir(faixas, p)
     return out
 end
 
---- true se é a primeira vez que esta página do livro conta (e já registra). total: páginas do livro agora.
+--- true if it is the first time this page of the book counts (and already records it). total: pages of the book now.
 function C.primeiraVez(s, livro, pagina, total, agora)
     s.vistas = s.vistas or {}
     local v = s.vistas[livro]
@@ -70,7 +70,7 @@ function C.primeiraVez(s, livro, pagina, total, agora)
     local faixas = lerFaixas(v.faixas)
     if contem(faixas, pagina) then return false end
     v.faixas = escreverFaixas(incluir(faixas, pagina))
-    -- só os livros mais recentes
+    -- only the most recent books
     local n, mais_velho, quando = 0, nil, math.huge
     for nome, x in pairs(s.vistas) do
         n = n + 1
@@ -80,7 +80,7 @@ function C.primeiraVez(s, livro, pagina, total, agora)
     return true
 end
 
--- Matéria inicial e final: pelo nome do capítulo no sumário ou por marcas no texto da página.
+-- Front and back matter: by the chapter name in the table of contents or by marks in the page text.
 local CAPITULOS = {}
 for t in ([[contents|table of contents|copyright|title page|cover|dedication|acknowledgments|acknowledgements|
     about the author|about the publisher|also by|other books by|books by|praise for|index|bibliography|notes|
@@ -92,18 +92,18 @@ for t in ([[contents|table of contents|copyright|title page|cover|dedication|ack
     posfácio|bibliografia|glossário|colofão|cronologia|epígrafe]]):gmatch("[^|]+") do
     CAPITULOS[#CAPITULOS + 1] = t:gsub("^%s+", ""):gsub("%s+$", "")
 end
--- capítulos que sempre continuam ("Also by John Steinbeck", "Outras obras de Clarice Lispector")
+-- chapters that always continue ("Also by John Steinbeck", "Outras obras de Clarice Lispector")
 local PREFIXOS = { "also by ", "books by ", "other books by ", "praise for ", "about the author", "outras obras ",
     "do mesmo autor", "da mesma autora", "sobre o autor", "sobre a autora" }
--- só marcas que praticamente só aparecem em ficha ou licença (nunca "printed in", que cabe num romance)
+-- only marks that practically only appear in a catalogue card or licence (never "printed in", which fits in a novel)
 local MARCAS = { "isbn", "©", "all rights reserved", "todos os direitos reservados",
     "dados internacionais de catalogação", "catalogação na publicação", "library of congress", "project gutenberg" }
 
---- true se a página é matéria inicial ou final (não molda o Yomimon).
+--- true if the page is front or back matter (does not shape Yomimon).
 function C.materia(capitulo, texto)
     if type(capitulo) == "string" then
         local c = capitulo:lower():gsub("^[%s%d%p]+", ""):gsub("[%s%p]+$", "")
-        -- nome exato ou com dois-pontos ("Introduction: …"); "Notes from Underground" não é "Notes"
+        -- exact name or with a colon ("Introduction: …"); "Notes from Underground" is not "Notes"
         for _, t in ipairs(CAPITULOS) do
             if c == t or c:sub(1, #t + 1) == t .. ":" then return true end
         end
@@ -116,8 +116,8 @@ function C.materia(capitulo, texto)
     return false
 end
 
---- true se esta página já moldou o Yomimon (foi digerida). A contagem e a digestão são separadas: uma
--- página folheada conta na primeira passagem, mas ainda pode ser digerida quando você volta e lê.
+--- true if this page already shaped Yomimon (was digested). Counting and digestion are separate: a
+-- page flipped through counts on the first pass, but can still be digested when you come back and read.
 function C.jaLida(s, livro, pagina)
     local v = s.vistas and s.vistas[livro]
     return v ~= nil and contem(lerFaixas(v.lidas), pagina)
@@ -127,7 +127,7 @@ function C.marcarLida(s, livro, pagina)
     if v then v.lidas = escreverFaixas(incluir(lerFaixas(v.lidas), pagina)) end
 end
 
---- Ritmo do leitor (segundos por letra): mediana das páginas lidas de verdade mais recentes.
+--- The reader's pace (seconds per letter): median of the most recent pages really read.
 function C.ritmo(s)
     local r = s.ritmo
     if type(r) ~= "table" or #r < 5 then return C.RITMO_PADRAO end
@@ -137,7 +137,7 @@ function C.ritmo(s)
     return o[math.floor((#o + 1) / 2)]
 end
 
---- true se a página foi lida de verdade (molda o Yomimon); se foi, entra no ritmo do leitor.
+--- true if the page was really read (shapes Yomimon); if so, it enters the reader's pace.
 function C.lidaDeVerdade(s, tempo, letras, capitulo, texto)
     if not texto or letras < C.LETRAS_MINIMAS or C.materia(capitulo, texto) then return false end
     local minimo = math.max(C.MIN_ABSOLUTO, C.FRACAO_RITMO * C.ritmo(s) * letras)

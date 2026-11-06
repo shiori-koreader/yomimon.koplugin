@@ -1,12 +1,12 @@
 --[[--
-Falas com dados da sua leitura: hora, páginas de hoje, recorde, sequência de dias,
-sessão sem parar, dias sumido e em que parte do livro você está.
+Phrases with data from your reading: time, pages today, record, streak of days,
+non-stop session, days away and what part of the book you are in.
 
-Cada gatilho olha o estado (preenchido por Estado.comer) e, se valer, oferece frases
-com brechas: {hora} ("2h13" / "2:13 a.m."), {n} (páginas ou dias), {livro}, {pct}.
-Gatilhos "fortes" (madrugada, recorde, maratona, sumiço) costumam ganhar das outras falas.
+Each trigger looks at the state (filled by Estado.comer) and, if it applies, offers phrases
+with gaps: {hora} ("2h13" / "2:13 a.m."), {n} (pages or days), {livro}, {pct}.
+"Strong" triggers (small hours, record, marathon, vanishing) usually beat the other phrases.
 
-Lógica pura (sem KOReader), testável fora dele.
+Pure logic (no KOReader), testable outside it.
 ]]
 
 local Lingua = require("yomimon_language")
@@ -14,19 +14,19 @@ local Voz = require("yomimon_voice")
 
 local Contexto = {}
 
-local LENDO_AGORA = 30 * 60   -- leu nos últimos 30 min: está lendo agora
+local LENDO_AGORA = 30 * 60   -- read in the last 30 min: it is reading now
 
--- Frases por gatilho e temperamento ("jovem" = ninfa e jovem; "velha" = adulta e anciã).
+-- Phrases by trigger and temperament ("jovem" = ninfa and jovem; "velha" = adulta and anciã).
 local FALAS = Lingua.content("context")
 
-Lingua.append(FALAS, Lingua.extra("contexto"))  -- lotes novos de frases
+Lingua.append(FALAS, Lingua.extra("contexto"))  -- new batches of phrases
 
 --- Hour for the phrases, formatted by the language ("2h13", "2:13 a.m.").
 function Contexto.hora(agora)
     return Lingua.format().clock(os.date("*t", agora))
 end
 
---- Gatilhos que valem agora, cada um { nome, n, forte }, os fortes primeiro.
+--- Triggers that apply now, each { nome, n, forte }, the strong ones first.
 function Contexto.gatilhos(s, agora)
     local lista = {}
     local function add(nome, n, forte) lista[#lista + 1] = { nome = nome, n = n, forte = forte or false } end
@@ -58,8 +58,8 @@ function Contexto.gatilhos(s, agora)
     return lista
 end
 
---- Uma fala com dados da leitura, ou nil. Devolve também se o gatilho é forte.
--- temperamento: "jovem" ou "velha". sorteio(n) devolve um inteiro de 1 a n.
+--- A phrase with reading data, or nil. Also returns whether the trigger is strong.
+-- temperamento: "jovem" or "velha". sorteio(n) returns an integer from 1 to n.
 function Contexto.fala(s, agora, temperamento, sorteio)
     sorteio = sorteio or math.random
     local lista = Contexto.gatilhos(s, agora)
@@ -71,7 +71,7 @@ function Contexto.fala(s, agora, temperamento, sorteio)
         hora = Contexto.hora(agora), n = g.n and tostring(g.n),
         livro = s.ultimo_livro, pct = g.n and (g.n .. "%"),
     }
-    -- as palavras de domínio ({gosto}, {cheiro}…) ficam para o resolvedor de voz (yomimon_voice.lua)
+    -- domain words ({gosto}, {cheiro}…) are left to the voice resolver (yomimon_voice.lua)
     local texto = Voz.escolher(banco, s, sorteio):gsub("{(%a+)}", function(b)
         if valores[b] then return valores[b] end
         if Voz.SLOTS[b] then return nil end

@@ -1,23 +1,23 @@
 --[[--
-Traços de personalidade da Yomimon: se movem devagar com o que VOCÊ lê.
+Yomimon's personality traits: they move slowly with what YOU read.
 
-Cinco eixos, de -100 a 100:
-  humor    amarga  ↔ otimista   (tragédias, mortes ↔ amor, festas, casamentos)
-  coragem  medrosa ↔ corajosa   (terror, crimes ↔ mar, viagens, aventuras)
-  coracao  cínica  ↔ romântica  (dinheiro, política, vingança ↔ amor, casamentos, cartas)
-  gosto    popular ↔ erudita    (crimes, festas ↔ filosofia, arte, ciência, fé)
-  relogio  diurna  ↔ noturna    (o horário em que você lê)
+Five axes, from -100 to 100:
+  humor    amarga  ↔ otimista   (tragedies, deaths ↔ love, parties, weddings)
+  coragem  medrosa ↔ corajosa   (horror, crimes ↔ sea, travel, adventures)
+  coracao  cínica  ↔ romântica  (money, politics, revenge ↔ love, weddings, letters)
+  gosto    popular ↔ erudita    (crimes, parties ↔ philosophy, art, science, faith)
+  relogio  diurna  ↔ noturna    (the time you read)
 
-Só páginas comidas de verdade mexem nos traços (nunca o que ela sabe do livro à frente).
-Cada página empurra pela DIFERENÇA para uma página média (yomimon_base_traits.lua): família e amor num
-romance antigo, ou saber e fé num clássico, estão em quase todo livro e não empurram; só o que o seu
-livro tem acima (ou abaixo) do normal molda ela. O que você NÃO lê só desfaz excesso: uma página sem
-nada para um traço puxa para o neutro, nunca para o polo oposto (não ler romance não deixa cínica).
-Cada página empurra um pouco e tudo volta devagar para o meio: o que você leu por último
-pesa mais. Quando um traço fica marcante, ela escreve no diário e ganha falas próprias
-(em yomimon_locales/<code>/data/traits.lua).
+Only pages really eaten move the traits (never what it knows of the book ahead).
+Each page pushes by the DIFFERENCE from an average page (yomimon_base_traits.lua): family and love in an old
+novel, or knowledge and faith in a classic, are in almost every book and do not push; only what your
+book has above (or below) normal shapes it. What you do NOT read only undoes excess: a page with
+nothing for a trait pulls towards neutral, never towards the opposite pole (not reading romance does not make it cynical).
+Each page pushes a little and everything slowly returns to the middle: what you read last
+weighs more. When a trait becomes striking, it writes in the diary and gets its own phrases
+(in yomimon_locales/<code>/data/traits.lua).
 
-Lógica pura (sem KOReader), testável fora dele.
+Pure logic (no KOReader), testable outside it.
 ]]
 
 local Lingua = require("yomimon_language")
@@ -32,11 +32,11 @@ Tracos.LISTA = {
     { id = "gosto",   neg = "popular", pos = "erudita" },
     { id = "relogio", neg = "diurna",  pos = "noturna" },
 }
-Tracos.PASSO = 0.5          -- quanto uma página pode mexer num traço
-Tracos.DECAIMENTO = 0.998   -- a cada página, tudo volta um pouco para o meio
-Tracos.MARCANTE = 25        -- daqui pra cima o traço aparece nas falas e no diário
+Tracos.PASSO = 0.5          -- how much a page can move a trait
+Tracos.DECAIMENTO = 0.998   -- on each page, everything returns a little to the middle
+Tracos.MARCANTE = 25        -- from here up the trait shows in the phrases and in the diary
 Tracos.FORTE = 60
-Tracos.FOLGA = 5            -- para descer de nível precisa cair 5 abaixo do limite (sem pisca-pisca)
+Tracos.FOLGA = 5            -- to drop a level it must fall 5 below the limit (no flicker)
 
 local ROTULO = {
     amarga = "BITTER", otimista = "HOPEFUL", medrosa = "JUMPY", corajosa = "BOLD",
@@ -44,23 +44,23 @@ local ROTULO = {
     diurna = "EARLY BIRD", noturna = "NIGHT OWL",
 }
 
--- O que cada sinal da página empurra (positivo = polo "pos" do eixo).
+-- What each page signal pushes (positive = the axis' "pos" pole).
 local PESOS = {
     humor = {
         temas = { morte = -1, guerra = -1, solidao = -1, vinganca = -1, medo = -0.5, loucura = -1, dinheiro = -0.5,
                   amor = 1, natureza = 0.5, comida = 1, infancia = 0.5, arte = 0.5, viagem = 0.5 },
         eventos = { morte = -2, doenca = -1, crime = -1, briga = -0.5, festa = 1.5, casamento = 1.5 },
-        -- (27/10/2026, PLANO-VOZ.md Etapa 6: loucura -0.5 → -1 e dinheiro -0.5, para a tragédia deixá-la amarga
-        -- e não só medrosa como o terror; Crime e Castigo, Hamlet e Macbeth são loucura, culpa e dinheiro)
-        -- (sem clima: a lista antiga puxava o terror para otimista; o dicionário ordena bem trechos curtos,
-        -- mas deixa Shakespeare e a prosa vitoriana "leves" — Hamlet e Romeu ficavam menos amargos com ele.
-        -- Fora desde 25/10/2026; ver ferramentas/validacao/MEMORIA-VINCULO.md)
+        -- (27/10/2026, PLANO-VOZ.md step 6: madness -0.5 → -1 and money -0.5, so tragedy leaves it bitter
+        -- and not just fearful like horror; Crime and Punishment, Hamlet and Macbeth are madness, guilt and money)
+        -- (without weather: the old list pulled horror towards optimistic; the dictionary orders short passages well,
+        -- but leaves Shakespeare and Victorian prose "light" — Hamlet and Romeo were less bitter with it.
+        -- Out since 25/10/2026; see ferramentas/validacao/MEMORIA-VINCULO.md)
     },
     coragem = {
         temas = { medo = -1.5, loucura = -0.5, noite = -0.3, viagem = 1, mar = 1, liberdade = 1, guerra = 0.5 },
         eventos = { fuga = -0.5, tempestade = 0.5, viagem = 1 },
-        -- (crime saiu em 27/10/2026: crime e investigação, de Sherlock a Crime e Castigo, não são histórias de
-        -- medo; o crime continua deixando ela amarga e um pouco cínica)
+        -- (crime left on 27/10/2026: crime and investigation, from Sherlock to Crime and Punishment, are not stories of
+        -- fear; crime still leaves it bitter and a little cynical)
     },
     coracao = {
         temas = { amor = 1.5, arte = 0.5, familia = 0.5, dinheiro = -1, politica = -1, vinganca = -1 },
@@ -72,30 +72,30 @@ local PESOS = {
     },
 }
 
-Tracos.PESOS = PESOS  -- exposto para as ferramentas de validação
+Tracos.PESOS = PESOS  -- exposed for the validation tools
 
 local function limitar(v, a) return math.max(-a, math.min(a, v)) end
 
--- Empurrão médio de uma página, por língua: o que todo livro tem não molda ela.
+-- Average push of a page, by language: what every book has does not shape it.
 Tracos.CENTRADOS = { "humor", "coragem", "coracao", "gosto" }
 local okB, BASE = pcall(require, "yomimon_base_traits")
 Tracos.BASE = okB and type(BASE) == "table" and BASE or nil
 
 local banco
---- Falas e anotações de diário dos traços, no idioma atual.
+--- Phrases and diary notes of the traits, in the current language.
 function Tracos.banco()
     banco = banco or Lingua.data("traits")
     return banco
 end
 
---- -2, -1, 0, 1 ou 2 para um valor (sem considerar o nível anterior).
+--- -2, -1, 0, 1 or 2 for a value (without considering the previous level).
 function Tracos.nivel(v)
     if v >= Tracos.FORTE then return 2 elseif v >= Tracos.MARCANTE then return 1
     elseif v <= -Tracos.FORTE then return -2 elseif v <= -Tracos.MARCANTE then return -1 end
     return 0
 end
 
--- Nível com folga: para enfraquecer, o valor precisa cair FOLGA abaixo do limite do nível atual.
+-- Level with slack: to weaken, the value must fall FOLGA below the current level's limit.
 local function nivelComFolga(v, atual)
     local alvo = Tracos.nivel(v)
     if atual ~= 0 and (alvo == 0 or (alvo > 0) == (atual > 0)) and math.abs(alvo) < math.abs(atual) then
@@ -105,8 +105,8 @@ local function nivelComFolga(v, atual)
     return alvo
 end
 
---- Quanto uma página empurra cada eixo (de -1 a 1). hora: a hora local da leitura.
--- bruto: sem descontar a página média (para calcular a média e para diagnóstico).
+--- How much a page pushes each axis (from -1 to 1). hora: the local time of reading.
+-- bruto: without discounting the average page (to compute the average and for diagnosis).
 function Tracos.empurrao(sinal, hora, bruto)
     local out = {}
     for id, P in pairs(PESOS) do
@@ -116,8 +116,8 @@ function Tracos.empurrao(sinal, hora, bruto)
         if P.clima then v = v + P.clima * (sinal.clima or 0) end
         out[id] = v
     end
-    -- (o tamanho médio das palavras empurrava o gosto; saiu em 25/10/2026: decidia 70–83% do traço e
-    -- chamava quase toda prosa de "popular", Henry James e Dostoiévski inclusive)
+    -- (the average word size pushed taste; out since 25/10/2026: it decided 70–83% of the trait and
+    -- called almost all prose "popular", Henry James and Dostoevsky included)
     local base = not bruto and Tracos.BASE and Tracos.BASE[sinal.pt and "pt" or "en"]
     local ausente = {}
     if base then
@@ -134,8 +134,8 @@ function Tracos.empurrao(sinal, hora, bruto)
     return out, ausente
 end
 
---- Empurrão médio de uma página, por língua, num corpus (linhas de livros30.txt; `fora`: livros a
--- ignorar). Usado por ferramentas/validacao/calcular_base_tracos.lua e pela régua da personalidade.
+--- Average push of a page, by language, over a corpus (lines of livros30.txt; `fora`: books to
+-- ignore). Used by ferramentas/validacao/calcular_base_tracos.lua and by the personality ruler.
 function Tracos.mediaDasPaginas(M, linhas, fora)
     local soma, n, livro = { en = {}, pt = {} }, { en = 0, pt = 0 }, nil
     for linha in linhas do
@@ -163,7 +163,7 @@ local function notaDiario(tr, antes, depois, livro)
     elseif math.abs(depois) > math.abs(antes) or (depois > 0) ~= (antes > 0) then
         polo, chave = depois > 0 and tr.pos or tr.neg, math.abs(depois)
     else
-        return nil  -- enfraqueceu de 2 para 1: não vale anotar
+        return nil  -- weakened from 2 to 1: not worth noting
     end
     local lista = Tracos.banco().diario[polo]
     lista = lista and lista[chave]
@@ -172,7 +172,7 @@ local function notaDiario(tr, antes, depois, livro)
     return (texto:gsub("{livro}", livro or T"this book"))
 end
 
---- Digere uma página: mexe nos traços e devolve as anotações de diário de quem mudou de nível.
+--- Digests a page: moves the traits and returns the diary notes of whoever changed level.
 function Tracos.digerir(s, sinal, agora, livro)
     s.tracos = s.tracos or {}
     s.tracos_nivel = s.tracos_nivel or {}
@@ -182,14 +182,14 @@ function Tracos.digerir(s, sinal, agora, livro)
     for _, tr in ipairs(Tracos.LISTA) do
         local atual = (s.tracos[tr.id] or 0) * Tracos.DECAIMENTO
         local v = limitar(atual + (emp[tr.id] or 0) * Tracos.PASSO, 100)
-        -- página sem nada para este eixo: o desconto da média só desfaz excesso (puxa para o neutro),
-        -- nunca leva ao polo oposto
+        -- page with nothing for this axis: the average discount only undoes excess (pulls towards neutral),
+        -- never leads to the opposite pole
         if ausente and ausente[tr.id] then
             if atual == 0 or (v > 0) ~= (atual > 0) then v = 0
             elseif math.abs(v) > math.abs(atual) then v = atual end
         end
-        -- um livro sozinho não fixa um traço forte: só passa de FORTE se o traço já era marcante, no mesmo
-        -- sentido, quando este livro começou
+        -- a single book does not fix a strong trait: it only goes past STRONG if the trait was already striking, in the same
+        -- direction, when this book started
         if math.abs(v) >= Tracos.FORTE then
             local L = livro and s.livros and s.livros[livro]
             local ini = L and L.tracos_inicio and L.tracos_inicio[tr.id] or 0
@@ -209,7 +209,7 @@ function Tracos.digerir(s, sinal, agora, livro)
     return notas
 end
 
---- Polos marcantes, do mais forte ao mais fraco: { {polo, valor}, ... }.
+--- Striking poles, from strongest to weakest: { {polo, valor}, ... }.
 function Tracos.marcantes(tracos)
     local lista = {}
     for _, tr in ipairs(Tracos.LISTA) do
@@ -220,12 +220,12 @@ function Tracos.marcantes(tracos)
     return lista
 end
 
---- Rótulo traduzido de um polo ("BITTER", "NIGHT OWL"…).
+--- Translated label of a pole ("BITTER", "NIGHT OWL"…).
 function Tracos.rotulo(polo)
     return T(ROTULO[polo] or polo)
 end
 
---- Até `max` rótulos dos traços marcantes ("BITTER", "NIGHT OWL"…), já traduzidos.
+--- Up to `max` labels of the striking traits ("BITTER", "NIGHT OWL"…), already translated.
 function Tracos.rotulos(tracos, max)
     local out = {}
     for i, m in ipairs(Tracos.marcantes(tracos)) do
@@ -235,8 +235,8 @@ function Tracos.rotulos(tracos, max)
     return out
 end
 
---- Uma fala do jeito que ela ficou, ou nil. Quanto mais forte o traço, mais ele aparece
--- (no máximo 4 em cada 10 falas). temperamento: "jovem" ou "velha".
+--- A phrase in the way it ended up, or nil. The stronger the trait, the more it shows
+-- (at most 4 in every 10 phrases). temperamento: "jovem" or "velha".
 function Tracos.fala(s, temperamento, sorteio)
     sorteio = sorteio or math.random
     local fortes = Tracos.marcantes(s.tracos)

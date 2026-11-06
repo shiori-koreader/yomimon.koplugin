@@ -1,40 +1,40 @@
 --[[--
-Influências literárias (desde 28/10/2026): as leituras mudam, devagar, o jeito de a Yomimon pensar e falar.
+Literary influences (since 28/10/2026): readings slowly change the way Yomimon thinks and speaks.
 
-Três níveis, todos de 0 a 100 por influência (yomimon_data/influences.lua):
-  contexto   o livro atual, pelo vetor dele (yomimon_vector.lua); refeito a cada 5 páginas lidas
-  recente    o que você anda lendo: a cada página lida de verdade, anda 1/300 do caminho até o contexto
-  acumulada  o que ficou: anda 1/2000 do caminho. Um livro de 300 páginas que é 70 numa influência deixa
-             a recente perto de 44 e a acumulada perto de 10. Nenhum livro sozinho vira a cabeça dela.
-Só página lida de verdade e nunca lida antes conta (a mesma porta dos traços: M.digerir com texto). Antes de
-20 páginas o livro não tem vetor, e nada muda.
+Three levels, all from 0 to 100 per influence (yomimon_data/influences.lua):
+  contexto   the current book, by its vector (yomimon_vector.lua); redone every 5 pages read
+  recente    what you have been reading: on each page really read, it moves 1/300 of the way to the context
+  acumulada  what stayed: it moves 1/2000 of the way. A 300-page book that is 70 in an influence leaves
+             the recent near 44 and the accumulated near 10. No single book turns its head.
+Only a page really read and never read before counts (the same door as the traits: M.digerir with text). Before
+20 pages the book has no vector, and nothing changes.
 
-Na fala (Estado.fala → Influencias.fala), a mistura pesa 45% o contexto, 30% a recente e 25% a acumulada. A
-influência mais forte escolhe a frase; a segunda, se for forte o bastante, entra na mesma fala por uma
-"lente" (um nome com artigo, numa lacuna {lente}) ou por um "fecho" (uma frase curta inteira no fim). Sem
-influência forte, sai a personalidade-base, às vezes temperada pela mais forte que houver. A fase dela
-(ninfa, jovem, adulta, anciã) escolhe entre as frases marcadas com `fase`; a da fase atual pesa mais.
-Estado guardado: s.influencias = { acumulada, recente, livro, contexto, contexto_em, tema, paginas }.
-Lógica pura (sem KOReader), testável fora dele. Sem rede, sem IA.
+In speech (Estado.fala → Influencias.fala), the mix weighs 45% the context, 30% the recent and 25% the accumulated. The
+strongest influence picks the phrase; the second, if strong enough, enters the same phrase through a
+"lens" (a name with an article, in a {lente} gap) or through a "fecho" (a whole short phrase at the end). Without a
+strong influence, the base personality comes out, sometimes seasoned by the strongest there is. Its stage
+(ninfa, jovem, adulta, anciã) chooses among the phrases marked with `fase`; the current stage's weighs more.
+Stored state: s.influencias = { acumulada, recente, livro, contexto, contexto_em, tema, paginas }.
+Pure logic (no KOReader), testable outside it. No network, no AI.
 ]]
 
 local Lingua = require("yomimon_language")
 
 local Infl = {}
 
-Infl.RECENTE = 300       -- páginas: quanto a recente demora para seguir o livro
-Infl.ACUMULADA = 2000    -- páginas: quanto a acumulada demora
-Infl.RECALCULAR = 5      -- páginas lidas entre um cálculo e outro do contexto
+Infl.RECENTE = 300       -- pages: how long the recent takes to follow the book
+Infl.ACUMULADA = 2000    -- pages: how long the accumulated takes
+Infl.RECALCULAR = 5      -- pages read between one context computation and the next
 Infl.PESOS = { contexto = 0.45, recente = 0.30, acumulada = 0.25 }
-Infl.MINIMO = 15         -- mistura a partir da qual uma influência escolhe a fala
-Infl.SEGUNDA = 0.6       -- a segunda entra se tiver pelo menos 60% da primeira (e o mínimo)
-Infl.POR_PONTOS = 4      -- chance da fala de influência: 1 em 20 a cada 4 pontos da mais forte, até 4 em 20
-Infl.MAX_CHANCE = 4      -- (era 6 em 10; com 70 frases por influência e as etiquetas do EPUB, um gênero forte tomava 4 falas em 10)
-Infl.BASE = 3            -- chance da personalidade-base, quando a influência não falou: 3 em 20 (era 3 em 10)
-Infl.MAX_FALA = 150      -- com o fecho, a fala não passa disso
-Infl.FECHO_ATE = 110     -- o fecho só entra em fala curta (até 110 letras e 2 frases): uma tirada por fala
-Infl.CURTA_ATE = 52      -- na Home, frase sem versão curta só entra se já tiver até isso de letras
-Infl.ETIQUETA = 40       -- no perfil do livro, o gênero que a etiqueta do EPUB indica vale pelo menos isso
+Infl.MINIMO = 15         -- mix from which an influence picks the phrase
+Infl.SEGUNDA = 0.6       -- the second enters if it has at least 60% of the first (and the minimum)
+Infl.POR_PONTOS = 4      -- chance of an influence phrase: 1 in 20 for each 4 points of the strongest, up to 4 in 20
+Infl.MAX_CHANCE = 4      -- (it was 6 in 10; with 70 phrases per influence and the EPUB tags, a strong genre took 4 phrases in 10)
+Infl.BASE = 3            -- chance of the base personality, when the influence did not speak: 3 in 20 (it was 3 in 10)
+Infl.MAX_FALA = 150      -- with the fecho, the phrase does not go past this
+Infl.FECHO_ATE = 110     -- the fecho only enters a short phrase (up to 110 letters and 2 sentences): one quip per phrase
+Infl.CURTA_ATE = 52      -- on the Home, a phrase without a short version only enters if it has up to this many letters
+Infl.ETIQUETA = 40       -- in the book profile, the genre the EPUB tag indicates is worth at least this
 
 local okL, LISTA = pcall(require, "yomimon_data.influences")
 Infl.LISTA = okL and type(LISTA) == "table" and LISTA or {}
@@ -42,7 +42,7 @@ Infl.POR_ID = {}
 for _, I in ipairs(Infl.LISTA) do Infl.POR_ID[I.id] = I end
 
 local bancos = {}
---- Frases no idioma atual (yomimon_locales/<code>/data/influences.lua), ou nil.
+--- Phrases in the current language (yomimon_locales/<code>/data/influences.lua), or nil.
 function Infl.banco()
     local c = Lingua.code()
     if bancos[c] == nil then
@@ -51,15 +51,15 @@ function Infl.banco()
     end
     return bancos[c] or nil
 end
-function Infl.usarBanco(b) bancos[Lingua.code()] = b end  -- (para testes)
+function Infl.usarBanco(b) bancos[Lingua.code()] = b end  -- (for tests)
 
 local function sat(x, k)
     if not x or x <= 0 then return 0 end
     return 1 - math.exp(-x / k)
 end
 
---- Intensidade de cada influência num livro, de 0 a 100, a partir do vetor dele (Vetor.de) e dos
--- acontecimentos por página. Devolve o perfil e o tema mais forte do livro (ou nil).
+--- Intensity of each influence in a book, from 0 to 100, from its vector (Vetor.de) and the
+-- happenings per page. Returns the profile and the book's strongest theme (or nil).
 function Infl.perfilDe(v, eventos_por_pagina)
     local f = {}
     for _, p in ipairs(v.temas or {}) do f[p[1]] = sat(p[2], 0.4) end
@@ -85,7 +85,7 @@ local DOBRA = { ["á"] = "a", ["à"] = "a", ["â"] = "a", ["ã"] = "a", ["é"] =
     ["Â"] = "a", ["Ã"] = "a", ["É"] = "e", ["Ê"] = "e", ["Í"] = "i", ["Ó"] = "o", ["Ô"] = "o", ["Õ"] = "o",
     ["Ú"] = "u", ["Ç"] = "c" }
 
---- As influências que as etiquetas de gênero do livro indicam (yomimon_data/genres.lua): { id = true }.
+--- The influences the book's genre tags indicate (yomimon_data/genres.lua): { id = true }.
 function Infl.doGenero(etiquetas)
     local ids = {}
     for _, e in ipairs(type(etiquetas) == "table" and etiquetas or {}) do
@@ -99,9 +99,9 @@ function Infl.doGenero(etiquetas)
     return ids
 end
 
---- Perfil do livro (como Infl.perfilDe) ou nil se ainda é cedo. O gênero que as etiquetas do EPUB indicam
--- vale pelo menos Infl.ETIQUETA: a etiqueta é só mapa (diz de que gênero o livro é); quem move a Yomimon
--- continua sendo cada página lida, em Infl.digerir.
+--- Book profile (like Infl.perfilDe) or nil if it is still early. The genre the EPUB tags indicate
+-- is worth at least Infl.ETIQUETA: the tag is only a map (it says which genre the book is); what moves Yomimon
+-- is still each page read, in Infl.digerir.
 function Infl.perfil(L)
     local okV, Vetor = pcall(require, "yomimon_vector")
     local v = okV and L and Vetor.de(L)
@@ -117,7 +117,7 @@ end
 
 local function arred(x) return math.floor(x * 1000 + 0.5) / 1000 end
 
---- Uma página lida de verdade do livro L (yomimon_memory.lua, junto com os traços).
+--- A page really read of book L (yomimon_memory.lua, together with the traits).
 function Infl.digerir(s, livro, L)
     if not (livro and L) then return end
     local I = type(s.influencias) == "table" and s.influencias or {}
@@ -139,7 +139,7 @@ function Infl.digerir(s, livro, L)
     I.paginas = (tonumber(I.paginas) or 0) + 1
 end
 
---- A mistura que vale na fala: { id = valor }. O contexto só conta se for do livro atual.
+--- The mix that applies in speech: { id = value }. The context only counts if it is of the current book.
 function Infl.mistura(s)
     local I = type(s.influencias) == "table" and s.influencias or {}
     local ctx = (I.livro == s.ultimo_livro and type(I.contexto) == "table") and I.contexto or {}
@@ -155,7 +155,7 @@ function Infl.mistura(s)
     return m
 end
 
---- As influências que mandam agora: até duas, { {id, valor}, ... }, a mais forte primeiro.
+--- The influences that rule now: up to two, { {id, value}, ... }, the strongest first.
 function Infl.dominantes(s)
     local m = Infl.mistura(s)
     local lista = {}
@@ -168,15 +168,15 @@ function Infl.dominantes(s)
     return out
 end
 
--- Fala ------------------------------------------------------------------------------------------
+-- Speech ------------------------------------------------------------------------------------------
 
---- Tipo de uma frase do banco: "modelo" (tem lacunas) ou "fixa".
+--- Kind of a bank phrase: "modelo" (has gaps) or "fixa".
 function Infl.tipo(frase)
     local t = type(frase) == "table" and frase[1] or frase
     return (type(t) == "string" and t:find("{", 1, true)) and "modelo" or "fixa"
 end
 
--- o acontecimento de destaque dos 3 capítulos mais recentes do livro atual, ou nil
+-- the standout happening of the 3 most recent chapters of the current book, or nil
 local function eventoRecente(s, Memoria)
     local L = s.ultimo_livro and s.livros and s.livros[s.ultimo_livro]
     if not (L and L.caps and Memoria) then return nil end
@@ -190,7 +190,7 @@ local function eventoRecente(s, Memoria)
     return nil
 end
 
--- valores das lacunas que existem agora; lacuna sem dado deixa a frase de fora
+-- values of the gaps that exist now; a gap without data leaves the phrase out
 local function lacunas(s, dados, B)
     local okM, Memoria = pcall(require, "yomimon_memory")
     local I = type(s.influencias) == "table" and s.influencias or {}
@@ -201,7 +201,7 @@ local function lacunas(s, dados, B)
     if ev and B.eventos then v.evento = B.eventos[ev] end
     local L = s.ultimo_livro and s.livros and s.livros[s.ultimo_livro]
     if L and type(L.autor) == "string" and L.autor:find("%S") then v.autor = L.autor end
-    -- o último livro terminado que não é o atual (as resenhas do diário)
+    -- the last finished book that is not the current one (the diary reviews)
     local resenhas = type(s.resenhas) == "table" and s.resenhas or {}
     for i = #resenhas, 1, -1 do
         local r = resenhas[i]
@@ -213,7 +213,7 @@ local function lacunas(s, dados, B)
     return v
 end
 
--- a frase marcada com uma fase (ou lista de fases) só vale nela
+-- a phrase marked with a stage (or list of stages) only applies in it
 local function daFase(f, fase)
     if not f.fase then return true end
     if type(f.fase) == "string" then return f.fase == fase end
@@ -234,7 +234,7 @@ local function serve(f, situ, valores, lente)
     return true
 end
 
--- na Home (2 linhas, ~50 letras) só servem a versão curta ou a frase que já é curta e sem lacunas
+-- on the Home (2 lines, ~50 letters) only the short version or a phrase that is already short and without gaps serve
 local function cabeNaHome(f)
     return f.curta ~= nil or (#f[1] <= Infl.CURTA_ATE and not f[1]:find("{", 1, true))
 end
@@ -244,7 +244,7 @@ local function escolher(lista, situ, valores, lente, sorteio, dita)
     local home = situ and situ.tela == "home"
     for _, f in ipairs(lista or {}) do
         if serve(f, situ, valores, lente) and not (dita and dita("infl:" .. f[1])) and (not home or cabeNaHome(f)) then
-            -- a frase feita para a situação ou para a fase de agora ganha
+            -- the phrase made for the situation or for the current stage wins
             local w = 1 + (f.quando and 2 or 0) + (f.fase and 2 or 0)
             cands[#cands + 1] = { f, w }
             total = total + w
@@ -259,7 +259,7 @@ local function escolher(lista, situ, valores, lente, sorteio, dita)
     return cands[#cands][1]
 end
 
---- Preenche um modelo: lacunas, lente e a primeira letra maiúscula.
+--- Fills a template: gaps, lens and the capital first letter.
 function Infl.preencher(texto, valores, lente)
     local out = texto:gsub("{([%w_]+)}", function(nome)
         if nome == "lente" then return lente end
@@ -268,8 +268,8 @@ function Infl.preencher(texto, valores, lente)
     return (out:gsub("^%l", string.upper))
 end
 
---- Junta um fecho no fim de uma fala (os dois são frases inteiras), ou nil se não couber. Fala longa ou
--- de 3+ frases já tem a sua tirada e fica como está.
+--- Joins a fecho at the end of a phrase (both are whole phrases), or nil if it does not fit. A long phrase or
+-- one of 3+ sentences already has its quip and stays as it is.
 function Infl.juntar(texto, fecho)
     if not (fecho and texto:find("[%.!%?…]$")) then return nil end
     local _, frases = texto:gsub("[%.!%?…]+%s", "")
@@ -279,12 +279,12 @@ function Infl.juntar(texto, fecho)
     return junto
 end
 
---- Uma fala de influência ou da personalidade-base, ou nil (aí o resto do Estado.fala decide).
--- dados: os de Estado (personagem, palavra…); situ: { triste, feliz, fome, cheia, noite, muda = true/false,
+--- A phrase from an influence or from the base personality, or nil (then the rest of Estado.fala decides).
+-- dados: those of Estado (personagem, palavra…); situ: { triste, feliz, fome, cheia, noite, muda = true/false,
 -- fase = "ninfa" | "jovem" | "adulta" | "ancia", tela = "home" | "traca" | nil };
--- dita(chave): true se a frase foi dita há pouco (fica de fora). Devolve o texto e a chave da regra de não
--- repetir (a frase do banco, antes de preencher; a versão curta usa a mesma chave). Na Home sai a versão
--- curta (`curta`), sem fecho.
+-- dita(chave): true if the phrase was said a moment ago (it stays out). Returns the text and the key of the no-repeat
+-- rule (the bank phrase, before filling; the short version uses the same key). On the Home the short
+-- version comes out (`curta`), without a fecho.
 function Infl.fala(s, dados, sorteio, situ, dita)
     local B = Infl.banco()
     if not B then return nil end
@@ -295,11 +295,11 @@ function Infl.fala(s, dados, sorteio, situ, dita)
     local r = sorteio(20)
     local lista, lente_de, fecho_de, chance_fecho
     if d1 and r <= k then
-        -- a mais forte escolhe; a segunda empresta a lente ou o fecho
+        -- the strongest picks; the second lends the lens or the fecho
         lista = B.influencias[d1[1]] and B.influencias[d1[1]].frases
         lente_de, fecho_de, chance_fecho = d2 and d2[1] or d1[1], d2 and d2[1], 2
     elseif r > 20 - Infl.BASE then
-        -- personalidade-base, temperada pela influência mais forte, se houver
+        -- base personality, seasoned by the strongest influence, if any
         lista = B.base
         lente_de, fecho_de, chance_fecho = d1 and d1[1], d1 and d1[1], 3
     else

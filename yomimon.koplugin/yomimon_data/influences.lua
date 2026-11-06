@@ -1,22 +1,22 @@
 --[[--
-As 16 influências literárias (desde 28/10/2026). Uma estrutura só para todas: cada influência é uma receita
-sobre o que o vetor do livro já mede (yomimon_vector.lua). Nada aqui detecta coisa nova.
+The 16 literary influences (since 28/10/2026). A single structure for all: each influence is a recipe
+over what the book vector already measures (yomimon_vector.lua). Nothing here detects anything new.
 
-Ingredientes da receita (cada um vira um número de 0 a 1 para o livro atual):
-  <tema>        um dos 24 temas, quanto o livro tem ACIMA da página média ("medo", "amor", "ciencia"…)
-  ev_<evento>   acontecimentos por página ("ev_crime", "ev_casamento"…)
-  _sombrio      tom bem abaixo do livro médio      _leve        tom bem acima
-  _frase_longa  frases bem mais longas que a média _frase_curta frases bem mais curtas
-  _teatro       o livro é uma peça                 _primeira    narrado por um "eu"
-Intensidade da influência no livro = 100 x soma(peso x ingrediente), no máximo 100. Pesos que somam
-menos de 1 deixam a influência conservadora: ela nunca chega ao topo só com pistas fracas.
+Ingredients of the recipe (each becomes a number from 0 to 1 for the current book):
+  <tema>        one of the 24 themes, how much the book has ABOVE the average page ("medo", "amor", "ciencia"…)
+  ev_<evento>   happenings per page ("ev_crime", "ev_casamento"…)
+  _sombrio      tone well below the average book      _leve        tone well above
+  _frase_longa  sentences much longer than average    _frase_curta sentences much shorter
+  _teatro       the book is a play                    _primeira    narrated by an "I"
+Intensity of the influence in the book = 100 x sum(weight x ingredient), at most 100. Weights that add up to
+less than 1 leave the influence conservative: it never reaches the top with weak clues alone.
 
-Realismo mágico, sátira, niilismo e mito não têm pista própria no que o plugin mede; as receitas deles
-são fracas de propósito (somam 0,5 a 0,85) e usam só indícios indiretos.
+Magical realism, satire, nihilism and myth have no clue of their own in what the plugin measures; their recipes
+are weak on purpose (they add up to 0.5 to 0.85) and use only indirect hints.
 ]]
 
 return {
-    -- narrativas
+    -- narrative
     { id = "epica", nome = "fantasia épica", grupo = "narrativa",
       receita = { guerra = 0.5, vinganca = 0.2, viagem = 0.15, fe = 0.15 } },
     { id = "misterio", nome = "mistério e investigação", grupo = "narrativa",
@@ -33,7 +33,7 @@ return {
       receita = { infancia = 0.1, familia = 0.1, tempo = 0.1, fe = 0.1, natureza = 0.1 } },
     { id = "satira", nome = "sátira e comédia", grupo = "narrativa",
       receita = { _leve = 0.25, politica = 0.25, dinheiro = 0.15, cidade = 0.1, ev_festa = 0.1 } },
-    -- estilísticas e dramáticas
+    -- stylistic and dramatic
     { id = "poesia", nome = "poesia e lirismo", grupo = "estilistica",
       receita = { arte = 0.35, natureza = 0.2, _frase_curta = 0.15, noite = 0.1 } },
     { id = "tragedia", nome = "tragédia", grupo = "estilistica",
@@ -42,7 +42,7 @@ return {
       receita = { dinheiro = 0.35, cidade = 0.25, politica = 0.15, comida = 0.1, _sombrio = 0.15 } },
     { id = "existencial", nome = "existencialismo e absurdo", grupo = "estilistica",
       receita = { solidao = 0.3, liberdade = 0.25, _sombrio = 0.15, morte = 0.1, loucura = 0.1, _primeira = 0.1 } },
-    -- interpretativas
+    -- interpretative
     { id = "filosofia", nome = "filosofia e metafísica", grupo = "interpretativa",
       receita = { saber = 0.4, fe = 0.2, liberdade = 0.15, tempo = 0.15, ciencia = 0.1 } },
     { id = "niilismo", nome = "niilismo e ceticismo", grupo = "interpretativa",

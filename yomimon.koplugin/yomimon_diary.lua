@@ -1,13 +1,13 @@
 --[[--
-Diário da Yomimon: o que ela escreve sobre a sua leitura, com coisas concretas.
+Yomimon's diary: what it writes about your reading, with concrete things.
 
-- Uma entrada por dia de leitura, montada com os dados daquele dia: quantas páginas, de qual
-  livro, a que horas, quem ela conheceu, uma fala de personagem, o evento e o assunto do dia.
-- Ao começar um livro: abertura variada (autor, mesmo autor de antes, livro largado, releitura).
-- Ao terminar um livro: resenha curta (protagonista, comparação com outros livros, série de
-  temas, o traço que o livro mexeu, nota) — e a resenha completa vai para s.resenhas.
+- One entry per reading day, built from that day's data: how many pages, of which
+  book, at what time, who it met, a character's line, the event and the subject of the day.
+- When starting a book: a varied opening (author, same author as before, abandoned book, re-read).
+- When finishing a book: a short review (protagonist, comparison with other books, series of
+  themes, the trait the book moved, grade) — and the full review goes to s.resenhas.
 
-As frases ficam em yomimon_locales/<code>/data/diary.lua. Lógica pura, testável fora do KOReader.
+The phrases live in yomimon_locales/<code>/data/diary.lua. Pure logic, testable outside KOReader.
 ]]
 
 local Lingua = require("yomimon_language")
@@ -15,12 +15,12 @@ local Lingua = require("yomimon_language")
 local Diario = {}
 
 local RESENHAS_MAX = 120
-local FIM_DO_LIVRO = 0.98     -- livro sem sumário que ajude: progresso a partir do qual conta como terminado
-local HISTORIA_MIN = 0.5      -- anexos que começariam antes da metade do arquivo: o sumário não é confiável
-local ENTRADA_MAX = 200       -- entradas maiores perdem partes opcionais
+local FIM_DO_LIVRO = 0.98     -- book without a helpful table of contents: progress from which it counts as finished
+local HISTORIA_MIN = 0.5      -- appendices that would start before the middle of the file: the table of contents is not reliable
+local ENTRADA_MAX = 200       -- bigger entries lose optional parts
 
--- Títulos de anexo (o que vem depois da história), em palavras inteiras: notas, cronologia, posfácio,
--- sobre o autor, créditos, propaganda da editora…
+-- Appendix titles (what comes after the story), as whole words: notes, chronology, afterword,
+-- about the author, credits, publisher ads…
 local ANEXOS = {}
 for p in ([[nota notas posfácio posfacio cronologia créditos creditos colofon colofão autor autora autores
     bibliografia referências glossário índice apêndice apêndices anexo anexos agradecimentos copyright
@@ -34,7 +34,7 @@ for _, p in ipairs({ "saiba mais", "outras leituras", "leia também", "leia mais
 end
 
 local function ehAnexo(titulo)
-    -- minúsculas (também À…Þ), sem números nem pontuação: "XLV. Notas" → " xlv notas "
+    -- lowercase (also À…Þ), without numbers or punctuation: "XLV. Notas" → " xlv notas "
     local t = " " .. tostring(titulo or ""):lower():gsub("\195([\128-\158])", function(c) return "\195" .. string.char(c:byte() + 32) end)
         :gsub("[^%a\128-\255]+", " ") .. " "
     for chave in pairs(ANEXOS) do
@@ -43,11 +43,11 @@ local function ehAnexo(titulo)
     return false
 end
 
---- Última página da história, pelo sumário. De trás para frente, pula os títulos de anexo; a história acaba
--- logo antes do primeiro deles. De trás para frente porque um capítulo da história pode se chamar "Notas"
--- (Brás Cubas, XLV). Só o nível de cima do sumário conta: as notas podem ter subtítulos ("Capítulo 1"…).
--- toc: { { titulo =, pagina =, nivel = }, … } na ordem do livro; total: páginas do arquivo.
--- Devolve nil quando o sumário não ajuda (vazio, só anexos, ou anexos antes da metade do arquivo).
+--- Last page of the story, by the table of contents. Going backwards, it skips the appendix titles; the story ends
+-- right before the first of them. Backwards because a chapter of the story may be called "Notas"
+-- (Brás Cubas, XLV). Only the top level of the table of contents counts: the notes may have subtitles ("Capítulo 1"…).
+-- toc: { { titulo =, pagina =, nivel = }, … } in the book's order; total: pages of the file.
+-- Returns nil when the table of contents does not help (empty, only appendices, or appendices before the middle of the file).
 function Diario.fimDaHistoria(toc, total)
     if type(toc) ~= "table" or not total or total < 1 then return nil end
     local nivel
@@ -78,7 +78,7 @@ end
 
 local function preencher(modelo, v)
     local texto = modelo:gsub("{([%w_]+)}", function(k) return v[k] or ("{" .. k .. "}") end)
-    -- pontuação de citação: “Quem?”, disse → “Quem?” disse ; “Fim.”, disse → “Fim,” disse
+    -- quotation punctuation: “Quem?”, disse → “Quem?” disse ; “Fim.”, disse → “Fim,” disse
     texto = texto:gsub("([%?!])\226\128\157,", "%1\226\128\157"):gsub("%.\226\128\157,", ",\226\128\157")
     return texto
 end
@@ -95,9 +95,9 @@ local function maiorDe(t)
     return melhor, valor
 end
 
--- Dia de leitura ---------------------------------------------------------------------
+-- Reading day ---------------------------------------------------------------------
 
---- Fecha o dia anterior (se o dia mudou) e escreve a entrada dele. Chamar antes de contar a página.
+--- Closes the previous day (if the day changed) and writes its entry. Call before counting the page.
 function Diario.virarDia(s, M, agora)
     local hoje = os.date("%Y-%m-%d", agora)
     if s.dia and s.dia.data ~= hoje then
@@ -109,8 +109,8 @@ function Diario.virarDia(s, M, agora)
                        temas = {}, clima = 0, eventos = {} }
 end
 
---- Conta uma página no dia de hoje.
--- contar: false quando a página já foi contada antes e agora só é digerida.
+--- Counts a page on today's date.
+-- contar: false when the page was already counted before and is now only digested.
 function Diario.pagina(s, livro, sinal, falas, agora, contar)
     local D = s.dia
     if not D then return end
@@ -135,7 +135,7 @@ function Diario.pagina(s, livro, sinal, falas, agora, contar)
     end
 end
 
---- Personagens que ela "conheceu" hoje (viraram personagem e ainda não tinham sido anotados).
+--- Characters it "met" today (became a character and had not been noted yet).
 local function conhecidosHoje(s, M, D)
     local novos = {}
     for _, livro in ipairs(D.ordem) do
@@ -154,7 +154,7 @@ local function conhecidosHoje(s, M, D)
     return novos
 end
 
---- Monta a entrada de um dia de leitura (ou nil, se não houve leitura).
+--- Builds the entry of a reading day (or nil, if there was no reading).
 function Diario.entradaDoDia(s, M, D)
     if not D or D.paginas == 0 or #D.ordem == 0 then return nil end
     local B, temp = Diario.banco().dia, temperamento(s)
@@ -162,7 +162,7 @@ function Diario.entradaDoDia(s, M, D)
     local maior = 0
     for _, l in ipairs(D.ordem) do if D.livros[l] > maior then livro, maior = l, D.livros[l] end end
     local v = { n = tostring(D.paginas), livro = livro }
-    -- abertura: quanto ela comeu
+    -- opening: how much it ate
     local abertura
     if #D.ordem >= 2 then
         v.livro2 = D.ordem[1] == livro and D.ordem[2] or D.ordem[1]
@@ -172,11 +172,11 @@ function Diario.entradaDoDia(s, M, D)
     elseif D.paginas < 80 then abertura = sorteia(B.banquete)
     else abertura = sorteia(B.enorme) end
     local partes = { preencher(abertura, v) }
-    -- horário, quando um período dominou o dia
+    -- time, when a period dominated the day
     local periodo, qtd = maiorDe(D.horas)
     local horario = periodo and qtd >= D.paginas * 0.6 and sorteia(B.horario[periodo])
-    -- detalhes do dia, em ordem de interesse
-    -- detalhes do dia, cada um com um peso (os mais concretos pesam mais)
+    -- details of the day, in order of interest
+    -- details of the day, each with a weight (the most concrete weigh more)
     local detalhes = {}
     local function detalhe(texto, peso) if texto then detalhes[#detalhes + 1] = { texto = texto, peso = peso } end end
     local novos = conhecidosHoje(s, M, D)
@@ -185,7 +185,7 @@ function Diario.entradaDoDia(s, M, D)
     elseif #novos == 1 then
         detalhe(preencher(sorteia(B.novo), { nome = novos[1] }), 4)
     end
-    -- fala de personagem: não repete quem falou no último dia anotado
+    -- character line: does not repeat who spoke on the last noted day
     if D.fala and #D.fala.fala <= 90 and D.fala.nome ~= s.diario_ultima_fala then
         detalhe(preencher(sorteia(B.fala[temp]), { nome = D.fala.nome, fala = D.fala.fala }), 3)
     end
@@ -198,7 +198,7 @@ function Diario.entradaDoDia(s, M, D)
     local clima = D.clima / D.paginas
     if clima <= -1 then detalhe(sorteia(B.pesado), 2)
     elseif clima >= 1 then detalhe(sorteia(B.leve), 2) end
-    -- até 2 detalhes, sorteados pelo peso
+    -- up to 2 details, drawn by weight
     for _ = 1, 2 do
         local soma = 0
         for _, d in ipairs(detalhes) do soma = soma + d.peso end
@@ -214,7 +214,7 @@ function Diario.entradaDoDia(s, M, D)
             end
         end
     end
-    -- fecho: no tom dela, puxado pelo clima do dia
+    -- closing: in its tone, pulled by the day's weather
     local fecho = sorteia((clima <= -1 and B.fecho_escuro or clima >= 1 and B.fecho_leve or B.fecho)[temp])
     local function montar(com_horario, n_partes)
         local p = { partes[1] }
@@ -229,9 +229,9 @@ function Diario.entradaDoDia(s, M, D)
     return texto
 end
 
--- Começo e fim de livro --------------------------------------------------------------
+-- Start and end of a book --------------------------------------------------------
 
---- Entrada de livro novo. anterior: o livro que ela vinha comendo antes (ou nil).
+--- Entry of a new book. anterior: the book it had been eating before (or nil).
 function Diario.inicioLivro(s, M, livro, onde, anterior)
     local B = Diario.banco().inicio
     local v = { livro = livro, autor = onde and onde.autor, anterior = anterior }
@@ -250,12 +250,12 @@ function Diario.inicioLivro(s, M, livro, onde, anterior)
     return preencher(sorteia(opcoes), v)
 end
 
---- Entrada de releitura.
+--- Entry of a re-read.
 function Diario.releitura(livro)
     return preencher(sorteia(Diario.banco().inicio.relendo), { livro = livro })
 end
 
--- Traço que mais mudou durante o livro (ou nil, se nenhum mudou o bastante).
+-- Trait that changed most during the book (or nil, if none changed enough).
 local function tracoDoLivro(s, L)
     local ok, Tracos = pcall(require, "yomimon_traits")
     if not ok then return nil end
@@ -267,7 +267,7 @@ local function tracoDoLivro(s, L)
     return melhor
 end
 
---- Fecha um livro terminado: escreve a resenha curta no diário e guarda a completa em s.resenhas.
+--- Closes a finished book: writes the short review in the diary and stores the full one in s.resenhas.
 function Diario.fimLivro(s, M, livro, agora)
     local L = s.livros and s.livros[livro]
     if not L then return end
@@ -281,7 +281,7 @@ function Diario.fimLivro(s, M, livro, agora)
     local tema = maiorDe(L.temas)
     local clima = (L.clima or 0) / math.max(1, L.paginas)
     local dias = L.dias or 1
-    -- nota: metade pelo ritmo com que você leu, metade pela intensidade do livro (eventos e clima)
+    -- grade: half by the pace you read at, half by the book's intensity (events and weather)
     local ppd = L.paginas / math.max(1, dias)
     local ritmo = ppd < 10 and 1 or ppd < 20 and 2 or ppd < 30 and 3 or ppd < 45 and 4 or 5
     local n_eventos = 0
@@ -292,7 +292,7 @@ function Diario.fimLivro(s, M, livro, agora)
     local traco = tracoDoLivro(s, L)
     local citacao = M.citacao(s, livro, function() return 1 end, 100)
 
-    -- comparações com as resenhas anteriores
+    -- comparisons with the previous reviews
     s.resenhas = s.resenhas or {}
     local anterior = s.resenhas[#s.resenhas]
     local serie = 0
@@ -300,7 +300,7 @@ function Diario.fimLivro(s, M, livro, agora)
         if s.resenhas[i].tema == tema and s.resenhas[i].livro ~= livro then serie = serie + 1 else break end
     end
 
-    -- o nome composto do livro (vetor do livro, yomimon_vector.lua): "uma história de mar, agitada"
+    -- the book's compound name (book vector, yomimon_vector.lua): "a sea story, restless"
     local okV, Vetor = pcall(require, "yomimon_vector")
     local nome = okV and Vetor.nome(Vetor.de(L)) or nil
 
@@ -312,7 +312,7 @@ function Diario.fimLivro(s, M, livro, agora)
         opcionais[#opcionais + 1] = preencher(sorteia(clima < (anterior.clima or 0) and B.mais_escuro or B.mais_leve),
             { outro = anterior.livro })
     end
-    if tema and serie == 1 then  -- 3º seguido em diante vira lembrança garantida (yomimon_memories)
+    if tema and serie == 1 then  -- 3rd in a row onwards becomes a guaranteed memory (yomimon_memories)
         local ordinal = Lingua.format().ordinals[math.min(serie, 5)]
         opcionais[#opcionais + 1] = preencher(sorteia(B.serie), { ordinal = ordinal, tema = M.tema(tema), de_tema = M.tema(tema, "de") })
     end
@@ -332,45 +332,45 @@ function Diario.fimLivro(s, M, livro, agora)
         nome = nome,
     }
     while #s.resenhas > RESENHAS_MAX do table.remove(s.resenhas, 1) end
-    -- palavras do livro (Etapa 5): terminado, guarda só as mais contadas
+    -- the book's words (step 5): finished, keeps only the most counted
     if M.podarVocab then M.podarVocab(L, M.VOCAB_FIM) end
     local okLem, Lem = pcall(require, "yomimon_memories")
     if okLem then
-        -- nível C, guardado e mudo: gênero provável e aura do protagonista
+        -- level C, stored and mute: probable genre and aura of the protagonist
         local r = s.resenhas[#s.resenhas]
         r.genero = Lem.genero(L.temas)
         r.aura = protagonista and L.aura and L.aura[protagonista] and Lem.aura(L.aura[protagonista]) or nil
         Lem.fimLivro(s, M, livro, agora, serie)
     end
-    -- nomes: fica só a lista final de personagens e lugares; as evidências saem do estado salvo
+    -- names: only the final list of characters and places stays; the evidence leaves the saved state
     if M.congelarNomes then M.congelarNomes(L, livro) end
 end
 
---- Chamado a cada página com o livro já registrado: dias de leitura, progresso, fim e releitura.
+--- Called on every page with the book already registered: reading days, progress, end and re-read.
 function Diario.acompanharLivro(s, M, L, livro, onde, agora)
     local hoje = os.date("%Y-%m-%d", agora)
     if L.ultimo_dia ~= hoje then L.ultimo_dia, L.dias = hoje, (L.dias or 0) + 1 end
     local p = onde and onde.progresso
     if not p then return end
     if L.terminado and p < 0.1 and not L.relendo_agora then
-        -- recomeçou um livro já terminado: releitura
+        -- restarted an already finished book: re-read
         L.terminado, L.relendo, L.relendo_agora = false, true, true
         L.tracos_inicio = {}
         for k, v in pairs(s.tracos or {}) do L.tracos_inicio[k] = v end
         M.anotar(s, agora, Diario.releitura(livro))
     end
     L.progresso = p
-    -- fim: a última página da história (onde.fim_historia, pelo sumário, em main.lua); sem ela, 98% do arquivo
+    -- end: the last page of the story (onde.fim_historia, by the table of contents, in main.lua); without it, 98% of the file
     if p >= (onde.fim_historia or FIM_DO_LIVRO) and not L.terminado then
         L.terminado, L.relendo_agora = true, nil
         Diario.fimLivro(s, M, livro, agora)
     end
 end
 
---- O status do livro no KOReader ("reading", "complete", "abandoned"…), olhado ao abrir, ao fechar e quando
--- o Kindle dorme. Virou "complete" (você marcou como terminado) enquanto ela acompanhava: terminado aqui
--- também, com resenha. Livro que ela vê pela primeira vez já terminado lá (lido antes dela) não conta; na
--- releitura o status continua "complete" e o fim vem pelo sumário. Devolve true quando terminou o livro.
+--- The book's status in KOReader ("reading", "complete", "abandoned"…), checked on opening, on closing and when
+-- the Kindle sleeps. It became "complete" (you marked it as finished) while it was following: finished here
+-- too, with a review. A book it sees for the first time already finished there (read before it) does not count; on a
+-- re-read the status stays "complete" and the end comes from the table of contents. Returns true when the book finished.
 function Diario.statusKOReader(s, M, livro, status, agora)
     local L = livro and s.livros and s.livros[livro]
     if not L then return end
@@ -384,7 +384,7 @@ function Diario.statusKOReader(s, M, livro, status, agora)
     end
 end
 
---- Mudança de obsessão (tema dominante), com frases variadas.
+--- Change of obsession (dominant theme), with varied phrases.
 function Diario.obsessao(M, antigo, novo)
     local B = Diario.banco().obsessao
     local texto

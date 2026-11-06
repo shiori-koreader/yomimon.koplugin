@@ -1,35 +1,35 @@
 --[[--
-A voz da Yomimon: o único lugar que entende as marcas de variante dentro das frases (PLANO-VOZ.md).
+Yomimon's voice: the only place that understands the variant marks inside phrases (PLANO-VOZ.md).
 
-Etapa 1, traço dentro da frase (como no Wildermyth):
+Step 1, trait inside the phrase (as in Wildermyth):
 
     "Achei um ponto final e <amarga:fiquei aliviada|otimista:já quero o próximo|fiquei com medo de acabar>."
 
-- A marca começa por uma opção com rótulo. Cada rótulo é um polo de traço: amarga, otimista, medrosa,
-  corajosa, cinica, romantica, popular, erudita, diurna ou noturna. Vence a opção do polo marcante
-  (Tracos.MARCANTE) mais forte entre os listados; empate fica com a primeira.
-- Limiar opcional: "medrosa.60:" só vale com o traço em 60 ou mais.
-- A opção sem rótulo é a fala de sempre: vale quando nenhum polo listado está marcante. Pode ser vazia.
-- Brechas {livro}, {personagem}… podem ir dentro das opções, as mesmas em todas. %s e %d nunca: o
-  string.format conta todas as opções.
+- The mark starts with an option with a label. Each label is a trait pole: amarga, otimista, medrosa,
+  corajosa, cinica, romantica, popular, erudita, diurna or noturna. The option of the strongest striking pole
+  (Tracos.MARCANTE) among those listed wins; a tie keeps the first.
+- Optional threshold: "medrosa.60:" only applies with the trait at 60 or more.
+- The option without a label is the usual phrase: it applies when no listed pole is striking. It may be empty.
+- Gaps {livro}, {personagem}… may go inside the options, the same in all. %s and %d never: string.format
+  counts all the options.
 
-Etapa 2, vocabulário do que ela comeu (os domínios de Caves of Qud):
+Step 2, vocabulary of what it ate (the domains of Caves of Qud):
 
-    "Lambi a capa. Só tinha {gosto|poeira}."         → "Só tinha sal." (quem anda lendo sobre o mar)
+    "Lambi a capa. Só tinha {gosto|poeira}."         → "Só tinha sal." (whoever has been reading about the sea)
     "Ainda mastigando “%s”.<dominio: Tem gosto de {gosto}.|>"
 
-- Cada tema tem um vocabulário (yomimon_locales/<code>/data/domains.lua) com seis tipos de palavra:
-  gosto, cheiro, comparacao, exclamacao, lugar e coisa.
-- O domínio de uma fala é o do livro atual ou o da vida, a obsessão dela (s.tema_dominante); quando os dois
-  existem e são diferentes, o do livro vale 6 em cada 10 vezes. O do livro, depois de algumas páginas, é o
-  tema que ele tem mais ACIMA da página média (yomimon_base_topics.lua): família e tempo estão em quase todo
-  romance antigo, então Drácula vira medo, não tempo, e Macbeth vira política, não família.
-- {gosto|padrão}: a palavra do domínio, ou o padrão quando não há domínio. {gosto} sem padrão só nos
-  núcleos do gerador, que pula o núcleo quando não há domínio.
-- A opção "dominio:" de uma marca vale quando há domínio e nenhum polo listado ganhou.
-- Ela prefere as palavras ainda não usadas: só repete depois de passar por todas do tipo.
+- Each theme has a vocabulary (yomimon_locales/<code>/data/domains.lua) with six kinds of word:
+  gosto, cheiro, comparacao, exclamacao, lugar and coisa.
+- The domain of a phrase is the current book's or life's, its obsession (s.tema_dominante); when both
+  exist and differ, the book's wins 6 times in 10. The book's, after a few pages, is the
+  theme it has most ABOVE the average page (yomimon_base_topics.lua): family and time are in almost every
+  old novel, so Dracula becomes fear, not time, and Macbeth becomes politics, not family.
+- {gosto|padrão}: the domain's word, or the default when there is no domain. {gosto} without a default only in the
+  generator cores, which skips the core when there is no domain.
+- The "dominio:" option of a mark applies when there is a domain and no listed pole won.
+- It prefers words not yet used: it only repeats after going through all of the kind.
 
-Lógica pura (sem KOReader), testável fora dele.
+Pure logic (no KOReader), testable outside it.
 ]]
 
 local Lingua = require("yomimon_language")
@@ -37,7 +37,7 @@ local Tracos = require("yomimon_traits")
 
 local Voz = {}
 
--- polo → eixo e sentido ("medrosa" → coragem, -1)
+-- pole → axis and direction ("medrosa" → coragem, -1)
 local POLOS = {}
 for _, tr in ipairs(Tracos.LISTA) do
     POLOS[tr.neg] = { eixo = tr.id, sinal = -1 }
@@ -45,19 +45,19 @@ for _, tr in ipairs(Tracos.LISTA) do
 end
 Voz.POLOS = POLOS
 
--- Tipos de palavra dos domínios.
+-- Kinds of domain word.
 Voz.SLOTS = { gosto = true, cheiro = true, comparacao = true, exclamacao = true, lugar = true, coisa = true }
 
-Voz.LIVRO_MIN_PAGINAS = 10  -- o livro só vira domínio depois de 10 páginas…
-Voz.LIVRO_MIN_PONTOS = 5    -- …com o tema em 5 pontos ou mais (contagem × peso do tema, como em L.temas)
-Voz.CHANCE_LIVRO = 6        -- em 10: o domínio do livro ganha do da vida
+Voz.LIVRO_MIN_PAGINAS = 10  -- the book only becomes a domain after 10 pages…
+Voz.LIVRO_MIN_PONTOS = 5    -- …with the theme at 5 points or more (count × theme weight, as in L.temas)
+Voz.CHANCE_LIVRO = 6        -- in 10: the book's domain beats life's
 
--- Quanto de cada tema tem uma página média, por língua (ferramentas/validacao/calcular_base_temas.lua).
+-- How much of each theme an average page has, by language (ferramentas/validacao/calcular_base_temas.lua).
 local okB, BASE_TEMAS = pcall(require, "yomimon_base_topics")
 Voz.BASE_TEMAS = okB and type(BASE_TEMAS) == "table" and BASE_TEMAS or nil
 
 local bancos = {}
---- Vocabulário dos domínios no idioma atual (ou nil).
+--- Domain vocabulary in the current language (or nil).
 function Voz.banco()
     local c = Lingua.code()
     if bancos[c] == nil then
@@ -67,7 +67,7 @@ function Voz.banco()
     return bancos[c] or nil
 end
 
---- O tema que o livro atual tem mais acima da página média, ou nil se ainda é cedo.
+--- The theme the current book has most above the average page, or nil if it is still early.
 function Voz.dominioDoLivro(s)
     local L = s and s.ultimo_livro and s.livros and s.livros[s.ultimo_livro]
     local paginas = L and L.paginas or 0
@@ -84,12 +84,12 @@ function Voz.dominioDoLivro(s)
     return melhor
 end
 
---- A obsessão dela (o tema da vida), ou nil.
+--- Its obsession (the life theme), or nil.
 function Voz.dominioDaVida(s)
     return s and s.tema_dominante
 end
 
---- Algum domínio com vocabulário?
+--- Is there any domain with vocabulary?
 function Voz.temDominio(s)
     local B = Voz.banco()
     if not B then return false end
@@ -97,7 +97,7 @@ function Voz.temDominio(s)
     return (l and B[l] ~= nil) or (v and B[v] ~= nil) or false
 end
 
---- O domínio de uma fala: o do livro ou o da vida (sorteio(n) devolve de 1 a n).
+--- The domain of a phrase: the book's or life's (sorteio(n) returns from 1 to n).
 function Voz.dominio(s, sorteio)
     local B = Voz.banco()
     if not B then return nil end
@@ -110,9 +110,9 @@ function Voz.dominio(s, sorteio)
     return livro or vida
 end
 
--- Palavras usadas há pouco, por tema e tipo: ela passa por todas antes de repetir.
+-- Words used a moment ago, by theme and kind: it goes through all of them before repeating.
 local usadas = {}
-function Voz.esquecerPalavras() usadas = {} end  -- (para testes)
+function Voz.esquecerPalavras() usadas = {} end  -- (for tests)
 function Voz.palavra(tema, slot, sorteio)
     local B = Voz.banco()
     local lista = B and B[tema] and B[tema][slot]
@@ -128,7 +128,7 @@ function Voz.palavra(tema, slot, sorteio)
     return p
 end
 
---- As opções de uma marca, separadas por "|" (o "|" dentro de {gosto|padrão} não separa).
+--- The options of a mark, separated by "|" (the "|" inside {gosto|padrão} does not separate).
 function Voz.partes(corpo)
     local out, ini, nivel = {}, 1, 0
     for i = 1, #corpo do
@@ -141,8 +141,8 @@ function Voz.partes(corpo)
     return out
 end
 
---- Opções de um grupo (o texto entre < e >): { {polo=, limiar=, texto=} | {dominio=true, texto=} | {texto=} }.
--- Devolve nil se nenhuma opção tem rótulo (não é uma marca de variante).
+--- Options of a group (the text between < and >): { {polo=, limiar=, texto=} | {dominio=true, texto=} | {texto=} }.
+-- Returns nil if no option has a label (it is not a variant mark).
 function Voz.opcoes(corpo)
     local lista, algum = {}, false
     for _, parte in ipairs(Voz.partes(corpo)) do
@@ -178,23 +178,23 @@ local function escolher(lista, tracos, haDominio)
     return padrao and padrao.texto or ""
 end
 
---- Troca as marcas de traço e as palavras de domínio pelo que vale para s.
--- sem_dominio (opcional): não usa domínio (o gerador já usou em outra parte da mesma fala).
--- Devolve o texto, os polos que escolheram alguma opção e o tema do domínio usado (ou nil).
+--- Swaps the trait marks and domain words for what applies to s.
+-- sem_dominio (optional): does not use a domain (the generator already used it in another part of the same phrase).
+-- Returns the text, the poles that chose some option and the theme of the domain used (or nil).
 function Voz.resolver(texto, s, sorteio, sem_dominio)
     if type(texto) ~= "string" or not (texto:find("<", 1, true) or texto:find("{", 1, true)) then
         return texto, {}, nil
     end
     local tracos = s and s.tracos or {}
     local polos, usado = {}, nil
-    local dom  -- o domínio da fala, decidido uma vez só (false: nenhum)
+    local dom  -- the phrase's domain, decided once only (false: none)
     local function dominio()
         if sem_dominio then return nil end
         if dom == nil then dom = Voz.dominio(s, sorteio) or false end
         return dom or nil
     end
-    -- 1) palavras de domínio, dentro e fora das marcas; cada uma fica entre \1 e \2 até o fim, para
-    --    saber se sobreviveu à escolha da marca
+    -- 1) domain words, inside and outside the marks; each one stays between \1 and \2 until the end, to
+    --    know whether it survived the choice of the mark
     local out = texto:gsub("{(%l+)(|?)([^{}]*)}", function(nome, barra, padrao)
         if not Voz.SLOTS[nome] then return nil end
         local d = dominio()
@@ -203,31 +203,31 @@ function Voz.resolver(texto, s, sorteio, sem_dominio)
         if barra == "|" then return padrao end
         return nil
     end)
-    -- 2) marcas de traço e de domínio
+    -- 2) trait and domain marks
     out = out:gsub("<([^<>]*)>", function(corpo)
         local lista = Voz.opcoes(corpo)
-        if not lista then return nil end  -- não é marca: fica como está
+        if not lista then return nil end  -- not a mark: stays as it is
         local escolhido, polo = escolher(lista, tracos, dominio)
         if polo then polos[#polos + 1] = polo end
         return escolhido
     end)
     if out:find("\1", 1, true) then usado = dom or nil end
     out = out:gsub("[\1\2]", "")
-    -- opção vazia deixa espaço sobrando
+    -- an empty option leaves extra space
     out = out:gsub("  +", " "):gsub("^ ", ""):gsub(" $", ""):gsub(" ([%.,!%?])", "%1")
     return out, polos, usado
 end
 
--- Etapa 4, a fala que combina com ela ganha (Valve, Hades, Emily Short) ----------------------------
--- Ao sortear de uma lista, a fala que tem variante de um traço marcante dela, ou palavra de domínio
--- quando ela tem domínio, pesa mais. Continua sorteio; sem traço nem domínio, todas pesam 1.
-Voz.PESO_TRACO = 8     -- quanto a mais pesa uma fala com variante de um polo marcante
-Voz.PESO_DOMINIO = 4   -- quanto a mais pesa uma fala com palavra de domínio, se ela tem domínio
--- (calibrados pela régua de voz em 27/10/2026: com 3 e 2, metade dos perfis com traço ficava abaixo de 50%
--- de falas com pista; com 8 e 4, todos passam, sem perder variedade)
+-- Step 4, the phrase that matches it wins (Valve, Hades, Emily Short) ----------------------------
+-- When drawing from a list, the phrase that has a variant of one of its striking traits, or a domain word
+-- when it has a domain, weighs more. Still a draw; without trait or domain, all weigh 1.
+Voz.PESO_TRACO = 8     -- how much more a phrase with a variant of a striking pole weighs
+Voz.PESO_DOMINIO = 4   -- how much more a phrase with a domain word weighs, if it has a domain
+-- (calibrated by the voice ruler on 27/10/2026: with 3 and 2, half of the profiles with a trait were below 50%
+-- of phrases with a clue; with 8 and 4, all pass, without losing variety)
 
-local pistas_cache = {}  -- por texto de banco (os bancos são fixos, então o cache não cresce sem fim)
---- O que uma fala pode mostrar: { polos = {polo = true}, dominio = bool } (guardado por texto).
+local pistas_cache = {}  -- by bank text (the banks are fixed, so the cache does not grow forever)
+--- What a phrase can show: { polos = {polo = true}, dominio = bool } (stored by text).
 function Voz.pistas(texto)
     if type(texto) ~= "string" then return { polos = {}, dominio = false } end
     local p = pistas_cache[texto]
@@ -244,8 +244,8 @@ function Voz.pistas(texto)
     return p
 end
 
---- Peso de uma fala para s: 1, mais PESO_TRACO se lista um polo marcante, mais PESO_DOMINIO se usa
--- domínio e ela tem domínio. temDominio (opcional) evita recalcular numa lista inteira.
+--- Weight of a phrase for s: 1, plus PESO_TRACO if it lists a striking pole, plus PESO_DOMINIO if it uses a
+-- domain and it has a domain. temDominio (optional) avoids recomputing over a whole list.
 function Voz.peso(texto, s, temDominio)
     local p = Voz.pistas(texto)
     local w = 1
@@ -261,8 +261,8 @@ function Voz.peso(texto, s, temDominio)
     return w
 end
 
---- Sorteia um item da lista, com o peso de cada fala (sorteio(n) devolve de 1 a n).
--- sem_dominio (opcional): o domínio não dá peso (já foi usado em outra parte da fala).
+--- Draws an item from the list, with the weight of each phrase (sorteio(n) returns from 1 to n).
+-- sem_dominio (optional): the domain gives no weight (already used in another part of the phrase).
 function Voz.escolher(lista, s, sorteio, sem_dominio)
     sorteio = sorteio or math.random
     if not lista or #lista == 0 then return nil end
@@ -272,7 +272,7 @@ function Voz.escolher(lista, s, sorteio, sem_dominio)
         pesos[i] = Voz.peso(t, s, dom)
         total = total + pesos[i]
     end
-    if total == #lista then return lista[sorteio(#lista)] end  -- ninguém se destaca: o sorteio de sempre
+    if total == #lista then return lista[sorteio(#lista)] end  -- nobody stands out: the usual draw
     local r = sorteio(total)
     for i, w in ipairs(pesos) do
         r = r - w
@@ -281,9 +281,9 @@ function Voz.escolher(lista, s, sorteio, sem_dominio)
     return lista[#lista]
 end
 
---- Causa inventada depois (Caves of Qud): o mau humor ganha um motivo real do livro atual, o
--- acontecimento que mais se destacou num capítulo recente. temperamento: "jovem" ou "velha".
--- Devolve a fala ou nil.
+--- Cause invented afterwards (Caves of Qud): the bad mood gets a real reason from the current book, the
+-- event that stood out most in a recent chapter. temperamento: "jovem" or "velha".
+-- Returns the phrase or nil.
 function Voz.causa(s, temperamento, sorteio)
     local B = Voz.banco()
     local C = B and B._causa

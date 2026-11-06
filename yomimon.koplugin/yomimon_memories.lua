@@ -1,19 +1,19 @@
 --[[--
-Lembranças: a memória que cria vínculo. Ela compara o livro de agora com o histórico de leitura (as
-resenhas, que passam de vida em vida) e lembra:
+Memories: the memory that creates a bond. It compares the current book with the reading history (the
+reviews, which pass from life to life) and remembers:
 
-  nível A (fatos exatos)   autor de novo (com a conta), aniversário de um livro terminado, personagem
-                           que volta (série), o livro mais longo, o lido mais rápido;
-  nível B (percepção medida) terceiro livro seguido com o mesmo tema dominante.
-  nível C (guardado, mudo)  gênero provável e aura do protagonista vão na resenha; "nada tão sombrio (ou
-                           leve) desde X" é calculado mas não fala (CLIMA_FALA = false): a média de clima
-                           de um livro inteiro põe Hamlet, Romeu e Julieta e Frankenstein entre os mais
-                           leves do corpus. Ver ferramentas/validacao/MEMORIA-VINCULO.md.
+  level A (exact facts)   author again (with the count), anniversary of a finished book, character
+                          who returns (series), the longest book, the fastest read;
+  level B (measured perception) third book in a row with the same dominant theme.
+  level C (stored, mute)  probable genre and aura of the protagonist go in the review; "nothing so gloomy (or
+                          light) since X" is computed but does not speak (CLIMA_FALA = false): the weather average
+                          of a whole book puts Hamlet, Romeo and Juliet and Frankenstein among the lightest
+                          of the corpus. See ferramentas/validacao/MEMORIA-VINCULO.md.
 
-Cada lembrança vira uma entrada no diário, a primeira fala da Home (uma vez) e um registro estruturado em
-s.lembrancas, que a régua da memória confere contra o que aconteceu de verdade.
+Each memory becomes a diary entry, the first Home phrase (once) and a structured record in
+s.lembrancas, which the memory ruler checks against what really happened.
 
-Lógica pura (sem KOReader), testável fora dele.
+Pure logic (no KOReader), testable outside it.
 ]]
 
 local Lingua = require("yomimon_language")
@@ -21,16 +21,16 @@ local Lingua = require("yomimon_language")
 local L = {}
 
 local MAX = 200
-local PAGINA_PERSONAGEM = 40   -- páginas do livro antes de procurar personagem que volta
-local PASSO_PERSONAGEM = 20    -- e depois só a cada 20 páginas: a lista de personagens pesa o livro inteiro,
-                               -- e refeita a cada página deixava a página 700 de Moby Dick 50 vezes mais lenta
-local PAGINA_CLIMA = 60        -- páginas antes de comparar o clima do livro com o histórico
-local LIVROS_NO_MEIO = 2       -- "desde X" só se houve pelo menos 2 livros depois de X
-local DIAS_DESDE = 30          -- e se X terminou há pelo menos 30 dias
-local BASE_RECORDE = 3         -- recordes só com pelo menos 3 livros terminados antes
-local MARGEM_RAPIDO = 1.2      -- "o mais rápido" só se 20% mais rápido que o melhor anterior (livro curto
-                               -- termina num dia incompleto e baixa a média: sem margem, todo livro longo ganhava)
-L.CLIMA_FALA = false           -- nível C: "nada tão sombrio/leve desde" calculado, mas mudo
+local PAGINA_PERSONAGEM = 40   -- pages of the book before looking for a returning character
+local PASSO_PERSONAGEM = 20    -- and afterwards only every 20 pages: the character list weighs the whole book,
+                               -- and redone on every page it made page 700 of Moby Dick 50 times slower
+local PAGINA_CLIMA = 60        -- pages before comparing the book's weather with the history
+local LIVROS_NO_MEIO = 2       -- "since X" only if there were at least 2 books after X
+local DIAS_DESDE = 30          -- and if X finished at least 30 days ago
+local BASE_RECORDE = 3         -- records only with at least 3 books finished before
+local MARGEM_RAPIDO = 1.2      -- "the fastest" only if 20% faster than the previous best (a short book
+                               -- ends on an incomplete day and lowers the average: without a margin, every long book won)
+L.CLIMA_FALA = false           -- level C: "nothing so gloomy/light since" computed, but mute
 
 local function mes(t) return Lingua.format().months[tonumber(os.date("%m", t))] end
 
@@ -39,7 +39,7 @@ local function preencher(modelo, v)
 end
 local function banco() return require("yomimon_diary").banco().lembranca or {} end
 
---- Registra uma lembrança: diário, Home (uma vez) e s.lembrancas.
+--- Records a memory: diary, Home (once) and s.lembrancas.
 local function lembrar(s, M, tipo, livro, agora, dados, v)
     local lista = banco()[tipo]
     if not lista or #lista == 0 then return nil end
@@ -65,9 +65,9 @@ local function terminados(s, livro)
     return out
 end
 
--- Nível A ----------------------------------------------------------------------------------
+-- Level A ----------------------------------------------------------------------------------
 
---- Começo de um livro: autor de novo, com a conta de quantos dele já foram. Devolve o texto (ou nil).
+--- Start of a book: author again, with the count of how many of theirs there were. Returns the text (or nil).
 function L.inicioLivro(s, M, livro, onde, agora)
     local autor = onde and onde.autor
     if not autor or autor == "" then return nil end
@@ -81,7 +81,7 @@ function L.inicioLivro(s, M, livro, onde, agora)
     return lembrar(s, M, "autor", livro, agora, { autor = autor, n = n }, { autor = autor, n = n, livro = livro })
 end
 
---- Uma vez por dia: aniversário de um livro terminado (mesmo dia e mês, um ano antes).
+--- Once a day: anniversary of a finished book (same day and month, a year before).
 local function aniversario(s, M, livro, agora)
     local hoje = os.date("%Y-%m-%d", agora)
     if s.lembranca_dia == hoje then return end
@@ -96,14 +96,14 @@ local function aniversario(s, M, livro, agora)
     end
 end
 
---- Personagem que volta de um livro anterior (série). Não vale em releitura.
+--- Character who returns from a previous book (series). Does not apply on a re-read.
 local function personagem(s, M, Lv, livro, agora)
     if Lv.relendo or (Lv.paginas or 0) < PAGINA_PERSONAGEM or (Lv.lembrou and Lv.lembrou.personagem) then return end
     if Lv.paginas % PASSO_PERSONAGEM ~= 0 or #(s.resenhas or {}) == 0 then return end
     local info = M.personagensInfo(s, livro)
     for i = 1, math.min(3, #info) do
         local nome = info[i].nome
-        local formas = {}  -- "Holmes" na resenha antiga vale para "Sherlock Holmes" agora, e vice-versa
+        local formas = {}  -- "Holmes" in the old review counts for "Sherlock Holmes" now, and vice versa
         for _, f in ipairs(info[i].formas or { nome }) do formas[f] = true end
         for k = #(s.resenhas or {}), 1, -1 do
             local r = s.resenhas[k]
@@ -120,9 +120,9 @@ local function personagem(s, M, Lv, livro, agora)
     end
 end
 
--- Nível B ----------------------------------------------------------------------------------
+-- Level B ----------------------------------------------------------------------------------
 
---- Clima do livro até aqui comparado com o histórico: "nada tão sombrio desde X" ou "o mais sombrio".
+--- The book's weather so far compared with the history: "nothing so gloomy since X" or "the gloomiest".
 local function climaDesde(s, M, Lv, livro, agora)
     if (Lv.paginas or 0) < PAGINA_CLIMA or (Lv.lembrou and Lv.lembrou.clima) then return end
     jaLembrou(Lv, "clima")
@@ -151,7 +151,7 @@ local function climaDesde(s, M, Lv, livro, agora)
     end
 end
 
---- Cada página lida.
+--- Each page read.
 function L.pagina(s, M, Lv, livro, agora)
     aniversario(s, M, livro, agora)
     if Lv then
@@ -160,8 +160,8 @@ function L.pagina(s, M, Lv, livro, agora)
     end
 end
 
---- Fim de um livro (depois da resenha guardada): recordes e série de tema.
--- serie: quantos livros seguidos antes deste tinham o mesmo tema dominante.
+--- End of a book (after the review is stored): records and theme series.
+-- serie: how many books in a row before this one had the same dominant theme.
 function L.fimLivro(s, M, livro, agora, serie)
     local cur = s.resenhas and s.resenhas[#s.resenhas]
     if not cur or cur.livro ~= livro then return end
@@ -183,7 +183,7 @@ function L.fimLivro(s, M, livro, agora, serie)
     end
 end
 
--- Nível C (guardado, mudo) -----------------------------------------------------------------
+-- Level C (stored, mute) -----------------------------------------------------------------
 
 local GENEROS = {
     terror = { "medo", "noite", "morte", "loucura" }, romance = { "amor", "familia" },
@@ -207,12 +207,12 @@ local function melhor(temas, grupos)
     table.sort(l, function(a, b) return a[2] > b[2] end)
     return l
 end
---- Gênero provável (≥ 30% dos temas e 8 pontos à frente) ou nil. NÃO usado em falas: acerta ~75%.
+--- Probable genre (≥ 30% of the themes and 8 points ahead) or nil. NOT used in phrases: right ~75% of the time.
 function L.genero(temas)
     local l = melhor(temas, GENEROS)
     if l and l[1][2] >= 0.30 and l[1][2] - (l[2] and l[2][2] or 0) >= 0.08 then return l[1][1] end
 end
---- Aura de um personagem pelos temas das páginas em que ele aparece. NÃO usado em falas ainda.
+--- Aura of a character by the themes of the pages where they appear. NOT used in phrases yet.
 function L.aura(temas)
     local l = melhor(temas, AURAS)
     return l and l[1][1] or nil

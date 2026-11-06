@@ -1,12 +1,12 @@
 --[[--
-Memória da Yomimon: o que os livros fazem com ela.
+Yomimon's memory: what the books do to it.
 
-Cada página comida passa por aqui. Ela registra:
-- temas (morte, amor, mar, guerra…) por palavras-chave, que mudam as falas dela;
-- personagens (nomes próprios que se repetem) de cada livro, usados nos comentários do Caderno;
-- o diário: eventos da vida dela, escritos com a voz dela.
+Every page eaten goes through here. It records:
+- themes (death, love, sea, war…) by keywords, which change its phrases;
+- characters (proper names that repeat) of each book, used in the Notebook comments;
+- the diary: events of its life, written in its own voice.
 
-Lógica pura (sem KOReader), testável fora dele.
+Pure logic (no KOReader), testable outside it.
 ]]
 
 local Lingua = require("yomimon_language")
@@ -16,7 +16,7 @@ local T = Lingua.t
 
 local M = {}
 
--- Temas e palavras que os alimentam (português e inglês, em minúsculas).
+-- Themes and the words that feed them (Portuguese and English, lowercase).
 M.TEMAS = {
     morte = { "morte", "morrer", "morreu", "morto", "morta", "mortos", "túmulo", "enterro", "cadáver", "luto", "funeral",
               "death", "dead", "die", "died", "grave", "funeral", "corpse",
@@ -81,7 +81,7 @@ M.TEMAS = {
              "scared", "dreaded" },
 }
 
--- Gênero de cada tema, para acertar "no mar", "pela morte", "de Deus"…
+-- Gender of each theme, to get "no mar", "pela morte", "de Deus" right…
 local TEMA_INFO = {
     morte = { "a", "morte" }, amor = { "o", "amor" }, guerra = { "a", "guerra" }, mar = { "o", "mar" },
     fe = { nil, "Deus" }, dinheiro = { "o", "dinheiro" }, loucura = { "a", "loucura" }, tempo = { "o", "tempo" },
@@ -96,7 +96,7 @@ local CONTRACAO = {
     por = { o = "pelo", a = "pela", os = "pelos", as = "pelas" }, a = { o = "ao", a = "à", os = "aos", as = "às" },
 }
 
---- Nome do tema com artigo e preposição contraída: M.tema("mar", "em") → "no mar".
+--- Theme name with article and contracted preposition: M.tema("mar", "em") → "no mar".
 function M.tema(t, prep)
     local info = TEMA_INFO[t]
     if not info then return t end
@@ -109,14 +109,14 @@ end
 M.NOMES_TEMA = {}
 for t in pairs(TEMA_INFO) do M.NOMES_TEMA[t] = M.tema(t) end
 
--- Pares que, juntos, deixam ela dividida.
+-- Pairs that, together, leave it divided.
 local OPOSTOS = { amor = "guerra", guerra = "amor", fe = "loucura", loucura = "fe", cidade = "natureza",
                   natureza = "cidade", dinheiro = "fe", familia = "solidao", solidao = "familia",
                   liberdade = "politica", politica = "liberdade", infancia = "morte", ciencia = "fe",
                   vinganca = "amor", arte = "dinheiro", saber = "medo", medo = "saber" }
 
--- Palavras comuns demais para fazer um tema sozinhas ("old", "time", "night", "mother"):
--- só contam com outra palavra do mesmo tema na página (ou repetidas 3+ vezes).
+-- Words too common to make a theme by themselves ("old", "time", "night", "mother"):
+-- they only count with another word of the same theme on the page (or repeated 3+ times).
 local GENERICAS = {}
 for p in ([[tempo anos velho velha time years old rua ruas multidão street streets crowd corner square
     menino menina criança crianças escola boy girl child children school noite lua vela estrelas night moon candle
@@ -133,7 +133,7 @@ for tema, palavras in pairs(M.TEMAS) do
     for _, p in ipairs(palavras) do indice[p] = tema end
 end
 
--- Eventos: grupos de palavras que indicam algo acontecendo na página.
+-- Events: groups of words that indicate something happening on the page.
 M.EVENTOS = {
     morte = { "morreu", "morrera", "morto", "morta", "enterro", "enterraram", "caixão", "luto", "velório", "funeral",
               "cadáver", "faleceu", "died", "dead", "coffin", "buried", "corpse",
@@ -160,9 +160,9 @@ for ev, palavras in pairs(M.EVENTOS) do
     for _, p in ipairs(palavras) do indice_evento[p] = ev end
 end
 
--- Assuntos do capítulo, para os cartões (yomimon_data/topics.lua): contados como os eventos. Palavra solta
--- entra com o plural (-s, -es); expressão de várias palavras conta como sequência, a não ser que contenha
--- uma palavra da própria lista ("great-grandfather" já conta como "grandfather").
+-- Chapter subjects, for the cards (yomimon_data/topics.lua): counted like the events. A single word
+-- also matches its plural (-s, -es); a multi-word expression counts as a sequence, unless it contains
+-- a word of the list itself ("great-grandfather" already counts as "grandfather").
 local okAs, ASSUNTOS = pcall(require, "yomimon_data.topics")
 M.ASSUNTOS = okAs and type(ASSUNTOS) == "table" and ASSUNTOS or {}
 local indice_assunto, frases_assunto = {}, {}
@@ -183,7 +183,7 @@ for as, palavras in pairs(M.ASSUNTOS) do
     end
 end
 table.sort(frases_assunto, function(a, b) return a.nome < b.nome end)
--- conta as expressões na sequência de palavras ws (1..n): chama achou(assunto, expressão) a cada uma
+-- counts the expressions in the word sequence ws (1..n): calls achou(subject, expression) for each one
 local function frasesDeAssunto(ws, n, achou)
     for _, f in ipairs(frases_assunto) do
         local k = #f.seq
@@ -197,7 +197,7 @@ local function frasesDeAssunto(ws, n, achou)
     end
 end
 
--- Clima: palavras que esquentam (+1) ou esfriam (-1) a página.
+-- Weather: words that warm (+1) or cool (-1) the page.
 local CLIMA = {}
 for p in ([[feliz alegria riso riu sorriu sorriso belo bela doce esperança paz luz gentil carinho ternura
     felicidade happy joy smile smiled laugh laughed beautiful sweet hope peace light kind gentle delighted delight]]):gmatch("%S+") do CLIMA[p] = 1 end
@@ -205,10 +205,10 @@ for p in ([[triste tristeza dor medo chorou choro lágrimas escuro sombra ódio 
     angústia horror melancolia infeliz infelizes sad pain fear cried tears dark shadow hate anger suffering despair
     cold horror dread grief weep weeping]]):gmatch("%S+") do CLIMA[p] = -1 end
 
--- Grafia antiga do português (quase todo o domínio público: "sciencia", "philosophia", "lagryma",
--- "afflicção", "egreja"). Palavra que não está nas listas é procurada também na forma modernizada:
--- sem acento, ph→f, th→t, y→i, sc→c no começo, consoantes dobradas viram uma (menos ss e rr).
--- Só em página em português: em inglês "three" viraria "tree" e "good" viraria "god".
+-- Old Portuguese spelling (almost all of the public domain: "sciencia", "philosophia", "lagryma",
+-- "afflicção", "egreja"). A word that is not in the lists is also looked up in its modernised form:
+-- no accent, ph→f, th→t, y→i, sc→c at the start, doubled consonants become one (except ss and rr).
+-- Only on Portuguese pages: in English "three" would become "tree" and "good" would become "god".
 local SEM_ACENTO = { ["á"] = "a", ["à"] = "a", ["â"] = "a", ["ã"] = "a", ["é"] = "e", ["ê"] = "e", ["í"] = "i",
     ["ó"] = "o", ["ô"] = "o", ["õ"] = "o", ["ú"] = "u", ["ü"] = "u", ["ç"] = "c" }
 local GRAFIA_FIXA = { egreja = "igreja", egrejas = "igrejas", pae = "pai", paes = "pais" }
@@ -217,7 +217,7 @@ local function grafiaModerna(w)
     w = w:gsub("([b-df-hj-np-tv-z])%1", function(c) if c == "s" or c == "r" then return c .. c end return c end)
     return GRAFIA_FIXA[w] or w
 end
--- índice paralelo pela forma moderna; forma que cai em dois grupos diferentes fica de fora
+-- parallel index by the modern form; a form that falls in two different groups is left out
 local function indiceModerno(mapa)
     local out, conflito = {}, {}
     for p, v in pairs(mapa) do
@@ -233,31 +233,31 @@ local assunto_mod = indiceModerno(indice_assunto)
 local GENERICAS_MOD = {}
 for p in pairs(GENERICAS) do GENERICAS_MOD[grafiaModerna(p)] = true end
 local function generica(w) return GENERICAS[w] or GENERICAS_MOD[grafiaModerna(w)] or false end
-M.grafiaModerna = grafiaModerna  -- usado pelos dicionários e pelas ferramentas
+M.grafiaModerna = grafiaModerna  -- used by the dictionaries and the tools
 
--- Palavras do próprio livro (PLANO-VOZ.md, Etapa 5) --------------------------------------------------
--- Candidatas: em minúscula (nome próprio nunca entra), 5 letras ou mais, só letras, fora das palavras
--- comuns da língua (yomimon_common_words.lua, gerada do corpus) e fora de advérbios e de palavras
--- ofensivas que os clássicos usam. Em português, a comparação com as comuns é na grafia moderna.
+-- The book's own words (PLANO-VOZ.md, step 5) --------------------------------------------------
+-- Candidates: lowercase (a proper name never enters), 5 letters or more, letters only, outside the
+-- language's common words (yomimon_common_words.lua, generated from the corpus) and outside adverbs and
+-- offensive words the classics use. In Portuguese, the comparison with the common ones uses modern spelling.
 local okComuns, COMUNS = pcall(require, "yomimon_common_words")
 COMUNS = okComuns and type(COMUNS) == "table" and COMUNS or nil
 local OFENSIVAS = {}
 for p in ([[nigger niggers nigga niggas negro negroes darkie darkies coolie coolies squaw squaws savage savages
             crioulo crioula crioulos crioulas negrinho negrinha negrinhos negrinhas mulato mulata mulatos mulatas
             selvagem selvagens bugre bugres]]):gmatch("%S+") do OFENSIVAS[p] = true end
--- Para ser marcante, a palavra precisa aparecer pelo menos uma vez logo depois de um artigo ou possessivo
--- ("o seminário", "the harpoon"): é o jeito barato de ficar com os substantivos e deixar de fora verbos
--- e advérbios ("montou", "afterward"). Por livro ficam as duas contas: vocab (todas) e vocab_art.
+-- To be striking, the word must appear at least once right after an article or possessive
+-- ("o seminário", "the harpoon"): the cheap way to keep nouns and leave out verbs
+-- and adverbs ("montou", "afterward"). Per book both counts are kept: vocab (all) and vocab_art.
 local DETERMINANTES = {}
 for p in ([[the a an this that these those his her my your their our its some no every
             o a os as um uma uns umas do da dos das no na nos nas ao aos pelo pela pelos pelas seu sua seus suas
             meu minha meus minhas teu tua este esta estes estas esse essa esses essas aquele aquela aqueles aquelas
             num numa dum duma]]):gmatch("%S+") do DETERMINANTES[p] = true end
-M.VOCAB_MAX, M.VOCAB_PODA = 150, 100   -- por livro: passando de 150 palavras, ficam as 100 mais contadas
-M.VOCAB_FIM = 20                       -- livro terminado guarda só as 20 mais contadas
-M.MARCANTE_MIN = 3                     -- vezes no livro para a palavra ser marcante
+M.VOCAB_MAX, M.VOCAB_PODA = 150, 100   -- per book: past 150 words, the 100 most counted stay
+M.VOCAB_FIM = 20                       -- a finished book keeps only the 20 most counted
+M.MARCANTE_MIN = 3                     -- times in the book for the word to be striking
 
---- A palavra pode ser marcante? (w como está no texto; pt = página em português)
+--- Can the word be striking? (w as it is in the text; pt = Portuguese page)
 function M.candidata(w, pt)
     if not COMUNS or not (w:find("^%l") or w:find("^\195[\160-\191]")) then return false end
     if not w:find("^[%a\128-\255]+$") or #w - select(2, w:gsub("[\128-\191]", "")) < 5 then return false end
@@ -270,10 +270,10 @@ function M.candidata(w, pt)
     return true
 end
 
--- Força de uma palavra no livro: todas as vezes, mais as vezes depois de artigo.
+-- Strength of a word in the book: all the times, plus the times after an article.
 local function forca(L, w) return (L.vocab[w] or 0) + ((L.vocab_art or {})[w] or 0) end
 
---- Deixa no vocabulário do livro só as `n` palavras mais fortes.
+--- Keeps in the book's vocabulary only the `n` strongest words.
 function M.podarVocab(L, n)
     local lista = {}
     for w in pairs(L.vocab or {}) do lista[#lista + 1] = { w, forca(L, w) } end
@@ -287,11 +287,11 @@ function M.podarVocab(L, n)
     L.vocab, L.vocab_art = novo, novo_art
 end
 
--- Clima por dicionário de sentimento: VADER (inglês, MIT) e SentiLex-PT 02 (português, CC-BY 4.0).
--- Nota da página = soma das valências por 100 palavras ("não"/"never" invertem as 3 seguintes), e o
--- clima é essa nota centrada na mediana da língua e dividida pela meia faixa central do corpus
--- (yomimon_weather_calibration.lua): página típica ~0, os 30% mais sombrios ou mais leves passam de ±1.
--- Sem os dicionários, volta à lista curta de palavras (CLIMA).
+-- Weather by sentiment dictionary: VADER (English, MIT) and SentiLex-PT 02 (Portuguese, CC-BY 4.0).
+-- Page score = sum of valences per 100 words ("não"/"never" invert the next 3), and the
+-- weather is that score centred on the language's median and divided by the corpus' central half-range
+-- (yomimon_weather_calibration.lua): a typical page ~0, the 30% gloomiest or lightest go past ±1.
+-- Without the dictionaries, it falls back to the short word list (CLIMA).
 local okEn, LEX_EN = pcall(require, "yomimon_lexicon_en")
 local okPt, LEX_PT = pcall(require, "yomimon_lexicon_pt")
 local okC, CAL_CLIMA = pcall(require, "yomimon_weather_calibration")
@@ -301,7 +301,7 @@ local NEGACAO = {}
 for w in ("no not never none nobody nothing neither nor nowhere cannot without não nunca jamais nem nada nenhum nenhuma ninguém sem"):gmatch("%S+") do
     NEGACAO[w] = true
 end
---- Nota de sentimento (por 100 palavras) de um texto já limpo, ou nil se não há dicionário da língua.
+--- Sentiment score (per 100 words) of an already clean text, or nil if there is no dictionary for the language.
 function M.sentimento(limpo, pt)
     local lex = LEXICO[pt and "pt" or "en"]
     if not lex then return nil end
@@ -321,7 +321,7 @@ local function temaDe(w, pt) return indice[w] or (pt and indice_mod[grafiaModern
 local function eventoDe(w, pt) return indice_evento[w] or (pt and evento_mod[grafiaModerna(w)]) or nil end
 local function assuntoDe(w, pt) return indice_assunto[w] or (pt and assunto_mod[grafiaModerna(w)]) or nil end
 local function climaDe(w, pt) return CLIMA[w] or (pt and clima_mod[grafiaModerna(w)]) or nil end
--- Língua da página pelas palavras mais comuns de cada uma.
+-- Language of the page by the most common words of each.
 local FUNCIONAL = {}
 for p in ("que não uma com para ele ela elle ella mas como seu sua dos das pelo pela"):gmatch("%S+") do FUNCIONAL[p] = "pt" end
 for p in ("the and was with that his her which this have from were they would"):gmatch("%S+") do FUNCIONAL[p] = "en" end
@@ -333,27 +333,27 @@ local function emPortugues(limpo)
     end
     return pt > en
 end
--- Peso de especificidade (yomimon_topic_weights.lua): tema que aparece em quase todo livro ("família",
--- "tempo") soma menos na memória do livro, do capítulo, do dia e na dela; tema raro soma mais.
--- A detecção por página não muda.
+-- Specificity weight (yomimon_topic_weights.lua): a theme that appears in almost every book ("family",
+-- "time") adds less to the memory of the book, chapter, day and its own; a rare theme adds more.
+-- Per-page detection does not change.
 local okP, PESOS = pcall(require, "yomimon_topic_weights")
 M.PESOS = okP and type(PESOS) == "table" and PESOS or {}
 function M.pesoTema(t, pt) return (M.PESOS[pt and "pt" or "en"] or {})[t] or 1 end
 
--- para a ferramenta de validação mostrar o que disparou cada tema
+-- for the validation tool to show what triggered each theme
 function M.temaDaPalavra(w, texto) return temaDe(w, texto and emPortugues(M.limpar(texto))) end
 
--- Palavras antes de um nome que indicam lugar ("em Genebra", "para Londres").
+-- Words before a name that indicate a place ("em Genebra", "para Londres").
 local PREP_LUGAR = {}
 for p in ("em no na in at into"):gmatch("%S+") do PREP_LUGAR[p] = true end
 
--- Verbos de fala ("disse Victor", "Victor perguntou").
+-- Speech verbs ("disse Victor", "Victor perguntou").
 local VERBO_FALA = {}
 for p in ([[disse dizia perguntou respondeu gritou murmurou exclamou sussurrou falou continuou acrescentou
     retrucou tornou replicou said says asked replied shouted whispered cried continued added answered
     exclaimed observed remarked rejoined repeated]]):gmatch("%S+") do VERBO_FALA[p] = true end
 
--- Palavras com maiúscula que não são personagens.
+-- Capitalised words that are not characters.
 local NAO_NOMES = {}
 for p in ([[Ele Ela Eles Elas Não Sim Mas Então Quando Depois Antes Porque Como Quem Que Onde Isso Aquilo
     Este Esta Esse Essa Aquele Aquela Senhor Senhora Dona Deus Nós Você Vocês Também Ainda Agora Nunca Sempre
@@ -386,32 +386,32 @@ for p in ([[Ele Ela Eles Elas Não Sim Mas Então Quando Depois Antes Porque Com
     NAO_NOMES[p] = true
 end
 
--- Teatro: papéis que, como rótulo de fala ("KING.", "NURSE."), são personagem mesmo sendo palavra comum.
+-- Theatre: roles that, as a speech label ("KING.", "NURSE."), are characters even though common words.
 local PAPEL_TEATRO = {}
 for p in ("King Queen Prince Princess Duke Lord Lady Ghost Nurse Porter Servant Doctor Captain Friar Clown Messenger"):gmatch("%S+") do
     PAPEL_TEATRO[p] = true
 end
 
--- Abreviações seguidas de ponto que não terminam a frase ("Mr. Collins", "D. Glória").
+-- Abbreviations followed by a full stop that do not end the sentence ("Mr. Collins", "D. Glória").
 local ABREVIACAO = {}
 for p in ("Mr Mrs Ms Dr Drs St Sr Sra Srs Srta Prof Exmo Exma Revd Rev Gen Col Capt Lt Jr"):gmatch("%S+") do
     ABREVIACAO[p] = true
 end
 
--- Palavras que, logo antes de um nome, fazem dele um lugar ("Rio Comprido", "rua dos Inválidos").
+-- Words that, right before a name, make it a place ("Rio Comprido", "rua dos Inválidos").
 local ANTES_LUGAR = {}
 for p in ([[rio rua praia largo travessa morro serra ilha lagoa monte lago cabo porto forte bairro engenho
     fazenda river mount lake cape fort port isle island vale sertão chapada ribeirão enseada baía cidade vila
     county valley bay gulf são santa santo san]]):gmatch("[%a\128-\255]+") do ANTES_LUGAR[p] = true end
 
--- Títulos antes de um nome ("Dona Glória", "Mr. Darcy"): contam como prova de que é gente.
+-- Titles before a name ("Dona Glória", "Mr. Darcy"): they count as proof that it is a person.
 local TITULOS = {}
 for p in ([[Sr Sra Srta Dona Dom Dr Dra Seu Sinhá Sinhô Padre Frei Irmã Irmão Tio Tia Capitão Coronel Major Conde
     Condessa Barão Mr Mrs Miss Ms Dr Sir Lady Lord Captain Colonel Uncle Aunt Madame Monsieur Mademoiselle
     Mister Señor D Professor Professora Prof]]):gmatch("[%a\128-\255]+") do TITULOS[p] = true end
 
--- Pessoas famosas, mitos e obras: aparecem com maiúscula, mas são citações, não personagens.
--- (Se o nome estiver no título do livro, aí é personagem: lendo "Hamlet", Hamlet conta.)
+-- Famous people, myths and works: they appear capitalised, but are quotations, not characters.
+-- (If the name is in the book's title, then it is a character: reading "Hamlet", Hamlet counts.)
 local REFERENCIAS = {}
 for p in ([[Shakespeare Hamlet Homero Homer Dante Cervantes Goethe Tolstói Tolstoi Tolstoy Dostoiévski Dostoevsky
     Kafka Proust Joyce Camões Saramago Eça Alencar Drummond Lispector Borges Neruda Nietzsche Kant Descartes
@@ -423,7 +423,7 @@ for p in ([[Shakespeare Hamlet Homero Homer Dante Cervantes Goethe Tolstói Tols
     Ulisses Ulysses Odisseu Quixote Fausto Faust Édipo Oedipus Prometeu Prometheus Narciso Vênus Venus Zeus
     Apolo Júpiter Jupiter Satanás Satan Lúcifer Lucifer]]):gmatch("[%a\128-\255]+") do REFERENCIAS[p] = true end
 
--- Lugares conhecidos (países, cidades, regiões, rios): nunca são personagens.
+-- Known places (countries, cities, regions, rivers): never characters.
 local LUGARES_CONHECIDOS = {}
 for p in ([[Brasil Portugal Angola Moçambique França France Inglaterra England Escócia Scotland Irlanda Ireland
     Espanha Spain Itália Italy Alemanha Germany Prússia Prussia Áustria Austria Suíça Switzerland Holanda Holland
@@ -440,12 +440,12 @@ for p in ([[Brasil Portugal Angola Moçambique França France Inglaterra England
     LUGARES_CONHECIDOS[p] = true
 end
 
--- Cidades conhecidas (GeoNames, CC-BY 4.0; 50 mil+ habitantes): nome assim só vira personagem com prova
--- (fala, título, verbo de pessoa). Nunca exclui sozinho: Elizabeth, Charlotte, Paris e Hamilton são cidades.
+-- Known cities (GeoNames, CC-BY 4.0; 50 thousand+ inhabitants): such a name only becomes a character with proof
+-- (speech, title, person verb). It never excludes alone: Elizabeth, Charlotte, Paris and Hamilton are cities.
 local okCid, CIDADES = pcall(require, "yomimon_cities")
 CIDADES = okCid and type(CIDADES) == "table" and CIDADES or {}
 
--- Palavras que, logo depois de um nome, fazem dele um lugar ("Baker Street", "Rua do Ouvidor").
+-- Words that, right after a name, make it a place ("Baker Street", "Rua do Ouvidor").
 local DEPOIS_LUGAR = {}
 for p in ([[Street Road Lane Square Avenue Hall House Lodge Park Abbey Manor Castle Court Place Bridge Inn
     Hotel Hill Heights Grange Rua Avenida Praça Largo Travessa Estrada Fazenda Engenho
@@ -453,7 +453,7 @@ for p in ([[Street Road Lane Square Avenue Hall House Lodge Park Abbey Manor Cas
     Desert Forest Woods Plains Springs Falls Harbor Harbour Peninsula Gulf Ocean Strait Channel Ridge Moor
     Moors Marsh Heath Downs]]):gmatch("[%a\128-\255]+") do DEPOIS_LUGAR[p] = true end
 
--- Verbos que, logo depois de um nome, mostram que ele é gente ("Capitu olhou", "Victor fled").
+-- Verbs that, right after a name, show it is a person ("Capitu olhou", "Victor fled").
 local VERBO_PESSOA = {}
 for p in ([[disse falou perguntou respondeu gritou murmurou sussurrou olhou sorriu riu chorou pensou sentiu
     suspirou voltou saiu entrou chegou partiu morreu matou beijou abraçou correu levantou sentou parou viu ouviu
@@ -464,13 +464,13 @@ for p in ([[disse falou perguntou respondeu gritou murmurou sussurrou olhou sorr
     VERBO_PESSOA[p] = true
 end
 
--- Primeira pessoa: muitas dessas palavras = narrador que fala de si.
+-- First person: many of these words = a narrator who talks about themselves.
 local EU = {}
 for p in ("eu me mim comigo meu minha meus minhas i my mine myself"):gmatch("%S+") do EU[p] = true end
--- Gênero de quem narra (português): "eu estava cansada", "fiquei sozinho", "sou mulher".
-local COPULA_EU = {}      -- só existem na primeira pessoa
+-- Gender of the narrator (Portuguese): "eu estava cansada", "fiquei sozinho", "sou mulher".
+local COPULA_EU = {}      -- only exist in the first person
 for p in ("sou estou fiquei fui estive senti sinto"):gmatch("%S+") do COPULA_EU[p] = true end
-local COPULA_TALVEZ = {}  -- primeira ou terceira pessoa: só contam depois de "eu"/"me"
+local COPULA_TALVEZ = {}  -- first or third person: they only count after "eu"/"me"
 for p in ("era estava ficava seria sentia"):gmatch("%S+") do COPULA_TALVEZ[p] = true end
 local INTENSIFICA = {}
 for p in ("muito tão meio bem mais ainda um uma toda todo completamente"):gmatch("%S+") do INTENSIFICA[p] = true end
@@ -485,7 +485,7 @@ local function generoDe(w)
     if w:find("ado$") or w:find("ido$") or w:find("oso$") or w:find("inho$") then return "m" end
 end
 
--- Expressões feitas que enganariam a contagem ("morrer de rir" não é sobre morte).
+-- Set phrases that would fool the count ("morrer de rir" is not about death).
 local EXPRESSOES = {
     "morr%a* de rir", "mort[oa]s? de cansaço", "mort[oa]s? de fome", "mort[oa]s? de vergonha", "morr%a* de medo",
     "mar de gente", "mar de rosas", "guerra fria", "pelo amor de deus", "meu deus", "graças a deus",
@@ -494,7 +494,7 @@ local EXPRESSOES = {
     "thank god", "god knows", "all the time", "from time to time", "in no time", "heart of gold",
 }
 
---- Texto em minúsculas sem as expressões feitas.
+--- Lowercase text without the set phrases.
 function M.limpar(texto)
     local t = texto:lower()
     for _, e in ipairs(EXPRESSOES) do t = t:gsub(e, " ") end
@@ -502,8 +502,8 @@ function M.limpar(texto)
 end
 
 local DIARIO_MAX = 150
-M.ESQUECIMENTO_TEMAS = 0.998  -- por página (meia-vida ~350 páginas, a mesma dos traços)
-local TRECHO_PAGINAS = 25   -- capítulo enorme (ou livro sem sumário): a cada 25 páginas conta como trecho novo
+M.ESQUECIMENTO_TEMAS = 0.998  -- per page (half-life ~350 pages, the same as the traits)
+local TRECHO_PAGINAS = 25   -- huge chapter (or a book without a table of contents): every 25 pages counts as a new stretch
 
 local function sorteia(lista, sorteio)
     return lista[(sorteio or math.random)(#lista)]
@@ -515,15 +515,15 @@ local function garantir(s)
     s.diario = s.diario or {}
 end
 
---- Escreve no diário (o mais novo fica no fim).
+--- Writes in the diary (the newest goes at the end).
 function M.anotar(s, agora, texto)
     garantir(s)
-    texto = (Voz.resolver(texto, s))  -- o diário fica escrito com o jeito dela no dia
+    texto = (Voz.resolver(texto, s))  -- the diary is written in its way of the day
     table.insert(s.diario, { t = agora, texto = texto })
     while #s.diario > DIARIO_MAX do table.remove(s.diario, 1) end
 end
 
---- Os dois temas mais fortes (nome, pontos), ou nil.
+--- The two strongest themes (name, points), or nil.
 function M.temasFortes(s)
     local lista = {}
     for tema, pts in pairs(s.temas or {}) do lista[#lista + 1] = { tema, pts } end
@@ -531,23 +531,23 @@ function M.temasFortes(s)
     return lista[1], lista[2]
 end
 
---- Ela está dividida entre dois temas opostos fortes?
+--- Is it divided between two strong opposite themes?
 function M.ambivalente(s)
     local a, b = M.temasFortes(s)
     if not (a and b) or b[2] < 15 then return nil end
     if OPOSTOS[a[1]] == b[1] and b[2] >= a[2] * 0.6 then return a[1], b[1] end
 end
 
---- Personagens de um livro, mais citados primeiro (só quem aparece pelo menos 3 vezes). Cada um:
--- { nome, vezes, falas, capitulos, protagonista, formas (todos os nomes da pessoa) }.
--- Desde 27/10/2026, pelas evidências de L.nomes (personagensNovo); livro terminado guarda só a lista final.
--- Livros lidos antes disso (sem L.nomes) seguem a regra antiga, abaixo.
+--- Characters of a book, most cited first (only those who appear at least 3 times). Each one:
+-- { nome, vezes, falas, capitulos, protagonista, formas (all names of the person) }.
+-- Since 27/10/2026, from the evidence in L.nomes (personagensNovo); a finished book keeps only the final list.
+-- Books read before that (without L.nomes) follow the old rule, below.
 function M.personagensInfo(s, livro)
     local L = livro and s.livros and s.livros[livro]
     if not L then return {} end
-    if L.personagens_fim then return L.personagens_fim end  -- terminado (numa releitura, até terminar de novo)
+    if L.personagens_fim then return L.personagens_fim end  -- finished (on a re-read, until it is finished again)
     if L.nomes then return (M._personagensNovo(L, livro)) end
-    -- regra antiga: "Sherlock Holmes": o nome e o sobrenome viram uma pessoa só (a forma mais citada)
+    -- old rule: "Sherlock Holmes": the first and last name become a single person (the most cited form)
     local apelido = {}
     for b, a in pairs(L.sobrenome or {}) do
         if (L.pers[a] or 0) >= (L.pers[b] or 0) then apelido[b] = a else apelido[a] = b end
@@ -568,8 +568,8 @@ function M.personagensInfo(s, livro)
     for nome, c in pairs(total) do
         local prova = ((L.prova or {})[nome] or 0) + ((L.falou or {})[nome] or 0)
         local paginas = (L.pags or {})[nome] or 0
-        -- suspeito de não ser gente (cidade conhecida, ou costuma vir com artigo: "the Nautilus",
-        -- "os Tupinambás"): só com prova, nunca só por aparecer muito
+        -- suspected of not being a person (known city, or usually comes with an article: "the Nautilus",
+        -- "os Tupinambás"): only with proof, never just for appearing a lot
         local suspeito = CIDADES[nome] or ((L.coisa or {})[nome] or 0) * 2 >= c
         if (c >= 3 and prova >= 1) or (not suspeito and c >= 5 and paginas >= 3) then
             lista[#lista + 1] = {
@@ -582,9 +582,9 @@ function M.personagensInfo(s, livro)
     return lista
 end
 
---- As palavras marcantes de um livro (Etapa 5): 3+ vezes nele e pelo menos uma depois de artigo, das mais
--- fortes para as mais fracas, menos as que também estão no vocabulário de 2 ou mais outros livros dela
--- (essas são dela, não do livro). Até `n`.
+--- The striking words of a book (step 5): 3+ times in it and at least one after an article, from the
+-- strongest to the weakest, except those that are also in the vocabulary of 2 or more other books of its own
+-- (those are its own, not the book's). Up to `n`.
 function M.marcantes(s, livro, n)
     local L = livro and s.livros and s.livros[livro]
     if not (L and L.vocab) then return {} end
@@ -617,22 +617,22 @@ local function maiusculo(w)
     local b1, b2 = w:byte(1), w:byte(2)
     if not b1 then return false end
     if b1 >= 65 and b1 <= 90 then return true end
-    return b1 == 195 and b2 and b2 >= 128 and b2 <= 158  -- À…Þ em UTF-8
+    return b1 == 195 and b2 and b2 >= 128 and b2 <= 158  -- À…Þ in UTF-8
 end
 
 local function somar(t, k, v) t[k] = (t[k] or 0) + (v or 1) end
 
--- Nomes com evidências (desde 27/10/2026) --------------------------------------------------------
--- Cada página anota os nomes (também os de várias palavras: "Petra Cotes", "Paulo Afonso") e as pistas
--- que vieram com cada um, por regra. Quem é gente, quem é lugar e quem é a mesma pessoa só se decide na
--- consulta, com as evidências do livro inteiro (personagensNovo). Protótipo e medições:
+-- Names with evidence (since 27/10/2026) --------------------------------------------------------
+-- Each page notes the names (also multi-word ones: "Petra Cotes", "Paulo Afonso") and the clues
+-- that came with each one, by rule. Who is a person, who is a place and who is the same person is only decided
+-- at query time, with the evidence of the whole book (personagensNovo). Prototype and measurements:
 -- ferramentas/experimentos/personagens/.
 
 local function emMinusculas(w)
     return (w:lower():gsub("\195([\128-\158])", function(c) return "\195" .. string.char(c:byte() + 32) end))
 end
 
--- título antes do nome → gênero ("m", "f" ou false); comparado em minúsculas ("madama Carlota", "lady Madeline")
+-- title before the name → gender ("m", "f" or false); compared in lowercase ("madama Carlota", "lady Madeline")
 local TITULO_GENERO = {}
 for p in ([[seu sinhô dom sr senhor doutor dr padre frei coronel capitão tenente sargento cabo major general comandante
     tio compadre mestre professor conselheiro barão conde marquês visconde rei príncipe sir mr mister monsieur lord
@@ -661,7 +661,7 @@ local PESSOA_NOME = {}
 for p in ([[homem mulher moça moço rapaz menina menino velho velha senhor senhora sargento tenente coronel padre médico
     médica datilógrafa cartomante preso criada criado escravo escrava viúva viúvo noiva noivo marido esposa filho filha
     pai mãe irmão irmã tio tia avô avó amigo amiga cigano cigana patrão patroa]]):gmatch("%S+") do PESSOA_NOME[p] = true end
-local LUGAR_ANTES = {}  -- "cidade de Recife", "rua do Ouvidor", "estado de Sergipe" ("fazenda de Fulano" é de alguém)
+local LUGAR_ANTES = {}  -- "cidade de Recife", "rua do Ouvidor", "estado de Sergipe" ("fazenda de Fulano" belongs to someone)
 for p in ([[estado cidade vila povoado município rio serra rua praça largo bairro sertão capital porto ilha lagoa morro
     travessa avenida aldeia arraial chapada ribeirão enseada baía praia cabo forte river mount lake cape fort port isle
     island valley bay gulf county]]):gmatch("%S+") do LUGAR_ANTES[p] = true end
@@ -675,10 +675,10 @@ local ESTADOS_COMPOSTOS = { ["Espírito Santo"] = true, ["Mato Grosso"] = true, 
 local PREPOSICAO = {}
 for p in ("de da do em para com por in at of to from with by"):gmatch("%S+") do PREPOSICAO[p] = true end
 
--- Peso de cada regra: a favor de ser gente, de ser lugar, e contra ser nome (palavra comum, citação)
+-- Weight of each rule: for being a person, for being a place, and against being a name (common word, quotation)
 local PESO_GENTE = { titulo = 2, fala = 2, verbo = 1, vocativo = 1.5, aposto = 1.5 }
 local PESO_LUGAR = { lugar = 2, rota = 2, santo = 1, em = 0.5 }
-local NOMES_FORMAS_MAX = 150     -- formas guardadas por livro enquanto lê (as de 1 vez saem primeiro)
+local NOMES_FORMAS_MAX = 150     -- forms kept per book while reading (those seen once go first)
 local MIN_MENCOES = 3
 
 local function baseVerbo(w)
@@ -690,12 +690,12 @@ local function ehGente(w) local b = baseVerbo(w) return VERBO_PESSOA[b] or GENTE
 local function candidatoNome(tk)
     local w = tk.w
     return maiusculo(w) and #w >= 2 and not w:find("^[%u%p]+$") and not NAO_NOMES[w] and not INTERJEICOES[w]
-        and TITULO_GENERO[emMinusculas(w)] == nil and not ABREVIACAO[w]  -- "St." de St. John não é nome
+        and TITULO_GENERO[emMinusculas(w)] == nil and not ABREVIACAO[w]  -- "St." of St. John is not a name
 end
 
---- Nomes de uma página, com as pistas de cada um (toks: as palavras de M.sinais).
--- Devolve { [forma] = { n, ini, meio, ev = { regra = vezes }, gen = { m, f } } } e as frases com
--- nomes em que um é o começo do outro ("Macabéa, a minha querida Maca"), para não juntar duas pessoas.
+--- Names on a page, with the clues of each one (toks: the words of M.sinais).
+-- Returns { [forma] = { n, ini, meio, ev = { regra = vezes }, gen = { m, f } } } and the sentences with
+-- names where one is the start of another ("Macabéa, a minha querida Maca"), so as not to join two people.
 local function nomesDaPagina(toks, dialogo)
     local nomes, juntos = {}, {}
     local por_frase, frase = {}, 0
@@ -705,7 +705,7 @@ local function nomesDaPagina(toks, dialogo)
         if tk.inicio then frase = frase + 1 end
         if candidatoNome(tk) then
             local j = i
-            while j - i < 5 and not toks[j].pont do  -- junta "Petra Cotes", "Olímpico de Jesus Moreira Chaves"
+            while j - i < 5 and not toks[j].pont do  -- joins "Petra Cotes", "Olímpico de Jesus Moreira Chaves"
                 local k = j + 1
                 while k <= #toks and CONECTOR_NOME[toks[k].w] and not toks[k].pont and not toks[k].abre do k = k + 1 end
                 local prox = toks[k]
@@ -728,34 +728,34 @@ local function nomesDaPagina(toks, dialogo)
             local colado_antes = p and not p.pont and not tk.abre
             local colado_depois = n1 and not ult.pont and not n1.abre
             local pl = p and emMinusculas(p.w)
-            -- título antes ("madama Carlota", "D. Plácida", "Seu Nestor")
+            -- title before ("madama Carlota", "D. Plácida", "Seu Nestor")
             if p and TITULO_GENERO[pl] ~= nil and not tk.abre and (not p.pont or (p.ponto and #p.w <= 4)) then
                 somar(d.ev, "titulo")
                 if TITULO_GENERO[pl] then somar(d.gen, TITULO_GENERO[pl]) end
             end
-            -- quem fala, ou faz coisa de gente logo depois do nome
-            -- ("said the Hatter", "disse o Paulo": o verbo de fala vem antes do artigo)
+            -- who speaks, or does something human right after the name
+            -- ("said the Hatter", "disse o Paulo": the speech verb comes before the article)
             local artigo_antes = colado_antes and (pl == "the" or pl == "o" or pl == "a") and pp and not pp.pont
             if (colado_antes and ehFala(p.w)) or (colado_depois and ehFala(n1.w)) or (artigo_antes and ehFala(pp.w)) then
                 somar(d.ev, "fala")
             elseif colado_depois and ehGente(n1.w) and not (colado_antes and PREPOSICAO[pl]) then
                 somar(d.ev, "verbo")
             end
-            -- chamado pelo nome numa fala: "– Maca, o quê?", "Logo ela, Maca?"
+            -- called by name in a line of speech: "– Maca, o quê?", "Logo ela, Maca?"
             local fim = ult.bruto:sub(-1)
             if (tk.inicio and dialogo > 0 and (fim == "," or fim == "?" or fim == "!") and not (n1 and candidatoNome(n1)))
                     or (p and p.bruto:sub(-1) == "," and (fim == "?" or fim == "!")) then
                 somar(d.ev, "vocativo")
             end
-            -- aposto: "Carlota, a cartomante" (não "Amaranta, o coronel Aureliano", que é lista)
+            -- apposition: "Carlota, a cartomante" (not "Amaranta, o coronel Aureliano", which is a list)
             if fim == "," and n1 and n2 and not n1.pont and (n1.w == "o" or n1.w == "a" or n1.w == "um" or n1.w == "uma")
                     and PESSOA_NOME[emMinusculas(n2.w)] and not (n3 and not n2.pont and maiusculo(n3.w)) then
                 somar(d.ev, "aposto")
                 somar(d.gen, (n1.w == "o" or n1.w == "um") and "m" or "f")
             end
-            -- artigo antes: só gênero ("a Bahia" também leva artigo)
+            -- article before: only gender ("a Bahia" also takes an article)
             if colado_antes and (pl == "o" or pl == "a") then somar(d.gen, pl == "o" and "m" or "f") end
-            -- lugar
+            -- place
             if colado_antes and pp and not pp.pont and CONECTOR_NOME[pl] and LUGAR_ANTES[emMinusculas(pp.w)] then
                 somar(d.ev, "lugar")
             elseif colado_antes and LUGAR_ANTES[pl] then
@@ -777,7 +777,7 @@ local function nomesDaPagina(toks, dialogo)
             i = i + 1
         end
     end
-    -- mesma frase, um nome é o começo do outro ("Macabéa" e "Maca"): conta, para não juntar duas pessoas
+    -- same sentence, one name is the start of another ("Macabéa" and "Maca"): counts, so as not to join two people
     for _, fs in pairs(por_frase) do
         for a = 1, #fs do
             for b = 1, #fs do
@@ -795,7 +795,7 @@ local function palavrasDe(forma)
     return out
 end
 
---- Guarda os nomes da página no livro (chamado por M.digerir).
+--- Stores the page's names in the book (called by M.digerir).
 local function guardarNomes(L, sinal, pag)
     L.nomes, L.caixa, L.juntos = L.nomes or {}, L.caixa or {}, L.juntos or {}
     L.nomes_versao = (L.nomes_versao or 0) + 1
@@ -810,7 +810,7 @@ local function guardarNomes(L, sinal, pag)
         N.n, N.meio = N.n + d.n, N.meio + d.meio
         for r, c in pairs(d.ev) do
             somar(N.ev, r, c)
-            N.ex[r] = N.ex[r] or pag  -- a página da primeira vez, para conferir depois
+            N.ex[r] = N.ex[r] or pag  -- the page of the first time, to check afterwards
         end
         for g, c in pairs(d.gen) do somar(N.gen, g, c) end
         for _, w in ipairs(palavrasDe(forma)) do
@@ -819,8 +819,8 @@ local function guardarNomes(L, sinal, pag)
             if d.meio > 0 then cx.M = cx.M + d.meio end
         end
     end
-    -- nome novo de uma palavra: quem estava na mesma página (para achar apelido que aparece logo depois do
-    -- nome: "Macabéa" → "Maca")
+    -- new one-word name: who was on the same page (to find a nickname that shows up right after the
+    -- name: "Macabéa" → "Maca")
     for _, forma in ipairs(novas) do
         if not forma:find(" ") then
             local viz = {}
@@ -830,14 +830,14 @@ local function guardarNomes(L, sinal, pag)
             if #viz > 0 then L.nomes[forma].viz = viz end
         end
     end
-    -- quantas vezes cada palavra de nome aparece em minúscula ("quanto", "seu")
+    -- how many times each name word appears in lowercase ("quanto", "seu")
     for w, cx in pairs(L.caixa) do
         local c = (sinal.minus or {})[emMinusculas(w)]
         if c then cx.m = cx.m + c end
     end
     for par, c in pairs(sinal.juntos_prefixo or {}) do somar(L.juntos, par, c) end
-    -- limpeza (a cada 10 páginas): palavra que só apareceu no começo da frase e que o livro escreve mais em
-    -- minúscula ("É", "Pois", "Quanto") sai; a contagem de maiúsculas fica só para as palavras dos nomes
+    -- cleanup (every 10 pages): a word that only appeared at the start of a sentence and that the book writes more in
+    -- lowercase ("É", "Pois", "Quanto") leaves; the capital count stays only for name words
     if L.nomes_versao % 10 == 0 then
         for forma, N in pairs(L.nomes) do
             local cx = L.caixa[forma:match("^%S+")]
@@ -851,7 +851,7 @@ local function guardarNomes(L, sinal, pag)
             if not (L.nomes[a] and L.nomes[b]) then L.juntos[par] = nil end
         end
     end
-    -- poda: o estado salvo não cresce sem fim
+    -- pruning: the saved state does not grow forever
     local n = 0
     for _ in pairs(L.nomes) do n = n + 1 end
     if n > NOMES_FORMAS_MAX then
@@ -863,22 +863,22 @@ end
 
 local cache_pers = setmetatable({}, { __mode = "k" })
 
---- Personagens de um livro pelas evidências (L.nomes). Devolve a mesma lista de M.personagensInfo, com
--- `formas` (todos os nomes da pessoa) e `lugares` à parte.
+--- Characters of a book by the evidence (L.nomes). Returns the same list as M.personagensInfo, with
+-- `formas` (all names of the person) and `lugares` apart.
 local function personagensNovo(L, livro)
     local c = cache_pers[L]
     if c and c.pags == L.paginas and c.n == L.nomes_versao then return c.lista, c.lugares end
     local N, CX = L.nomes, L.caixa or {}
     local titulo = livro and emMinusculas(livro) or ""
-    -- as palavras de cada nome, separadas uma vez só: dentro dos laços de baixo (nome × nome), separar de novo
-    -- a cada par era quase todo o tempo da consulta num livro longo (Moby Dick, página 700: 250 ms no Mac)
+    -- the words of each name, split once: inside the loops below (name × name), splitting again
+    -- on every pair was almost all of the query time in a long book (Moby Dick, page 700: 250 ms on the Mac)
     local PW, COM = {}, {}
     local function pw(f)
         local p = PW[f]
         if not p then p = palavrasDe(f); PW[f] = p end
         return p
     end
-    local function comConectores(f)  -- todas as palavras, com "de", "da"
+    local function comConectores(f)  -- all the words, with "de", "da"
         local ws = COM[f]
         if not ws then
             ws = {}
@@ -887,8 +887,8 @@ local function personagensNovo(L, livro)
         end
         return ws
     end
-    -- 1. forma que só aparece no começo da frase vale se o livro escreve a primeira palavra mais com maiúscula
-    --    no meio da frase do que em minúscula ("Quanto a mim", "Talvez Cotrim" → "Cotrim"); senão sai a palavra
+    -- 1. a form that only appears at the start of a sentence is valid if the book writes the first word more capitalised
+    --    mid-sentence than in lowercase ("Quanto a mim", "Talvez Cotrim" → "Cotrim"); otherwise the word leaves
     local function comum(w)
         local cx = CX[w] or { M = 0, m = 0 }
         return cx.M == 0 or cx.m > cx.M
@@ -898,7 +898,7 @@ local function personagensNovo(L, livro)
         local alvo = forma
         local cx1 = not forma:find(" ") and CX[forma]
         if cx1 and cx1.m >= 3 and cx1.m > 2 * cx1.M then
-            alvo = nil  -- o livro usa a palavra quase sempre em minúscula ("Já disse…"): não é nome
+            alvo = nil  -- the book uses the word almost always in lowercase ("Já disse…"): it is not a name
         elseif d.meio == 0 then
             local ps = {}
             for w in forma:gmatch("%S+") do ps[#ps + 1] = w end
@@ -917,7 +917,7 @@ local function personagensNovo(L, livro)
             for _, v in ipairs(d.viz or {}) do e.viz[v] = true end
         end
     end
-    -- 2. pistas do livro inteiro: palavra comum, gente famosa citada, lugar conhecido
+    -- 2. clues from the whole book: common word, famous person cited, known place
     for forma, e in pairs(F) do
         if not forma:find(" ") then
             local cx = CX[forma]
@@ -928,12 +928,12 @@ local function personagensNovo(L, livro)
         elseif ESTADOS_COMPOSTOS[forma] then
             e.lugar_lista = 2
         else
-            local todas = true  -- "Jesus Cristo": todas as palavras são de gente famosa citada
+            local todas = true  -- "Jesus Cristo": all the words are of a famous person cited
             for _, w in ipairs(pw(forma)) do if not REFERENCIAS[w] then todas = false end end
             if todas and not titulo:find(emMinusculas(forma), 1, true) then e.ev.citacao = 2 end
         end
     end
-    -- 3. a mesma pessoa
+    -- 3. the same person
     local grupo, compostas = {}, {}
     for forma in pairs(F) do
         grupo[forma] = forma
@@ -941,7 +941,7 @@ local function personagensNovo(L, livro)
     end
     table.sort(compostas, function(a, b) return #pw(a) < #pw(b) or (#pw(a) == #pw(b) and a < b) end)
     local function raiz(f) while grupo[f] ~= f do f = grupo[f] end return f end
-    -- "Olímpico de Jesus" é o começo de um só nome mais longo ("… Moreira Chaves"): a mesma pessoa
+    -- "Olímpico de Jesus" is the start of a single longer name ("… Moreira Chaves"): the same person
     for _, c1 in ipairs(compostas) do
         local p1 = pw(c1)
         local j1 = table.concat(p1, " ")
@@ -958,7 +958,7 @@ local function personagensNovo(L, livro)
         end
         if alvo then grupo[alvo] = raiz(c1) end
     end
-    -- nome solto que é o primeiro (ou o último, sem "de" antes) de um só nome composto que aparece 2+ vezes
+    -- a loose name that is the first (or the last, without "de" before) of a single compound name that appears 2+ times
     local vezes_familia = {}
     for _, c1 in ipairs(compostas) do somar(vezes_familia, raiz(c1), F[c1].n) end
     for forma in pairs(F) do
@@ -976,7 +976,7 @@ local function personagensNovo(L, livro)
             if alvo and not varios then grupo[forma] = alvo end
         end
     end
-    -- apelido: o começo de um nome, que apareceu pela primeira vez perto dele ("Macabéa" → "Maca")
+    -- nickname: the start of a name, which appeared for the first time near it ("Macabéa" → "Maca")
     for forma, e in pairs(F) do
         if grupo[forma] == forma and not forma:find(" ") and #forma >= 3 then
             for outra in pairs(F) do
@@ -990,7 +990,7 @@ local function personagensNovo(L, livro)
             end
         end
     end
-    -- 4. tipo de cada pessoa ou coisa, com as pistas de todos os nomes dela
+    -- 4. type of each person or thing, with the clues of all its names
     local G = {}
     for forma, e in pairs(F) do
         local r = raiz(forma)
@@ -1006,7 +1006,7 @@ local function personagensNovo(L, livro)
             if PESO_LUGAR[regra] then g.lugar = g.lugar + PESO_LUGAR[regra] * v end
         end
         g.lugar = g.lugar + (e.lugar_lista or 0)
-        g.coisa = (g.coisa or 0) + 0.5 * (e.ev.coisa or 0)  -- "the Nautilus": só pesa contra quem nunca fala
+        g.coisa = (g.coisa or 0) + 0.5 * (e.ev.coisa or 0)  -- "the Nautilus": only weighs against someone who never speaks
         g.comum = g.comum + (e.ev.comum or 0)
         g.citacao = g.citacao + (e.ev.citacao or 0)
         g.falas = g.falas + (e.ev.fala or 0)
@@ -1037,8 +1037,8 @@ local function personagensNovo(L, livro)
 end
 M._personagensNovo = personagensNovo
 
---- Livro terminado: guarda só a lista final de personagens e lugares e apaga as evidências (o estado salvo
--- não cresce a cada livro). Numa releitura, as evidências recomeçam.
+--- Finished book: keeps only the final list of characters and places and erases the evidence (the saved state
+-- does not grow with each book). On a re-read, the evidence starts again.
 function M.congelarNomes(L, livro)
     if not L or not L.nomes then return end
     local lista, lugares = personagensNovo(L, livro)
@@ -1046,11 +1046,11 @@ function M.congelarNomes(L, livro)
     L.nomes, L.caixa, L.juntos, L.nomes_versao, L.aura = nil, nil, nil, nil, nil
 end
 
---- Lê os sinais de uma página: temas, eventos, clima, personagens, lugares, citações, quem fala,
--- provas de que um nome é gente, primeira pessoa e tamanho das palavras.
--- livro (opcional): nomes que estão no título do livro nunca são tratados como citação.
--- capitulo (opcional): se a página começa com o título do capítulo ("XXV Na Tijuca Nisto…"), as palavras do
--- título e a primeira depois dele contam como começo de frase (só para os nomes).
+--- Reads the signals of a page: themes, events, weather, characters, places, quotations, who speaks,
+-- proof that a name is a person, first person and word size.
+-- livro (optional): names that are in the book's title are never treated as a quotation.
+-- capitulo (optional): if the page starts with the chapter title ("XXV Na Tijuca Nisto…"), the title words and the
+-- first one after it count as the start of a sentence (only for the names).
 function M.sinais(texto, livro, capitulo)
     local sinal = { temas = {}, eventos = {}, assuntos = {}, clima = 0, pers = {}, pers_inicio = {}, lugares = {}, falou = {},
                     pares = {}, coisa = {}, refs = {}, prova = {}, eu = 0, palavras = 0, letras = 0, genero = {}, frases = 0,
@@ -1096,7 +1096,7 @@ function M.sinais(texto, livro, capitulo)
         local cal = M.CLIMA_CALIBRACAO and M.CLIMA_CALIBRACAO[pt and "pt" or "en"]
         sinal.clima = cal and (nota - cal.mediana) / cal.meia_faixa or nota
     end
-    -- gênero de quem diz "eu" (português)
+    -- gender of whoever says "eu" (Portuguese)
     for i = 1, n - 1 do
         local w = minusculas[i]
         local eu_antes = i > 1 and (minusculas[i - 1] == "eu" or minusculas[i - 1] == "me")
@@ -1107,7 +1107,7 @@ function M.sinais(texto, livro, capitulo)
             if g then somar(sinal.genero, g) end
         end
     end
-    -- evento só conta com 2+ palavras diferentes do grupo (ou 3+ ocorrências); assunto também
+    -- an event only counts with 2+ different words of the group (or 3+ occurrences); a subject too
     for ev, c in pairs(sinal.eventos) do
         local diferentes = 0
         for _ in pairs(hits_evento[ev]) do diferentes = diferentes + 1 end
@@ -1119,7 +1119,7 @@ function M.sinais(texto, livro, capitulo)
         for _ in pairs(hits_assunto[as]) do diferentes = diferentes + 1 end
         if diferentes < 2 and c < 3 then sinal.assuntos[as] = nil end
     end
-    -- tema: uma palavra genérica solta ("time", "old", "night") não faz assunto
+    -- theme: a loose generic word ("time", "old", "night") does not make a subject
     for t, c in pairs(sinal.temas) do
         local diferentes, especifica = 0, false
         for p in pairs(hits_tema[t]) do
@@ -1128,24 +1128,24 @@ function M.sinais(texto, livro, capitulo)
         end
         if not especifica and diferentes < 2 and c < 3 then sinal.temas[t] = nil end
     end
-    -- palavras em ordem, sabendo quais começam frase
-    -- aspas curvas, travessões e « » viram espaço; reticências viram "..." (fim de frase)
+    -- words in order, knowing which ones start a sentence
+    -- curly quotes, dashes and « » become a space; ellipses become "..." (end of sentence)
     local normal = texto:gsub("\226\128\166", "... "):gsub("\226\128[\148\156]", " . ")
         :gsub("\194\171", " . "):gsub("\226\128[\147\152\153\157]", " "):gsub("\194\187", " ")
     local toks, inicio = {}, true
     for bruto in normal:gmatch("%S+") do
         local w = bruto:gsub("^%p+", ""):gsub("%p+$", "")
-        -- pont: a palavra termina em pontuação (vírgula, "!", fim de fala…)
+        -- pont: the word ends in punctuation (comma, "!", end of speech…)
         if w ~= "" then
             toks[#toks + 1] = { w = w, inicio = inicio, pont = bruto:find("%p$") ~= nil, ponto = bruto:find("%.$") ~= nil,
                                 bruto = bruto, abre = bruto:find("^%p") ~= nil }
         end
-        -- "Mr." e "D." não terminam frase; uma inicial sozinha ("J.") também não
+        -- "Mr." and "D." do not end a sentence; a lone initial ("J.") neither
         inicio = bruto:find("[%.!%?:]$") ~= nil and not (bruto:find("%.$") and (ABREVIACAO[w] or w:find("^%u$")))
     end
-    -- estilo e ritmo do livro (vetor do livro, yomimon_vector.lua): frases e marcas de diálogo na página
+    -- style and rhythm of the book (book vector, yomimon_vector.lua): sentences and dialogue marks on the page
     for _, tk in ipairs(toks) do if tk.inicio then sinal.frases = sinal.frases + 1 end end
-    -- palavras do próprio livro (Etapa 5): candidatas da página
+    -- the book's own words (step 5): candidates from the page
     sinal.vocab, sinal.vocab_art = {}, {}
     for i, tk in ipairs(toks) do
         if M.candidata(tk.w, pt) then
@@ -1159,10 +1159,10 @@ function M.sinais(texto, livro, capitulo)
     local _, aspas = texto:gsub("\226\128\156", "")       -- “
     local _, guillemets = texto:gsub("\194\171", "")       -- «
     local _, retas = texto:gsub('"', "")
-    local _, travessoes = texto:gsub("\226\128\148%s*%u", "")  -- — Fala (diálogo à portuguesa)
+    local _, travessoes = texto:gsub("\226\128\148%s*%u", "")  -- — Speech (Portuguese-style dialogue)
     sinal.dialogo = aspas + guillemets + math.floor(retas / 2) + travessoes
-    -- nomes com evidências (personagensNovo) e quantas vezes cada palavra aparece em minúscula
-    local _, travessoes_curtos = texto:gsub("\226\128\147", "")  -- – (diálogo de Clarice)
+    -- names with evidence (personagensNovo) and how many times each word appears in lowercase
+    local _, travessoes_curtos = texto:gsub("\226\128\147", "")  -- – (Clarice-style dialogue)
     local toks_nomes = toks
     if type(capitulo) == "string" and capitulo ~= "" and texto:match("^%s*(.*)"):sub(1, #capitulo) == capitulo then
         local n_titulo = select(2, capitulo:gsub("%S+", ""))
@@ -1176,12 +1176,12 @@ function M.sinais(texto, livro, capitulo)
     for _, tk in ipairs(toks) do
         if tk.w:find("^%l") or tk.w:find("^\195[\159-\191]") then somar(sinal.minus, emMinusculas(tk.w)) end
     end
-    -- caixa alta inteira (ADVENTURE, DIARY, XXIX) é título, cabeçalho ou rótulo, não nome
+    -- all caps (ADVENTURE, DIARY, XXIX) is a title, header or label, not a name
     local function ehNome(w) return maiusculo(w) and #w >= 3 and not NAO_NOMES[w] and not w:find("^[%u%p]+$") end
-    -- palavra que também aparece em minúscula na página é palavra comum ("Let" no começo do verso, "let" no meio)
+    -- a word that also appears in lowercase on the page is a common word ("Let" at the start of the verse, "let" in the middle)
     local em_minuscula = {}
     for _, tk in ipairs(toks) do if tk.w:find("^%l") then em_minuscula[tk.w] = true end end
-    -- teatro: rótulo de fala em caixa alta no começo da frase ("HAMLET.", "LADY MACBETH."); só vale com 2+ na página
+    -- theatre: speech label in caps at the start of a sentence ("HAMLET.", "LADY MACBETH."); only valid with 2+ on the page
     local rotulos = {}
     for i, tk in ipairs(toks) do
         local ant = toks[i - 1]
@@ -1193,7 +1193,7 @@ function M.sinais(texto, livro, capitulo)
     if #rotulos >= 2 then
         for _, nome in ipairs(rotulos) do
             somar(sinal.pers, nome); somar(sinal.falou, nome)
-            -- teatro: o rótulo de quem fala ("HAMLET.") é prova de gente
+            -- theatre: the label of who speaks ("HAMLET.") is proof of a person
             local d = sinal.nomes[nome] or { n = 0, ini = 0, meio = 0, ev = {}, gen = {} }
             sinal.nomes[nome] = d
             d.n, d.meio = d.n + 1, d.meio + 1
@@ -1215,9 +1215,9 @@ function M.sinais(texto, livro, capitulo)
         elseif ehNome(w) and (LUGARES_CONHECIDOS[w] or (prox and DEPOIS_LUGAR[prox.w]) or depoisDeLugar(i)) then
             somar(sinal.lugares, w)
         elseif ehNome(w) and em_minuscula[w:lower()] and not (ant and TITULOS[ant.w]) then
-            -- palavra comum com maiúscula: não é nome
+            -- common word with a capital: not a name
         elseif tk.inicio and ehNome(w) then
-            somar(sinal.pers_inicio, w)  -- só conta se já for conhecido como personagem
+            somar(sinal.pers_inicio, w)  -- only counts if already known as a character
         elseif not tk.inicio and ehNome(w) then
             if ant and PREP_LUGAR[ant.w:lower()] then
                 somar(sinal.lugares, w)
@@ -1228,18 +1228,18 @@ function M.sinais(texto, livro, capitulo)
                 end
             end
         end
-        -- artigo antes do nome: "the Nautilus", "the Pequod" (inglês); "os Tupinambás" (português, plural).
-        -- Pessoa quase nunca leva artigo assim; quem leva (the Duchess, the Nurse) costuma falar e ter prova.
+        -- article before the name: "the Nautilus", "the Pequod" (English); "os Tupinambás" (Portuguese, plural).
+        -- A person almost never takes an article like this; those who do (the Duchess, the Nurse) usually speak and have proof.
         if ehNome(w) and ant and not ant.pont then
             local a = ant.w:lower()
             if (not pt and a == "the") or (pt and (a == "os" or a == "as")) then somar(sinal.coisa, w) end
         end
-        -- provas de que um nome é gente: título antes ("Dona Glória") ou verbo de pessoa depois ("Capitu olhou")
+        -- proof that a name is a person: title before ("Dona Glória") or person verb after ("Capitu olhou")
         if ehNome(w) and not citacao and not LUGARES_CONHECIDOS[w] then
             if (ant and TITULOS[ant.w]) or (prox and VERBO_PESSOA[prox.w:lower()]) then somar(sinal.prova, w) end
         end
-        -- quem fala: "disse Capitu" / "said Mr. Bennet" / "Capitu disse". Nome colado em pontuação
-        -- ("Overboard!” said", "Mr. Wilson,” said", "—Viu? perguntou") é parte da fala, não quem fala.
+        -- who speaks: "disse Capitu" / "said Mr. Bennet" / "Capitu disse". A name stuck to punctuation
+        -- ("Overboard!” said", "Mr. Wilson,” said", "—Viu? perguntou") is part of the speech, not who speaks.
         if VERBO_FALA[w:lower()] then
             local depois = prox
             if depois and TITULOS[depois.w] then depois = toks[i + 2] end
@@ -1250,7 +1250,7 @@ function M.sinais(texto, livro, capitulo)
     return sinal
 end
 
--- Falas dos personagens ----------------------------------------------------------------
+-- Characters' speech ----------------------------------------------------------------
 -- “Fala,” disse Nome. / “Fala,” Nome disse. / Nome disse: “Fala.” / — Fala — disse Nome.
 local ABRE, FECHA, TRAVESSAO = "\226\128\156", "\226\128\157", "\226\128\148"
 local FALA_MIN, FALA_MAX = 18, 140
@@ -1260,7 +1260,7 @@ local function nomeDeGente(w)
     return w and maiusculo(w) and #w >= 3 and not NAO_NOMES[w] and not REFERENCIAS[w] and not LUGARES_CONHECIDOS[w]
 end
 
--- Quem disse: verbo de fala logo depois da fala ("disse Darcy", "Darcy said") ou logo antes ("Darcy said:").
+-- Who said it: speech verb right after the speech ("disse Darcy", "Darcy said") or right before ("Darcy said:").
 local function quemDisse(depois, antes)
     local a, b = depois:match("^[%s,%.!%?;:]*([%a\128-\255]+)%s+([%a\128-\255]+)")
     if a and VERBO_FALA[a:lower()] and TITULOS[b] then  -- "said Mr. Bennet"
@@ -1276,7 +1276,7 @@ local function limparFala(f)
     return (f:gsub("%s+", " "):gsub("^%s+", ""):gsub("[%s,;—]+$", ""))
 end
 
---- Falas atribuídas numa página: { {nome =, fala =}, ... } (só falas de tamanho razoável).
+--- Speech attributed on a page: { {nome =, fala =}, ... } (only speeches of a reasonable size).
 function M.falasDaPagina(texto)
     local out = {}
     local function guardar(fala, nome)
@@ -1294,8 +1294,8 @@ function M.falasDaPagina(texto)
             local bruta = texto:sub(a + #abre, b - 1)
             local depois = texto:sub(b + #fecha, b + #fecha + 60)
             local nome = quemDisse(depois, texto:sub(math.max(1, a - 40), a - 1))
-            -- “Primeira parte,” disse Fulano, “e o resto.” → junta as duas partes
-            -- (só junta se a segunda parte continua a frase, em minúscula; senão a primeira termina ali)
+            -- “Primeira parte,” disse Fulano, “e o resto.” → joins the two parts
+            -- (only joins if the second part continues the sentence, in lowercase; otherwise the first ends there)
             if nome and bruta:find(",%s*$") then
                 local c = texto:find(abre, b + #fecha, true)
                 local d = c and c - b < 60 and texto:find(fecha, c + #abre, true)
@@ -1339,12 +1339,12 @@ local function guardarCitacoes(L, falas)
     end
 end
 
---- Uma fala marcante de um personagem do livro: { nome, fala }, ou nil.
--- Prefere o protagonista e falas mais curtas; max_tam limita o tamanho.
+--- A striking line of a character in the book: { nome, fala }, or nil.
+-- Prefers the protagonist and shorter lines; max_tam limits the size.
 function M.citacao(s, livro, sorteio, max_tam)
     local L = livro and s.livros and s.livros[livro]
     if not L or not L.citacoes then return nil end
-    local pers = {}  -- qualquer nome da pessoa ("Cotes" e "Petra Cotes") → a posição dela na lista
+    local pers = {}  -- any name of the person ("Cotes" and "Petra Cotes") → their position in the list
     for i, p in ipairs(M.personagensInfo(s, livro)) do
         for _, f in ipairs(p.formas or { p.nome }) do pers[f] = pers[f] or i end
     end
@@ -1357,14 +1357,14 @@ function M.citacao(s, livro, sorteio, max_tam)
     return boas[(sorteio or math.random)(math.min(#boas, 4))]
 end
 
---- Digere uma página: atualiza temas, livro, capítulo e escreve no diário quando algo muda.
--- Quando o capítulo muda, deixa um comentário sobre o capítulo que acabou (s.comentario_pendente).
--- contar: false quando a página já foi contada antes (folheada) e agora só é digerida: não soma de novo
--- às páginas do livro, do capítulo e do dia.
+--- Digests a page: updates themes, book, chapter and writes in the diary when something changes.
+-- When the chapter changes, leaves a comment on the chapter that ended (s.comentario_pendente).
+-- contar: false when the page was already counted before (flipped through) and is now only digested: it does not add again
+-- to the pages of the book, chapter and day.
 function M.digerir(s, texto, onde, agora, contar)
     contar = contar ~= false
     garantir(s)
-    Diario.virarDia(s, M, agora)  -- dia novo: escreve a entrada do dia anterior
+    Diario.virarDia(s, M, agora)  -- new day: writes the entry of the previous day
     local livro = onde and onde.livro
     local L
     if livro then
@@ -1374,14 +1374,14 @@ function M.digerir(s, texto, onde, agora, contar)
             for k, v in pairs(s.tracos or {}) do L.tracos_inicio[k] = v end
             s.livros[livro] = L
             local anterior = s.livro_corrente ~= livro and s.livro_corrente or nil
-            -- autor que volta, contado pelas resenhas (lembrança); senão, a abertura de sempre
+            -- author who returns, counted by the reviews (memory); otherwise, the usual opening
             local okLem, Lem = pcall(require, "yomimon_memories")
             if not (okLem and Lem.inicioLivro(s, M, livro, onde, agora)) then
                 M.anotar(s, agora, Diario.inicioLivro(s, M, livro, onde, anterior))
             end
         end
         s.livro_corrente = livro
-        -- etiquetas de gênero do EPUB (uma por linha): só mapa do gênero, em Infl.perfil
+        -- EPUB genre tags (one per line): only a genre map, in Infl.perfil
         if not L.etiquetas and type(onde.etiquetas) == "string" and onde.etiquetas:find("%S") then
             L.etiquetas = {}
             for e in onde.etiquetas:gmatch("[^\n]+") do
@@ -1407,15 +1407,15 @@ function M.digerir(s, texto, onde, agora, contar)
         if sinal.pt then L.paginas_pt = (L.paginas_pt or 0) + 1 end
     end
     Diario.pagina(s, livro, sinal, falas, agora, contar)
-    -- traços de personalidade: só o que você leu mexe neles
+    -- personality traits: only what you read moves them
     if tem_texto then
         local okT, notas = pcall(function() return require("yomimon_traits").digerir(s, sinal, agora, livro) end)
         if okT and notas then for _, nota in ipairs(notas) do M.anotar(s, agora, nota) end end
-        -- influências literárias: a mesma porta (página lida de verdade, uma vez só)
+        -- literary influences: the same door (page really read, only once)
         if livro and L then pcall(function() require("yomimon_influences").digerir(s, livro, L) end) end
     end
 
-    -- os temas dela esquecem devagar, como os traços: a obsessão acompanha o que você anda lendo
+    -- its themes forget slowly, like the traits: the obsession follows what you have been reading
     if tem_texto then
         for t, v in pairs(s.temas) do s.temas[t] = v * M.ESQUECIMENTO_TEMAS end
     end
@@ -1425,10 +1425,10 @@ function M.digerir(s, texto, onde, agora, contar)
     end
 
     if L then
-        -- nomes com evidências: quem é gente, lugar ou a mesma pessoa sai daqui, na consulta (personagensNovo).
-        -- Livro terminado já tem a lista final: as páginas depois do fim (notas, posfácio) não entram.
+        -- names with evidence: who is a person, place or the same person comes out of here, at query time (personagensNovo).
+        -- A finished book already has the final list: pages after the end (notes, afterword) do not enter.
         if not L.terminado then guardarNomes(L, sinal, L.paginas) end
-        -- aura: temas das páginas de cada nome recorrente com pista de gente (guardado; ainda não vira fala)
+        -- aura: themes of the pages of each recurring name with a clue of being a person (stored; not yet turned into a phrase)
         L.aura = L.aura or {}
         for nome in pairs(L.nomes and sinal.nomes or {}) do
             local Nn = L.nomes[nome]
@@ -1441,12 +1441,12 @@ function M.digerir(s, texto, onde, agora, contar)
         for nome, c in pairs(sinal.lugares) do somar(L.lugares, nome, c) end
         for nome, c in pairs(sinal.falou) do somar(L.falou, nome, c) end
         for nome, c in pairs(sinal.refs) do somar(L.refs, nome, c) end
-        -- vetor do livro: palavras, frases e diálogo, para estilo e ritmo (só somas)
+        -- book vector: words, sentences and dialogue, for style and rhythm (sums only)
         L.palavras = (L.palavras or 0) + (sinal.palavras or 0)
         L.frases = (L.frases or 0) + (sinal.frases or 0)
         L.dialogo = (L.dialogo or 0) + (sinal.dialogo or 0)
         if tem_texto then L.paginas_texto = (L.paginas_texto or 0) + 1 end
-        -- palavras do próprio livro (Etapa 5): soma e poda (o estado salvo não cresce sem fim)
+        -- the book's own words (step 5): sum and prune (the saved state does not grow forever)
         if sinal.vocab and next(sinal.vocab) then
             L.vocab, L.vocab_art = L.vocab or {}, L.vocab_art or {}
             local n = 0
@@ -1458,13 +1458,13 @@ function M.digerir(s, texto, onde, agora, contar)
         local N = L.narrador
         N.eu, N.palavras = N.eu + sinal.eu, N.palavras + sinal.palavras
         N.f, N.m = N.f + (sinal.genero.f or 0), N.m + (sinal.genero.m or 0)
-        if L.nomes then for nome in pairs(L.aura) do if not L.nomes[nome] then L.aura[nome] = nil end end end  -- nome podado
+        if L.nomes then for nome in pairs(L.aura) do if not L.nomes[nome] then L.aura[nome] = nil end end end  -- pruned name
 
-        -- capítulo: memória própria e comentário quando muda
+        -- chapter: own memory and a comment when it changes
         for ev, c in pairs(sinal.eventos) do somar(L.eventos, ev, c) end
         for as, c in pairs(sinal.assuntos) do somar(L.assuntos, as, c) end
         local cap = onde.capitulo or "?"
-        -- capítulo enorme (ou livro sem sumário): divide em trechos de 25 páginas
+        -- huge chapter (or a book without a table of contents): splits into stretches of 25 pages
         if L.cap_base ~= cap then
             L.cap_base, L.cap_parte = cap, 1
         elseif L.caps[L.cap_atual] and L.caps[L.cap_atual].paginas >= TRECHO_PAGINAS then
@@ -1477,24 +1477,24 @@ function M.digerir(s, texto, onde, agora, contar)
                 s.comentario_pendente = { texto = (Voz.resolver(comentario.texto, s)), t = agora, livro = livro,
                                           evento = comentario.evento }
             end
-            -- o capítulo que acabou falou de um assunto dos cartões (pelo texto ou pelo título)
+            -- the chapter that ended talked about a card subject (by the text or by the title)
             M.cartaoDoCapitulo(s, L, L.cap_atual, true, agora, livro)
         end
         if not L.caps[cap] then
             L.n_caps = (L.n_caps or 0) + 1
             L.caps[cap] = { ordem = L.n_caps, pers = {}, temas = {}, eventos = {}, clima = 0, paginas = 0 }
-            -- guarda só os 40 capítulos mais recentes
+            -- keeps only the 40 most recent chapters
             if L.n_caps > 40 then
                 for nome, C in pairs(L.caps) do if C.ordem <= L.n_caps - 40 then L.caps[nome] = nil end end
             end
-            -- capítulo novo: o título já pode acender um assunto dos cartões
+            -- new chapter: the title may already light up a card subject
             if (L.cap_parte or 1) == 1 then M.cartaoDoCapitulo(s, L, cap, false, agora, livro) end
         end
         L.cap_atual = cap
         local C = L.caps[cap]
         if contar then C.paginas = C.paginas + 1 end
         C.clima = C.clima + sinal.clima
-        -- (só nomes que já apareceram no meio de uma frase: "É" e "Pois" no começo da frase não entram)
+        -- (only names that already appeared mid-sentence: "É" and "Pois" at the start of a sentence do not enter)
         for nome, d in pairs(sinal.nomes) do
             local Nn = L.nomes and L.nomes[nome]
             if d.meio > 0 or (Nn and Nn.meio > 0) then somar(C.pers, nome, d.n) end
@@ -1505,11 +1505,11 @@ function M.digerir(s, texto, onde, agora, contar)
             C.assuntos = C.assuntos or {}
             for as, c in pairs(sinal.assuntos) do somar(C.assuntos, as, c) end
         end
-        -- dias de leitura, fim do livro (resenha) e releitura
+        -- reading days, end of the book (review) and re-read
         Diario.acompanharLivro(s, M, L, livro, onde, agora)
     end
 
-    -- lembranças: aniversário, personagem que volta, nada tão sombrio desde…
+    -- memories: anniversary, character who returns, nothing so gloomy since…
     if tem_texto then
         local okLem, Lem = pcall(require, "yomimon_memories")
         if okLem then Lem.pagina(s, M, L, livro, agora) end
@@ -1526,7 +1526,7 @@ function M.digerir(s, texto, onde, agora, contar)
     end
 end
 
--- Comentário de fim de capítulo -------------------------------------------------------
+-- End-of-chapter comment -------------------------------------------------------
 
 local Content = Lingua.content("memory")
 local FALAS_EVENTO, FALAS_NOVO, FALAS_SUMIU = Content.FALAS_EVENTO, Content.FALAS_NOVO, Content.FALAS_SUMIU
@@ -1541,10 +1541,10 @@ local function maiorDe(t)
     return melhor, valor
 end
 
--- Assuntos dos cartões ----------------------------------------------------------------------------
+-- Card subjects ----------------------------------------------------------------------------
 
---- Assuntos que o título de um capítulo acende ("III Genealogia" → antepassados): { assunto = true }.
--- Palavras inteiras, em minúsculas, com o plural; sem a grafia antiga (o título pode estar em inglês).
+--- Subjects that a chapter title lights up ("III Genealogia" → ancestors): { subject = true }.
+-- Whole words, lowercase, with the plural; without the old spelling (the title may be in English).
 function M.assuntosDoTitulo(titulo)
     local acesos = {}
     if type(titulo) ~= "string" then return acesos end
@@ -1558,8 +1558,8 @@ function M.assuntosDoTitulo(titulo)
     return acesos
 end
 
---- Assuntos de que um capítulo fala pelo texto, com a regra dos eventos: com pouco livro lido antes, 3+
--- sinais; depois, o dobro da frequência do resto do livro (e 2+ sinais). { assunto = true }.
+--- Subjects a chapter talks about by the text, with the events rule: with little of the book read before, 3+
+-- signals; afterwards, double the frequency of the rest of the book (and 2+ signals). { subject = true }.
 function M.assuntosDoCapitulo(L, C)
     local acesos = {}
     if not C or (C.paginas or 0) < 1 then return acesos end
@@ -1575,19 +1575,19 @@ function M.assuntosDoCapitulo(L, C)
     return acesos
 end
 
---- Um capítulo começou (acabou = false: só o título conta) ou acabou (título e texto): se ele fala de um
--- assunto, o primeiro cartão que serve fica guardado (yomimon_cards.lua). Um cartão por capítulo.
+--- A chapter started (acabou = false: only the title counts) or ended (title and text): if it talks about a
+-- subject, the first card that fits is stored (yomimon_cards.lua). One card per chapter.
 function M.cartaoDoCapitulo(s, L, capnome, acabou, agora, livro)
     local C = L.caps and L.caps[capnome]
     if not C or C.cartao then return end
-    -- o título vale só na primeira parte de um capítulo enorme ("X (2)" não repete)
+    -- the title only counts in the first part of a huge chapter ("X (2)" does not repeat)
     local assuntos = capnome:find(" %(%d+%)$") and {} or M.assuntosDoTitulo(capnome)
     if acabou then for as in pairs(M.assuntosDoCapitulo(L, C)) do assuntos[as] = true end end
     if not next(assuntos) then return end
     local okC, Cartoes = pcall(require, "yomimon_cards")
     local okE, Estado = pcall(require, "yomimon_state")
     if not (okC and okE) then return end
-    -- {personagem}: quem mais aparece no capítulo (pelo nome mais usado da pessoa)
+    -- {personagem}: who appears most in the chapter (by the most used name of the person)
     local pessoa = {}
     for _, p in ipairs(M.personagensInfoDe(L)) do for _, f in ipairs(p.formas or { p.nome }) do pessoa[f] = p end end
     local nome = maiorDe(C.pers)
@@ -1596,8 +1596,8 @@ function M.cartaoDoCapitulo(s, L, capnome, acabou, agora, livro)
     if Cartoes.capitulo(s, assuntos, dados, agora, livro) then C.cartao = true end
 end
 
---- O evento que mais se destaca num capítulo, ou nil. Com pouco livro lido antes, pede 3+
--- sinais do evento; depois, o dobro da frequência do resto do livro (e 2+ sinais).
+--- The event that stands out most in a chapter, or nil. With little of the book read before, asks for 3+
+-- signals of the event; afterwards, double the frequency of the rest of the book (and 2+ signals).
 function M.eventoDoCapitulo(L, C)
     local pags_antes = (L.paginas or 0) - C.paginas
     local melhor, nota = nil, 0
@@ -1615,19 +1615,19 @@ function M.eventoDoCapitulo(L, C)
     return melhor
 end
 
---- Comentário sobre um capítulo que acabou de terminar: { texto, evento? } ou nil.
+--- Comment on a chapter that just ended: { texto, evento? } or nil.
 function M.comentarioCapitulo(s, L, capnome, sorteio)
     sorteio = sorteio or math.random
     local C = L.caps[capnome]
     if not C or C.paginas < 1 then return nil end
     local anteriores = {}
     for _, D in pairs(L.caps) do if D.ordem < C.ordem then anteriores[#anteriores + 1] = D end end
-    -- 1) evento que se destaca: bem mais frequente neste capítulo do que no resto do livro
+    -- 1) event that stands out: much more frequent in this chapter than in the rest of the book
     local ev = M.eventoDoCapitulo(L, C)
     if ev and FALAS_EVENTO[ev] then return { texto = sorteia(FALAS_EVENTO[ev], sorteio), evento = ev } end
-    -- 2) personagem novo (forte neste capítulo, ausente antes)
+    -- 2) new character (strong in this chapter, absent before)
     local info = M.personagensInfoDe(L)
-    local pessoa = {}  -- qualquer nome da pessoa → ela
+    local pessoa = {}  -- any name of the person → the person
     for _, p in ipairs(info) do for _, f in ipairs(p.formas or { p.nome }) do pessoa[f] = p end end
     local function noCapitulo(D, p)
         local c = 0
@@ -1643,25 +1643,25 @@ function M.comentarioCapitulo(s, L, capnome, sorteio)
             if not visto then return { texto = string.format(sorteia(FALAS_NOVO, sorteio), p.nome) } end
         end
     end
-    -- 3) protagonista sumiu
+    -- 3) protagonist vanished
     for _, p in ipairs(info) do
         if p.protagonista and noCapitulo(C, p) == 0 and C.paginas >= 3 then
             return { texto = string.format(sorteia(FALAS_SUMIU, sorteio), p.nome) }
         end
     end
-    -- 4) tema do capítulo diferente do tema do livro
+    -- 4) chapter theme different from the book's theme
     local t_cap = maiorDe(C.temas)
     local t_livro = maiorDe(L.temas)
     if t_cap and t_livro and t_cap ~= t_livro and (C.temas[t_cap] or 0) >= 3 then
         return { texto = string.format(sorteia(FALAS_VIROU, sorteio), M.tema(t_livro, "de"), M.tema(t_cap, "de")) }
     end
-    -- 5) clima comparado com a média dos anteriores
+    -- 5) weather compared with the average of the previous ones
     if #anteriores >= 1 then
         local soma, pags = 0, 0
         for _, D in ipairs(anteriores) do soma, pags = soma + D.clima, pags + D.paginas end
         local antes = pags > 0 and soma / pags or 0
         local agora_c = C.clima / C.paginas
-        -- limites calibrados nos livros (10% dos capítulos cada); sem calibração, ±1
+        -- limits calibrated on the books (10% of the chapters each); without calibration, ±1
         local lg = (L.paginas_pt or 0) * 2 > (L.paginas or 0) and "pt" or "en"
         local cal = M.CLIMA_CALIBRACAO and M.CLIMA_CALIBRACAO[lg] or {}
         if agora_c < antes + (cal.azedou or -1) then return { texto = sorteia(FALAS_AZEDOU, sorteio) } end
@@ -1670,8 +1670,8 @@ function M.comentarioCapitulo(s, L, capnome, sorteio)
     return nil
 end
 
---- Quem narra o livro: { primeira = true/false, genero = "f"/"m"/nil }, ou nil se ainda é cedo.
--- Primeira pessoa = mais de 2% das palavras são "eu/me/meu…" (com pelo menos 1.500 palavras lidas).
+--- Who narrates the book: { primeira = true/false, genero = "f"/"m"/nil }, or nil if it is still early.
+-- First person = more than 2% of the words are "eu/me/meu…" (with at least 1,500 words read).
 function M.narrador(L)
     local N = L and L.narrador
     if not N or N.palavras < 1500 then return nil end
@@ -1683,7 +1683,7 @@ function M.narrador(L)
     return info
 end
 
---- Pessoas e obras citadas num livro, mais citadas primeiro: { {nome, vezes}, ... }.
+--- People and works cited in a book, most cited first: { {nome, vezes}, ... }.
 function M.referencias(s, livro)
     local L = livro and s.livros and s.livros[livro]
     local lista = {}
@@ -1692,12 +1692,12 @@ function M.referencias(s, livro)
     return lista
 end
 
---- personagensInfo a partir da tabela do livro (sem precisar do título).
+--- personagensInfo from the book's table (without needing the title).
 function M.personagensInfoDe(L)
     return M.personagensInfo({ livros = { x = L } }, "x")
 end
 
---- Tudo o que ela percebeu de um livro (para o painel dev).
+--- Everything it noticed about a book (for the dev panel).
 function M.percepcao(s, livro)
     local L = livro and s.livros and s.livros[livro]
     if not L then return nil end
@@ -1716,14 +1716,14 @@ function M.percepcao(s, livro)
     return out
 end
 
--- Falas que vêm dos livros ------------------------------------------------------
+-- Phrases that come from the books ------------------------------------------------------
 
 
--- Citações do livro atual ({nome} citado {n} vezes) e quem narra.
--- Uma fala de personagem citada por ela ({nome} disse {fala}).
+-- Quotations of the current book ({nome} cited {n} times) and who narrates.
+-- A character's line quoted by it ({nome} said {fala}).
 
 
---- Uma fala influenciada pelos livros, ou nil. temperamento (opcional): "jovem" ou "velha".
+--- A phrase influenced by the books, or nil. temperamento (optional): "jovem" or "velha".
 function M.fala(s, sorteio, temperamento)
     sorteio = sorteio or math.random
     local a, b = M.ambivalente(s)
@@ -1758,13 +1758,13 @@ function M.fala(s, sorteio, temperamento)
     if #opcoes > 0 then return opcoes[sorteio(#opcoes)]() end
 end
 
--- Caderno: comentários com contexto ------------------------------------------------
---
--- Sem IA: a Yomimon junta pistas reais do trecho (personagens citados, assunto, tamanho,
--- nota, hora, capítulo, quantos sublinhados o livro tem) e escolhe uma frase pronta que
--- combine com elas. A escolha é estável: o mesmo trecho recebe sempre o mesmo comentário.
+-- Notebook: comments with context ------------------------------------------------
+-- 
+-- No AI: Yomimon gathers real clues from the passage (characters cited, subject, length,
+-- note, time, chapter, how many highlights the book has) and picks a ready-made phrase that
+-- matches them. The choice is stable: the same passage always gets the same comment.
 
---- Assunto mais presente num trecho (pelas listas de temas), ou nil.
+--- Subject most present in a passage (by the theme lists), or nil.
 function M.temaDoTexto(texto)
     local cont, melhor, tema = {}, 0, nil
     local limpo = M.limpar(texto or "")
@@ -1795,10 +1795,10 @@ local function nomesNoTexto(texto, nomes)
     return achados
 end
 
---- Comentário da Yomimon sobre um sublinhado.
--- item: { texto, nota, capitulo, data ("AAAA-MM-DD HH:MM:SS") }
--- ctx:  { temperamento, livro, personagens = {...}, ordem = n-ésimo do livro, total = n do livro,
---         no_capitulo = quantos no mesmo capítulo, s = estado (para as variantes de traço) }
+--- Yomimon's comment on a highlight.
+-- item: { texto, nota, capitulo, data ("YYYY-MM-DD HH:MM:SS") }
+-- ctx:  { temperamento, livro, personagens = {...}, ordem = n-th of the book, total = n of the book,
+--         no_capitulo = how many in the same chapter, s = state (for the trait variants) }
 function M.comentarioContexto(item, ctx)
     local texto = item.texto or ""
     local h = hash(texto)
@@ -1828,15 +1828,15 @@ function M.comentarioContexto(item, ctx)
     if item.capitulo and (ctx.no_capitulo or 0) >= 3 then add(string.format(pega(C.capitulo), item.capitulo)) end
     add(pega(C.geral[temp] or C.geral.velha))
 
-    -- pistas específicas vêm primeiro; o comentário geral só entra quando não há outra
+    -- specific clues come first; the general comment only enters when there is no other
     if #candidatos > 1 then table.remove(candidatos) end
     local escolhido = candidatos[h % #candidatos + 1]
-    -- ctx.s (opcional): o estado, para as variantes de traço
+    -- ctx.s (optional): the state, for the trait variants
     if ctx.s then escolhido = (Voz.resolver(escolhido, ctx.s)) end
     return escolhido
 end
 
---- Compatível com a versão anterior: comentário só pelo texto e temperamento.
+--- Compatible with the previous version: comment only by the text and temperament.
 function M.comentario(texto, temperamento)
     return M.comentarioContexto({ texto = texto }, { temperamento = temperamento })
 end
@@ -1847,7 +1847,7 @@ if Content.NOMES then
     for t in pairs(M.NOMES_TEMA) do M.NOMES_TEMA[t] = M.tema(t) end
 end
 
--- Lotes novos de frases (yomimon_locales/<code>/data/extra.lua) somam às listas acima.
+-- New batches of phrases (yomimon_locales/<code>/data/extra.lua) add to the lists above.
 Lingua.append({ FALAS_EVENTO = FALAS_EVENTO, FALAS_NOVO = FALAS_NOVO, FALAS_SUMIU = FALAS_SUMIU,
     FALAS_AZEDOU = FALAS_AZEDOU, FALAS_ADOCOU = FALAS_ADOCOU, FALAS_VIROU = FALAS_VIROU, FALAS_TEMA = FALAS_TEMA,
     C = C, FALAS_CITACAO = FALAS_CITACAO, FALAS_REFERENCIA = FALAS_REFERENCIA }, Lingua.extra("memoria"))
