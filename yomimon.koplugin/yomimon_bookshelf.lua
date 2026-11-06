@@ -1,19 +1,19 @@
 --[[--
-Integração com o Bookshelf: um cartão da Yomimon (um "micro-module" dele) na tela inicial, no menu inicial e
-na estante, no meio dos livros. O Bookshelf acha bookshelf_modules/yomimon.lua dentro da pasta do plugin e
-pede o desenho aqui; quem decide o tamanho do cartão é ele (a pessoa redimensiona à vontade). Se o
-Bookshelf não estiver instalado, nada disto é usado.
+Bookshelf integration: a Yomimon card (one of its "micro-modules") on the home screen, the start menu and
+the shelf, among the books. Bookshelf finds bookshelf_modules/yomimon.lua inside the plugin folder and asks
+for the drawing here; it decides the card size (the user resizes it freely). If Bookshelf is not installed,
+none of this is used.
 
-Duas versões, pelo formato do cartão:
-  estreito (quadrado ou alto)  só ela, para quem quer economizar espaço
-  largo                        o balão em cima com até 2 linhas (o texto do cartão do Simple UI), o mesmo
-                               balão da tela da Yomimon, e ela embaixo
-  estante                      o balão já aparece num espaço mais estreito (a prateleira é alta), com a letra
-                               menor se precisar, para ela não ocupar a prateleira inteira; ela fica em pé
-                               na prateleira (na estante de capas, no meio da altura, como as capas)
-O balão tem a largura da fala. Ela fica do maior tamanho que couber; o balão pode descer até as antenas,
-porque o desenho tem margem vazia em cima. Num cartão largo baixo demais para os dois, ou na lista de
-módulos para adicionar, fica só ela. Fora da estante, o conjunto fica no meio da altura.
+Two versions, by the card's shape:
+  narrow (square or tall)  only Yomimon, for those who want to save space
+  wide                     the balloon on top with up to 2 lines (the Simple UI card's text), the same
+                           balloon as the Yomimon screen, and Yomimon below
+  shelf                    the balloon already shows in a narrower space (the shelf is tall), with a smaller
+                           font if needed, so it does not take the whole shelf; it stands on the shelf (on
+                           the covers shelf, at mid height, like the covers)
+The balloon is as wide as the phrase. Yomimon gets the biggest size that fits; the balloon may come down to its
+head, because the drawing has an empty margin on top. On a wide card too low for both, or in the list of
+modules to add, only Yomimon shows. Outside the shelf, the group is centred in the height.
 ]]
 
 local Device = require("device")
@@ -31,15 +31,15 @@ local Estado = require("yomimon_state")
 
 local Bookshelf = {}
 
--- O kit de módulos do Bookshelf (o Bookshelf já está carregado quando este arquivo é usado).
+-- Bookshelf's module kit (Bookshelf is already loaded when this file is used).
 local ok_kit, Kit = pcall(require, "lib/bookshelf_module_kit")
 if not ok_kit or type(Kit) ~= "table" then Kit = nil end
 
--- A pasta bookshelf_modules da Yomimon (o Bookshelf a passa para bookshelf_modules/yomimon.lua).
+-- Yomimon's bookshelf_modules folder (Bookshelf passes it to bookshelf_modules/yomimon.lua).
 local pasta_modulos
 
--- A Yomimon aberta agora (biblioteca ou leitor). O Bookshelf 6.1 acha a instância pela pasta do plugin
--- (Kit.plugin); num Bookshelf mais antigo, fica a que o main.lua guarda no Screensaver ao iniciar.
+-- The Yomimon open right now (library or reader). Bookshelf 6.1 finds the instance by the plugin folder
+-- (Kit.plugin); on an older Bookshelf, it is the one main.lua stores in Screensaver at startup.
 local function instancia()
     if Kit and Kit.plugin and pasta_modulos then
         local ok, traca = pcall(Kit.plugin, pasta_modulos)
@@ -49,7 +49,7 @@ local function instancia()
     return ok and Screensaver and Screensaver.yomimon_instancia or nil
 end
 
--- Formato do cartão pela proporção (os mesmos limites do Bookshelf).
+-- Card shape by aspect ratio (the same limits as Bookshelf).
 local function formaDe(w, h)
     if not h or h <= 0 then return "quadrado" end
     local r = w / h
@@ -60,9 +60,9 @@ end
 
 local FORMAS = { wide = "largo", tall = "alto", square = "quadrado" }
 
--- Texto do balão ------------------------------------------------------------------
+-- Balloon text ------------------------------------------------------------------
 
--- O mesmo pensamento até ela comer, dormir/acordar ou passarem 20 minutos (como no Simple UI).
+-- The same thought until it eats, sleeps/wakes or 20 minutes pass (as in Simple UI).
 local TROCA_SEGUNDOS = 20 * 60
 local TENTATIVAS = 12
 local cache = {}
@@ -81,7 +81,7 @@ local function contarLinhas(texto, face, largura)
     return ok and n or math.huge
 end
 
--- Largura da linha mais longa da fala quebrada em `largura` (para o balão ficar do tamanho do texto).
+-- Width of the longest line of the phrase wrapped to `largura` (so the balloon is as big as the text).
 local function larguraDoTexto(texto, face, largura)
     local ok, maior = pcall(function()
         local c = TextBoxWidget:new{ text = texto, face = face, width = largura, alignment = "center" }
@@ -105,13 +105,13 @@ local function alturaDaLinha(face, largura)
     return ok and h or 1
 end
 
--- O que, mudando, troca a fala: a fase, se ela está dormindo e as páginas lidas.
+-- What changes the phrase when it changes: the stage, whether it is sleeping and the pages read.
 local function marcaDe(s, agora)
     local e = Estado.expressao(s, agora)
     return table.concat({ Estado.fase(s).nome, tostring(e == "dormindo" or e == "casulo"), s.paginas or 0 }, ":")
 end
 
--- Uma fala que caiba em `max_linhas`; guarda a escolhida e só troca quando a marca muda ou o tempo passa.
+-- A phrase that fits in `max_linhas`; keeps the chosen one and only changes when the mark changes or time passes.
 local function textoDoBalao(traca, linhas, max_linhas)
     local s, agora = traca.estado, os.time()
     local marca = marcaDe(s, agora)
@@ -127,11 +127,11 @@ local function textoDoBalao(traca, linhas, max_linhas)
     return texto, n
 end
 
--- Balão de pixels -------------------------------------------------------------------
+-- Pixel balloon -------------------------------------------------------------------
 
--- O mesmo balão da tela da Yomimon (YomimonScreen:balao, Figma 28:5911): borda de 3, sombra de pixels à direita e
--- embaixo, rabinho no meio embaixo. As medidas são as do Figma, em pontos; o "pixel" do balão (u) tem 3
--- pontos. bw e bh são a largura e a altura do balão sem a sombra e o rabinho.
+-- The same balloon as the Yomimon screen (YomimonScreen:balao, Figma 28:5911): border of 3, pixel shadow on the right and
+-- below, tail in the middle at the bottom. The measures are Figma's, in points; the balloon's "pixel" (u) is 3
+-- points. bw and bh are the width and height of the balloon without the shadow and the tail.
 local function pintarBalao(bb, bx, by, bw, bh, u)
     local PRETO, BRANCO = Blitbuffer.COLOR_BLACK, Blitbuffer.COLOR_WHITE
     local k = u / 3
@@ -141,25 +141,25 @@ local function pintarBalao(bb, bx, by, bw, bh, u)
         local x1, y1 = bx + math.floor((rx + rw) * k + 0.5), by + math.floor((ry + rh) * k + 0.5)
         bb:paintRect(x0, y0, x1 - x0, y1 - y0, cor)
     end
-    local t = math.floor(W / 2) - 7          -- começo do rabinho
-    r(3, 3, W - 6, H - 3, BRANCO)            -- fundo
-    r(6, 0, W - 12, 3, PRETO)                -- topo
+    local t = math.floor(W / 2) - 7          -- start of the tail
+    r(3, 3, W - 6, H - 3, BRANCO)            -- background
+    r(6, 0, W - 12, 3, PRETO)                -- top
     r(3, 3, 3, 3, PRETO); r(W - 6, 3, 3, 3, PRETO)
-    r(0, 6, 3, H - 9, PRETO)                 -- lado esquerdo
+    r(0, 6, 3, H - 9, PRETO)                 -- left side
     r(3, H - 3, 3, 3, PRETO)
-    r(W - 3, 6, 3, H - 3, PRETO)             -- lado direito
+    r(W - 3, 6, 3, H - 3, PRETO)             -- right side
     r(W - 6, H - 3, 3, 6, PRETO)
-    r(W, 9, 3, H - 3, PRETO)                 -- sombra à direita
+    r(W, 9, 3, H - 3, PRETO)                 -- shadow on the right
     r(W + 3, 12, 3, H - 6, PRETO)
     r(6, H, W - 12, 3, PRETO)                -- base
-    r(9, H + 3, W - 9, 3, PRETO)             -- sombra embaixo
+    r(9, H + 3, W - 9, 3, PRETO)             -- shadow below
     r(12, H + 6, W - 9, 3, PRETO)
-    r(t, H + 6, 3, 3, PRETO)                 -- rabinho
+    r(t, H + 6, 3, 3, PRETO)                 -- tail
     r(t + 4, H + 9, 9, 3, PRETO); r(t + 7, H + 12, 3, 3, PRETO)
     r(t + 1, H, 15, 3, BRANCO); r(t + 4, H + 3, 9, 3, BRANCO); r(t + 7, H + 6, 3, 3, BRANCO)
 end
 
--- Do fim do balão (bh) até a ponta do rabinho: 15 pontos do Figma, 5 "pixels".
+-- From the end of the balloon (bh) to the tip of the tail: 15 Figma points, 5 "pixels".
 local function rabinho(u) return 5 * u end
 
 local function pintarTexto(bb, texto, face, tx, ty, largura, altura)
@@ -176,9 +176,9 @@ local function pintarTexto(bb, texto, face, tx, ty, largura, altura)
     caixa:free()
 end
 
--- O desenho dela ---------------------------------------------------------------------
+-- The drawing ---------------------------------------------------------------------
 
--- Onde estão os pixels pintados de um desenho de 64x64 (deslocamento e tamanho, em pixels do desenho).
+-- Where the painted pixels of a 64x64 drawing are (offset and size, in drawing pixels).
 local caixas = {}
 local function caixaDoDesenho(nome)
     local real = Desenho.resolver(nome)
@@ -197,9 +197,9 @@ local function caixaDoDesenho(nome)
     return caixas[real]
 end
 
--- Os tons do desenho (os de yomimon_drawing.lua). A sombrinha embaixo dela é o cinza claro ("3") nas duas
--- últimas linhas com pixels; na madeira da prateleira do Bookshelf ela some, então aqui ela é pintada com o
--- cinza escuro. O mesmo tom "3" no corpo dela não muda, e o desenho fica igual em todo o resto do plugin.
+-- The drawing's tones (those of yomimon_drawing.lua). The little shadow under it is the light grey ("3") on the two
+-- last lines with pixels; on the wood of Bookshelf's shelf it disappears, so here it is painted with the dark
+-- grey. The same tone "3" in the body does not change, and the drawing stays the same in the rest of the plugin.
 local TONS = {
     ["#"] = Blitbuffer.COLOR_BLACK,
     ["1"] = Blitbuffer.Color8(0x55),
@@ -210,12 +210,12 @@ local TONS = {
 }
 local TOM_DA_SOMBRA = "1"
 
--- Como Desenho.pintarSprite (cada pixel vira um quadrado de `escala` px), com a sombrinha mais escura.
+-- Like Desenho.pintarSprite (each pixel becomes a square of `escala` px), with the darker little shadow.
 local function pintarDesenho(bb, nome, x, y, escala)
     local linhas = Desenho.sprite(nome)
     if not linhas then return end
     local c = caixaDoDesenho(nome)
-    local sombra_desde = c.y + c.h - 1  -- as duas últimas linhas com pixels
+    local sombra_desde = c.y + c.h - 1  -- the last two lines with pixels
     for j, linha in ipairs(linhas) do
         local i, n = 1, #linha
         while i <= n do
@@ -232,7 +232,7 @@ local function pintarDesenho(bb, nome, x, y, escala)
     end
 end
 
--- A caixa do desenho de agora junto com a do desenho da fase: o tamanho dela não muda a cada expressão.
+-- The box of the current drawing together with that of the stage's drawing: its size does not change with each expression.
 local function caixaDela(sprite)
     local a, b = caixaDoDesenho(sprite), caixaDoDesenho(sprite:match("^([^_]+)") or sprite)
     local x0, y0 = math.min(a.x, b.x), math.min(a.y, b.y)
@@ -240,8 +240,8 @@ local function caixaDela(sprite)
     return { x = x0, y = y0, w = x1 - x0, h = y1 - y0 }
 end
 
--- O que cada cartão na tela desenhou por último (desenho e fala), pela chave do cartão. O on_minute
--- compara com o de agora e só redesenha o cartão quando algo mudou: sem mudança, a tela não pisca.
+-- What each card on screen drew last (drawing and phrase), by the card's key. on_minute
+-- compares it with the current one and only redraws the card when something changed: without change, the screen does not flicker.
 local desenhado = {}
 
 local function chaveDo(ctx)
@@ -249,21 +249,21 @@ local function chaveDo(ctx)
     return id and (tostring(ctx.surface) .. ":" .. tostring(id)) or nil
 end
 
--- O cartão ----------------------------------------------------------------------------
+-- The card ----------------------------------------------------------------------------
 
 local Cartao = Widget:extend{
     traca = nil,
     largura = 0,
     altura = 0,
     forma = "largo",
-    estante = false,    -- em pé na prateleira, no meio dos livros
-    capas = false,      -- na estante de capas: no meio da altura, como as capas, em vez de em pé
-    so_desenho = false, -- na lista de módulos para adicionar: só ela, sem fala
-    chave = nil,        -- para o on_minute saber o que este cartão desenhou
+    estante = false,    -- standing on the shelf, among the books
+    capas = false,      -- on the covers shelf: at mid height, like the covers, instead of standing
+    so_desenho = false, -- in the list of modules to add: only Yomimon, without a phrase
+    chave = nil,        -- so on_minute knows what this card drew
 }
 
 function Cartao:init()
-    -- "pixel" do balão (3 pontos do Figma), o mesmo do cartão do Simple UI
+    -- the balloon's "pixel" (3 Figma points), the same as the Simple UI card
     self.u = math.max(2, math.floor(Screen:getWidth() / 618 * 3 + 0.5))
 end
 
@@ -284,9 +284,9 @@ function Cartao:paintTo(bb, x, y)
     local caixa = caixaDela(sprite)
     local function escalaPara(altura) return math.floor(math.min(w * 0.9 / caixa.w, altura / caixa.h)) end
 
-    -- o balão: até 2 linhas, no máximo 90 "pixels" de largura, e só da largura da fala. Vai no cartão
-    -- largo; na estante, onde a altura da prateleira é grande, já a partir de 56 "pixels" de largura, para
-    -- ela não ocupar a prateleira inteira. Abaixo de 70, a letra fica a menor do cartão do Simple UI.
+    -- the balloon: up to 2 lines, at most 90 "pixels" wide, and only as wide as the phrase. It goes on the wide
+    -- card; on the shelf, where the shelf height is large, already from 56 "pixels" of width, so
+    -- Yomimon does not take the whole shelf. Below 70, the font is the smallest of the Simple UI card.
     local balao
     local quer_balao = self.forma == "largo" or (self.estante and w >= 56 * u)
     if traca and not self.so_desenho and quer_balao then
@@ -299,20 +299,20 @@ function Cartao:paintTo(bb, x, y)
             local ok, texto, n = pcall(textoDoBalao, traca,
                 function(t) return contarLinhas(t, face, largura) end, max_linhas)
             if not ok then
-                logger.warn("Yomimon: could not pick o texto do cartão do Bookshelf:", texto)
+                logger.warn("Yomimon: could not pick the Bookshelf card text:", texto)
                 texto, n = nil, 0
             end
             if texto then bw = math.max(20 * u, math.min(bw, larguraDoTexto(texto, face, largura) + 2 * pad_x + u)) end
             local bh = math.min(n or 1, max_linhas) * lh + 2 * pad_y
-            -- só com balão se ainda sobrar lugar para ela em pelo menos o dobro do tamanho do desenho
+            -- only with a balloon if there is still room for Yomimon at least at twice the drawing's size
             if texto and escalaPara(h - bh - rabinho(u) - u) >= 2 then
                 balao = { texto = texto, face = face, w = bw, h = bh, pad_x = pad_x, pad_y = pad_y }
             end
         end
     end
 
-    -- tamanho dela e altura do conjunto (balão + rabinho + ela). Na estante, sem balão ela fica do tamanho
-    -- que teria com um balão de 2 linhas: não fica maior que os livros nem cresce quando o balão some.
+    -- its size and the height of the group (balloon + tail + Yomimon). On the shelf, without a balloon it keeps the size
+    -- it would have with a 2-line balloon: it is not bigger than the books and does not grow when the balloon goes away.
     local acima = balao and (balao.h + rabinho(u) + u) or 0
     local reserva = acima
     if self.estante and not balao then
@@ -332,30 +332,30 @@ function Cartao:paintTo(bb, x, y)
         pintarTexto(bb, balao.texto, balao.face, bx + balao.pad_x, topo + balao.pad_y,
             balao.w - 2 * balao.pad_x, balao.h - 2 * balao.pad_y)
     end
-    -- o desenho é posicionado pelos pixels pintados (a margem vazia dele pode ficar por baixo do balão)
+    -- the drawing is positioned by its painted pixels (its empty margin may sit under the balloon)
     local sx = x + math.floor((w - caixa.w * escala) / 2) - caixa.x * escala
     local sy = topo + acima - caixa.y * escala
     pintarDesenho(bb, sprite, sx, sy, escala)
 end
 
--- Proteção: se o cartão falhar ao desenhar, o Bookshelf continua (o cartão fica em branco).
+-- Protection: if the card fails to draw, Bookshelf carries on (the card stays blank).
 require("yomimon_guard").padrao:envolver(Cartao, { "paintTo" })
 
--- O módulo para o Bookshelf (o formato está em bookshelf.koplugin/micromodules/README.md) ----------
+-- The module for Bookshelf (the format is in bookshelf.koplugin/micromodules/README.md) ----------
 
 function Bookshelf.modulo(pasta)
     pasta_modulos = pasta
     return {
-        key = "yomimon",  -- fica gravado nos layouts das pessoas: nunca mudar
+        key = "yomimon",  -- saved in people's layouts: never change
         title = T"Yomimon",
         summary = T"Your Pokémon. Works offline.",
-        bare = true,          -- sem cartão por trás: ela e o balão direto no fundo, como no Simple UI
-        -- ela se ajusta sozinha ao tamanho do cartão (o desenho em passos inteiros): o Bookshelf 6.1 desenha
-        -- uma vez só, no tamanho do cartão, em vez de procurar um tamanho de letra
+        bare = true,          -- no card behind: Yomimon and the balloon straight on the background, as in Simple UI
+        -- it fits the card size by itself (the drawing in whole steps): Bookshelf 6.1 draws
+        -- once, at the card's size, instead of searching for a font size
         self_sized = true,
-        tap_feedback = true,  -- tocar abre a tela dela
-        -- ao ser adicionado, começa com 2 de largura e 1 de altura: a versão com balão. O Bookshelf não tem
-        -- largura máxima; mais largo só sobra espaço em volta, o desenho não muda.
+        tap_feedback = true,  -- tapping opens its screen
+        -- when added, it starts 2 wide and 1 high: the version with a balloon. Bookshelf has no
+        -- maximum width; wider only leaves space around, the drawing does not change.
         start_w = 2,
         start_h = 1,
         min_w = 1,
@@ -365,7 +365,7 @@ function Bookshelf.modulo(pasta)
             local w = math.max(1, math.floor(ctx.width or 0))
             local h = (ctx.height and ctx.height > 0) and math.floor(ctx.height) or nil
             if not h then
-                -- menu inicial e lista para adicionar: altura natural, a do cartão do Simple UI
+                -- start menu and list to add: natural height, that of the Simple UI card
                 h = math.floor(Screen:getHeight() * 0.16 * (ctx.scale or 100) / 100)
                 if ctx.max_height and ctx.max_height > 0 then h = math.min(h, math.floor(ctx.max_height)) end
             end
@@ -381,9 +381,9 @@ function Bookshelf.modulo(pasta)
             }
         end,
 
-        -- Uma vez por minuto, com o cartão na tela: redesenha só quando o desenho dela muda (uma expressão sem
-        -- desenho próprio cai no da fase, e aí nada muda) ou quando a fala do balão trocaria (a marca mudou ou
-        -- passaram os 20 minutos).
+        -- Once a minute, with the card on screen: redraws only when its drawing changes (an expression without its own
+        -- drawing falls back to the stage's, and then nothing changes) or when the balloon's phrase would change (the mark changed or
+        -- the 20 minutes passed).
         on_minute = function(ctx)
             local antes = desenhado[chaveDo(ctx)]
             local traca = antes and instancia()

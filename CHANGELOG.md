@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.0.0 (unreleased)
+
+- Languages are extensible: one folder per language in `locales/<code>/` (UI texts, phrase banks, data banks and
+  formats), found by scanning the folder and listed in the language menu, with English as the fallback. The English
+  UI text is now the translation key in the code. `scripts/check_locales.lua` reports untranslated texts, and the
+  README in `locales/` explains how to add a language.
+- The sprite cache moved to `koreader/yomimon/sprites/`, so a plugin update no longer wipes it; sprites cached
+  inside the plugin folder by earlier versions are moved there on first use.
+- About and disclaimer: a menu item under *Tools > Yomimon*, shown once after the first welcome.
+- Code comments and log messages of the main modules are in English; CI runs the tests, the locale check and a
+  non-blocking luacheck.
+- The language menu lists the languages found, and "Automatic" follows the KOReader language (English when there
+  is no locale for it). **To keep the Portuguese UI on an English KOReader, pick it once in *Yomimon > Language*.**
+
 ## 0.1.1 (2026-11-05)
 
 - The A-Z bar in the picker now shows only the species of the chosen letter (tap it again for the full list);

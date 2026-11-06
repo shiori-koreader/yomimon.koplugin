@@ -1,5 +1,5 @@
 --[[--
-Desenho da Yomimon: pinta os sprites em pixel art e gera a imagem da tela de descanso.
+Drawing: paints the pixel-art sprites and generates the sleep-screen image.
 ]]
 
 local Blitbuffer = require("ffi/blitbuffer")
@@ -15,7 +15,7 @@ local Estado = require("yomimon_state")
 local Baixar = require("yomimon_download")
 local Sprite = require("yomimon_sprite")
 
--- "p<dex>" é o sprite baixado da espécie; "bola" é a reserva enquanto ele não existe.
+-- "p<dex>" is the species' downloaded sprite; "bola" is the fallback while it does not exist.
 local Sprites = { bola = Sprite.bola() }
 setmetatable(Sprites, { __index = function(_, nome)
     local dex = type(nome) == "string" and nome:match("^p(%d+)$")
@@ -24,22 +24,22 @@ end })
 
 local Desenho = {}
 
--- Pasta do plugin, tirada do próprio arquivo ("plugins/yomimon.koplugin", ou outro nome, ou um caminho absoluto).
+-- Plugin folder, taken from the file itself ("plugins/yomimon.koplugin", or another name, or an absolute path).
 local PASTA = debug.getinfo(1, "S").source:match("^@(.*)/[^/]*$") or "plugins/yomimon.koplugin"
 
---- Caminho de uma fonte da pasta `fontes` para o Font:getFace do KOReader, que procura a partir da pasta de
--- fontes dele (./fonts). Funciona com qualquer nome de pasta do plugin.
+--- Path of a font in the `fontes` folder for KOReader's Font:getFace, which searches from its own fonts
+-- folder (./fonts). Works with any plugin folder name.
 function Desenho.caminhoFonte(arquivo)
     if PASTA:sub(1, 1) == "/" then
-        return string.rep("../", 16) .. PASTA:sub(2) .. "/fonts/" .. arquivo  -- sobe até a raiz e desce
+        return string.rep("../", 16) .. PASTA:sub(2) .. "/fonts/" .. arquivo  -- goes up to the root and comes down
     end
     return "../" .. (PASTA:gsub("^%./", "")) .. "/fonts/" .. arquivo
 end
 
--- Todos os desenhos têm 64x64 pixels.
+-- All drawings are 64x64 pixels.
 Desenho.LARGURA, Desenho.ALTURA = 64, 64
 
--- Os 5 tons do Figma (níveis exatos do e-ink) + o cinza antigo.
+-- Figma's 5 tones (exact e-ink levels) + the old grey.
 local CORES = {
     ["#"] = Blitbuffer.COLOR_BLACK,
     ["1"] = Blitbuffer.Color8(0x55),
@@ -49,13 +49,13 @@ local CORES = {
     ["+"] = Blitbuffer.COLOR_GRAY,
 }
 
---- Linhas de um desenho (para saber o tamanho).
+--- Lines of a drawing (to know its size).
 function Desenho.sprite(nome)
     return Sprites[Desenho.resolver(nome)]
 end
 
 local topos = {}
---- Primeira linha com pixels do desenho (onde começa a cabeça/antena).
+--- First line with pixels in the drawing (where the head starts).
 function Desenho.topoReal(nome)
     local real = Desenho.resolver(nome)
     if topos[real] == nil then
@@ -67,8 +67,8 @@ function Desenho.topoReal(nome)
     return topos[real]
 end
 
---- Nome de um desenho que existe: o próprio ou, se aquela variação
--- (ex.: "p1_feliz") não existe, o desenho da forma ("p1"); sem ele, a bola.
+--- Name of a drawing that exists: its own or, if that variation
+-- (e.g. "p1_feliz") does not exist, the form's drawing ("p1"); without it, the ball.
 function Desenho.resolver(nome)
     if nome and Sprites[nome] then return nome end
     local fase = nome and nome:match("^([^_]+)")
@@ -76,7 +76,7 @@ function Desenho.resolver(nome)
     return "bola"
 end
 
---- Quadros de animação que existem de verdade, ou nil se não há o que animar.
+--- Animation frames that really exist, or nil if there is nothing to animate.
 function Desenho.quadros(lista)
     if not lista then return nil end
     local reais, diferentes, visto = {}, 0, {}
@@ -88,9 +88,9 @@ function Desenho.quadros(lista)
     return reais
 end
 
---- Pinta o sprite `nome` com cada pixel virando um quadrado de `escala` px.
--- No modo noturno o KOReader inverte a tela inteira; o sprite é desenhado já invertido para continuar com o
--- visual de sempre (cartão branco) em vez de virar um negativo. Não vale ao gravar imagens (Desenho.gravando).
+--- Paints the sprite `nome` with each pixel becoming a square of `escala` px.
+-- In night mode KOReader inverts the whole screen; the sprite is drawn already inverted to keep its usual
+-- look (white card) instead of becoming a negative. Does not apply when recording images (Desenho.gravando).
 function Desenho.pintarSprite(bb, nome, x, y, escala)
     local linhas = Sprites[Desenho.resolver(nome)]
     if not linhas then return end
@@ -99,7 +99,7 @@ function Desenho.pintarSprite(bb, nome, x, y, escala)
         bb:paintRect(x, y, Desenho.LARGURA * escala, Desenho.ALTURA * escala, Blitbuffer.COLOR_WHITE)
     end
     for j, linha in ipairs(linhas) do
-        -- junta pixels vizinhos da mesma cor num retângulo só
+        -- joins neighbouring pixels of the same colour into a single rectangle
         local i, n = 1, #linha
         while i <= n do
             local c = linha:sub(i, i)
@@ -115,7 +115,7 @@ function Desenho.pintarSprite(bb, nome, x, y, escala)
     if noturno then bb:invertRect(x, y, Desenho.LARGURA * escala, Desenho.ALTURA * escala) end
 end
 
---- Roda fn(...) sem a inversão do modo noturno (para gravar imagens em arquivo).
+--- Runs fn(...) without the night-mode inversion (to record images to a file).
 function Desenho.gravar(fn, ...)
     Desenho.gravando = true
     local ok, a, b = pcall(fn, ...)
@@ -124,7 +124,7 @@ function Desenho.gravar(fn, ...)
     return a, b
 end
 
---- Widget que mostra um sprite.
+--- Widget that shows a sprite.
 Desenho.SpriteWidget = Widget:extend{
     nome = nil,
     escala = 8,
@@ -139,7 +139,7 @@ function Desenho.SpriteWidget:paintTo(bb, x, y)
     Desenho.pintarSprite(bb, self.nome, x, y, self.escala)
 end
 
---- Escala inteira que faz o sprite caber em `largura` x `altura`.
+--- Integer scale that makes the sprite fit in `largura` x `altura`.
 function Desenho.escalaPara(largura, altura)
     return math.max(1, math.floor(math.min(largura / Desenho.LARGURA, altura / Desenho.ALTURA)))
 end
@@ -175,10 +175,10 @@ local function milhar(n)  -- 1.234 or 1,234, by language
 end
 Desenho.milhar = milhar
 
---- Gera a imagem da tela de descanso (PNG em tons de cinza) em `caminho`.
+--- Generates the sleep-screen image (greyscale PNG) at `caminho`.
 function Desenho.gerarTelaDescanso(s, caminho, agora)
     local sw, sh = Screen:getWidth(), Screen:getHeight()
-    local w, h = math.min(sw, sh), math.max(sw, sh) -- a tela de descanso é sempre em pé
+    local w, h = math.min(sw, sh), math.max(sw, sh) -- the sleep screen is always portrait
     local bb = Blitbuffer.new(w, h, Blitbuffer.TYPE_BB8)
     bb:fill(Blitbuffer.COLOR_WHITE)
 

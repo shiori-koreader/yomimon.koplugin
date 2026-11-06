@@ -8,21 +8,23 @@
 
 *In English: [README.md](README.md).*
 
-> **Status: em desenvolvimento (0.1.0).** A identidade, os caminhos e os avisos legais já foram trocados em relação
-> ao projeto em que este se baseia. O bichinho, a evolução e os textos ainda estão sendo convertidos. Veja o
-> [CHANGELOG](CHANGELOG.md).
-
 O Yomimon (*yomi* 読み, "leitura", mais "-mon") acompanha as páginas que você realmente lê e reage a elas: livros
-terminados, hábitos de leitura, o horário em que você lê. Roda no seu leitor **sem IA e sem internet** (exceto, nos
-planos, um download único do sprite do bichinho escolhido), e sua leitura nunca sai do aparelho.
+terminados, hábitos de leitura, o horário em que você lê. Roda no seu leitor **sem IA**, e sua leitura nunca sai do aparelho. O único uso da internet é o download do sprite
+(e da descrição) do bichinho escolhido.
 
-## Planejado
+## Como funciona
 
 - Você escolhe o bichinho na primeira vez que abrir. Cada espécie evolui pela própria linha.
 - Sem ovo, sem morte e sem linhagem: ao chegar na forma final, ele fica para sempre.
 - Ele continua com fome quando você para de ler.
 - Os sprites são baixados no aparelho, só do bichinho escolhido e das evoluções dele, convertidos e guardados em
   cache. Nenhuma arte de terceiros fica neste repositório.
+
+## Idiomas
+
+A interface e as frases existem em inglês e em português do Brasil. Em *Yomimon > Idioma* você escolhe um ou segue o
+idioma do KOReader. Cada idioma é uma pasta em `yomimon.koplugin/locales/`, e o que a pasta não tiver cai para o
+inglês: acrescentar um idioma é acrescentar uma pasta (veja [locales/README.md](yomimon.koplugin/locales/README.md)).
 
 ## Instalação
 

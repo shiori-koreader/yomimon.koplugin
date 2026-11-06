@@ -1,11 +1,11 @@
 --[[--
-Boas-vindas: aparece na primeira vez que o Yomimon abre (ou pelo modo dev).
+Welcome: appears the first time Yomimon opens (or through dev mode).
 
-Tela 1 · escolha      — lista dos Pokémon, em ordem alfabética, com atalho por letra
-Tela 2 · confirmação  — o sprite dele (baixado no aparelho) + ESCOLHER ESTE
-Tela 3 · onde me achar — 3 opções (abrir ao iniciar, gesto, cartão no Simple UI) + PRONTO
+Screen 1 · pick         — list of Pokémon in alphabetical order, with a letter filter
+Screen 2 · confirmation — its sprite (downloaded on the device) + PICK THIS ONE
+Screen 3 · where to find me — 3 options (open at startup, gesture, Simple UI card) + DONE
 
-Reaproveita os componentes da tela principal (balão, cartões, fonte e escala do Figma).
+Reuses the main screen's components (balloon, cards, Figma font and scale).
 ]]
 
 local Device = require("device")
@@ -37,7 +37,7 @@ local POR_PAGINA = 8
 local LETRAS = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
                  "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" }
 
--- A Silkscreen não tem ♀, ♂ nem ’.
+-- Silkscreen has no ♀, ♂ or ’.
 local function rotulo(nome)
     return (nome:gsub("♀", " F"):gsub("♂", " M"):gsub("’", "'"):upper())
 end
@@ -60,12 +60,12 @@ local BoasVindas = InputContainer:extend{
     traca = nil,
     passo = 1,
     pagina = 1,
-    escolha = nil,      -- item da lista escolhido (tela 2)
-    so_escolha = false, -- só trocar de Pokémon: termina na tela 2, sem as perguntas de instalação
-    ao_terminar = nil,  -- função chamada no fim
+    escolha = nil,      -- list item picked (screen 2)
+    so_escolha = false, -- only switch Pokémon: ends on screen 2, without the install questions
+    ao_terminar = nil,  -- function called at the end
 }
 
--- componentes emprestados da tela da Yomimon
+-- components borrowed from the Yomimon screen
 for _, nome in ipairs({ "px", "face", "ret", "texto", "larguraTexto", "cartao", "medirBalao", "balao", "alvo" }) do
     BoasVindas[nome] = YomimonScreen[nome]
 end
@@ -96,7 +96,7 @@ function BoasVindas:init()
     }
 end
 
---- Sprite centrado, com o balão logo acima da cabeça real (como na tela principal).
+--- Centred sprite, with the balloon right above the real head (as on the main screen).
 function BoasVindas:sprite(bb, nome, fala, centro_y, tamanho)
     local escala = math.max(1, math.floor(tamanho * self.k / Desenho.LARGURA))
     local lado = escala * Desenho.LARGURA
@@ -108,14 +108,14 @@ function BoasVindas:sprite(bb, nome, fala, centro_y, tamanho)
     self:balao(bb, fala, nil, math.max(24, cabeca - 30 - (m.H + 15)), m)
 end
 
---- Botão grande (cartão com sombra) com texto centralizado.
+--- Big button (card with shadow) with centred text.
 function BoasVindas:botao(bb, texto, y, acao)
     self:cartao(bb, 20, y, 578, 80, true)
     self:texto(bb, texto, 0, y + 24, true, 24, PRETO, LARG / 2)
     self:alvo(14, y - 6, 590, 92, acao)
 end
 
---- Opção com caixinha de marcar (quadrado de pixels, cheio quando ligada).
+--- Option with a check box (pixel square, filled when on).
 function BoasVindas:opcao(bb, y, titulo, detalhe, ligada, acao, desativada)
     self:cartao(bb, 20, y, 578, 74, true)
     local cx, cy = 40, y + 24
@@ -133,7 +133,7 @@ function BoasVindas:opcao(bb, y, titulo, detalhe, ligada, acao, desativada)
     if not desativada then self:alvo(14, y - 4, 590, 82, acao) end
 end
 
---- As espécies da letra escolhida (todas, quando nenhuma está escolhida).
+--- The species of the chosen letter (all of them when none is chosen).
 function BoasVindas:visiveis()
     if not self.letra then return self.itens end
     local lista = {}
@@ -147,7 +147,7 @@ function BoasVindas:totalPaginas()
     return math.max(1, math.ceil(#self:visiveis() / POR_PAGINA))
 end
 
---- Mostra só a letra tocada; tocar de novo nela volta à lista toda.
+--- Shows only the tapped letter; tapping it again goes back to the whole list.
 function BoasVindas:filtrarLetra(letra)
     self.letra = self.letra ~= letra and letra or nil
     self.pagina = 1
@@ -193,7 +193,7 @@ function BoasVindas:pintarLista(bb)
     self:texto(bb, string.format("%d/%d", self.pagina, self:totalPaginas()), 0, self.so_escolha and ny + 62 or ny + 16, false, 16, PRETO, LARG / 2)
 end
 
---- Descrição da Pokédex num cartão, quebrada em até 4 linhas (a última termina em "..." se não couber).
+--- Pokédex description in a card, wrapped to at most 4 lines (the last ends in "..." if it does not fit).
 function BoasVindas:pintarDescricao(bb, texto, y)
     local largura, linhas, atual = 510, {}, ""
     for palavra in texto:gmatch("%S+") do
@@ -245,7 +245,7 @@ function BoasVindas:spriteBaixado(it)
     return true
 end
 
--- Mostra "Baixando…" antes de bloquear a tela com o download (arquivos de ~1 KB, mas a conexão pode demorar).
+-- Shows "Downloading…" before blocking the screen with the download (files of ~1 KB, but the connection may take a while).
 function BoasVindas:baixar(linha)
     local aviso = InfoMessage:new{ text = T"Downloading the picture…" }
     UIManager:show(aviso)
@@ -335,11 +335,11 @@ function BoasVindas:onTap(_, ges)
 end
 
 function BoasVindas:onClose()
-    UIManager:close(self)  -- fechar no meio: sem Pokémon escolhido; as perguntas voltam depois
+    UIManager:close(self)  -- closing midway: no Pokémon chosen; the questions come back later
     return true
 end
 
--- Proteção (como na tela da Yomimon): se falhar, toque fecha.
+-- Protection (as on the Yomimon screen): if it fails, a tap closes it.
 require("yomimon_guard").padrao:envolver(BoasVindas, { "paintTo", "onTap" }, function(nome, self, bb, x, y)
     if nome == "paintTo" then
         bb:paintRect(x, y, self.dimen.w, self.dimen.h, BRANCO)

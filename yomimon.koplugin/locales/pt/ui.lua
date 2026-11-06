@@ -1,4 +1,7 @@
 return {
+    ["Open Yomimon"] = "Abrir o Yomimon",
+    ["About and disclaimer"] = "Sobre e aviso legal",
+    ["Yomimon is an unofficial fan project. It is not affiliated with or endorsed by Nintendo, Game Freak, Creatures or The Pokémon Company. Pokémon names and sprites belong to their owners: the sprites are downloaded on your device from PokeAPI and are not part of this plugin.\n\nBased on Silverfish by Matheus Oliveira. Code under GPL-3.0; phrases under CC BY-NC-SA 4.0."] = "O Yomimon é um projeto de fã não oficial. Não tem afiliação com a Nintendo, a Game Freak, a Creatures nem a The Pokémon Company, nem é endossado por elas. Os nomes e os sprites dos Pokémon pertencem aos seus donos: os sprites são baixados no seu aparelho do PokeAPI e não fazem parte deste plugin.\n\nBaseado no Silverfish, de Matheus Oliveira. Código sob GPL-3.0; frases sob CC BY-NC-SA 4.0.",
     [" (ALREADY SAID)"] = " (JÁ DITO)",
     ["%d screens saved to %s"] = "%d telas salvas em %s",
     ["%d simulations, %d screens saved to koreader/yomimon/demo"] = "%d simulações, %d telas salvas em koreader/yomimon/demo",

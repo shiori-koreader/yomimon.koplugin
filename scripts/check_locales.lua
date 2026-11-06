@@ -26,7 +26,16 @@ for _, file in ipairs(listing("ls " .. PLUGIN .. "/*.lua")) do sources[#sources 
 local all_text = table.concat(sources, "\n")
 
 local used = {}
-for key in all_text:gmatch('[^%w_]T%s*%(?%s*"([^"]*)"') do used[key:gsub("\n", "\n")] = true end
+local function unescape(literal)
+    local chunk = (loadstring or load)('return "' .. literal .. '"')
+    return chunk and chunk() or literal
+end
+
+local function escape(text)
+    return (text:gsub("\\", "\\\\"):gsub("\n", "\\n"):gsub('"', '\\"'))
+end
+
+for key in all_text:gmatch('[^%w_]T%s*%(?%s*"([^"]*)"') do used[unescape(key)] = true end
 
 local codes = listing("ls " .. PLUGIN .. "/locales")
 for _, code in ipairs(codes) do
@@ -42,7 +51,7 @@ for _, code in ipairs(codes) do
             errors = errors + 1
         else
             for key in pairs(ui) do
-                if not all_text:find(key:gsub("[%p%c]", "%%%0"):gsub("\n", "\n"), 1) then
+                if not all_text:find(escape(key), 1, true) then
                     print("ERROR " .. code .. ": ui.lua key not used by the code: " .. key)
                     errors = errors + 1
                 end

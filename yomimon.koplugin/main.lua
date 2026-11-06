@@ -1,8 +1,8 @@
 --[[--
-Yomimon: um bichinho virtual que se alimenta das letras que você lê.
+Yomimon: a virtual pet that feeds on the letters you read.
 
-Cada página lida (com pelo menos alguns segundos de leitura) vira comida.
-O estado fica em settings/yomimon.lua; a imagem da tela de descanso em koreader/yomimon/.
+Each page read (with at least a few seconds of reading) becomes food.
+The state lives in settings/yomimon.lua; the sleep-screen image in koreader/yomimon/.
 ]]
 
 local DataStorage = require("datastorage")
@@ -25,10 +25,10 @@ local Diario = require("yomimon_diary")
 local YomimonScreen = require("yomimon_screen")
 local Screensaver = require("ui/screensaver")
 
--- Nenhum erro da Yomimon interrompe a leitura: vai para o log; depois de 3 seguidos ela se cala
--- até o KOReader reiniciar e avisa uma vez (ver yomimon_guard.lua e o fim deste arquivo).
+-- No Yomimon error interrupts reading: it goes to the log; after 3 in a row it stays quiet
+-- until KOReader restarts and warns once (see yomimon_guard.lua and the end of this file).
 Guarda.padrao:configurar(
-    function(nome, err) logger.warn("Yomimon: erro em " .. tostring(nome) .. " (a leitura continua):", err) end,
+    function(nome, err) logger.warn("Yomimon: error in " .. tostring(nome) .. " (reading continues):", err) end,
     function()
         UIManager:nextTick(function()
             UIManager:show(InfoMessage:new{
@@ -37,18 +37,18 @@ Guarda.padrao:configurar(
         end)
     end)
 
-local LETRAS_POR_SEGUNDO = 60    -- teto de velocidade de leitura
-local LETRAS_ESTIMADAS = 1200    -- quando não dá para extrair o texto da página
-local PAGINAS_ENTRE_IMAGENS = 10 -- de quantas em quantas páginas redesenha a tela de descanso
+local LETRAS_POR_SEGUNDO = 60    -- reading speed ceiling
+local LETRAS_ESTIMADAS = 1200    -- used when the page text cannot be extracted
+local PAGINAS_ENTRE_IMAGENS = 10 -- how many pages between sleep-screen redraws
 
 local Yomimon = WidgetContainer:extend{
     name = "yomimon",
     is_doc_only = false,
 }
 
--- O KOReader mostra a tela de descanso antes de avisar os plugins que vai dormir (Screensaver:setup e show,
--- depois o evento Suspend). Para a fala ser escolhida quando o Kindle vai dormir, a Yomimon desenha a imagem
--- aqui, logo antes de o KOReader pegar a imagem da pasta. Embrulha uma vez só, mesmo se o plugin recarregar.
+-- KOReader shows the sleep screen before telling plugins it is going to sleep (Screensaver:setup and show,
+-- then the Suspend event). So that the phrase is chosen when the Kindle goes to sleep, Yomimon draws the image
+-- here, right before KOReader picks the image up from the folder. Wrapped once, even if the plugin reloads.
 if not Screensaver.yomimon_setup_original then
     Screensaver.yomimon_setup_original = Screensaver.setup
     Screensaver.setup = function(...)
@@ -59,7 +59,7 @@ if not Screensaver.yomimon_setup_original then
 end
 
 function Yomimon:init()
-    Screensaver.yomimon_instancia = self  -- a Yomimon aberta agora (biblioteca ou leitor)
+    Screensaver.yomimon_instancia = self  -- the Yomimon open right now (library or reader)
     self.pasta = DataStorage:getDataDir() .. "/yomimon"
     self.imagem = self.pasta .. "/yomimon.png"
     self.db = LuaSettings:open(DataStorage:getSettingsDir() .. "/yomimon.lua")
@@ -67,8 +67,8 @@ function Yomimon:init()
     self.estado = Estado.normalizar(self.db:readSetting("estado"), agora)
     Estado.passarTempo(self.estado, agora)
     self.paginas_sem_imagem = 0
-    -- modo dev: com o arquivo koreader/yomimon/falhar, a digestão da página falha de propósito (nunca na versão
-    -- da comunidade)
+    -- dev mode: with the file koreader/yomimon/falhar, page digestion fails on purpose (never in the community
+    -- version)
     local okV, Versao = pcall(require, "yomimon_version")
     local publica = okV and type(Versao) == "table" and Versao.publica
     self.falha_teste = not publica and lfs.attributes(self.pasta .. "/falhar", "mode") == "file"
@@ -77,12 +77,12 @@ function Yomimon:init()
     self:aplicarGesto()
     UIManager:nextTick(function() self:aoIniciar() end)
     UIManager:nextTick(function() Guarda.padrao:chamar("garantirSprites", self.garantirSprites, self) end)
-    -- cartão na tela inicial e botão no Simple UI, se ele estiver instalado
+    -- card on the home screen and button in Simple UI, if it is installed
     local ok, Integracao = pcall(require, "yomimon_simpleui")
     if ok then
         Integracao.registrar(self)
     else
-        logger.warn("Yomimon: integração com o Simple UI indisponível:", Integracao)
+        logger.warn("Yomimon: Simple UI integration unavailable:", Integracao)
     end
 end
 
@@ -96,14 +96,23 @@ function Yomimon:addToMainMenu(menu_items)
     menu_items.yomimon = {
         text = T"Yomimon",
         sorting_hint = "tools",
-        callback = function() self:onMostrarTraca() end,
+        sub_item_table = {
+            { text = T"Open Yomimon", callback = function() self:onMostrarTraca() end },
+            { text = T"About and disclaimer", callback = function() self:mostrarSobre() end },
+        },
     }
 end
 
--- Telas da Yomimon abertas (a principal e as boas-vindas), de qualquer instância do plugin. Fica uma só por vez,
--- e ela fecha junto com a biblioteca ou o livro que a abriu. Sem isso, uma tela coberta por outra janela (ex.: o
--- Simple UI abre a Home por cima dela quando o Kindle acorda) ficava esquecida embaixo; ao sair do KOReader, que
--- só fecha quando não sobra janela, as telas esquecidas apareciam empilhadas.
+function Yomimon:mostrarSobre()
+    UIManager:show(require("ui/widget/infomessage"):new{
+        text = T"Yomimon is an unofficial fan project. It is not affiliated with or endorsed by Nintendo, Game Freak, Creatures or The Pokémon Company. Pokémon names and sprites belong to their owners: the sprites are downloaded on your device from PokeAPI and are not part of this plugin.\n\nBased on Silverfish by Matheus Oliveira. Code under GPL-3.0; phrases under CC BY-NC-SA 4.0.",
+    })
+end
+
+-- Yomimon screens that are open (the main one and the welcome), from any plugin instance. Only one at a time,
+-- and it closes with the library or book that opened it. Without this, a screen covered by another window (for
+-- example Simple UI opening the Home over it when the Kindle wakes up) was forgotten underneath; when leaving
+-- KOReader, which only closes once no window is left, the forgotten screens showed up piled together.
 local telas = setmetatable({}, { __mode = "k" })
 
 local function fecharTelas(dono)
@@ -128,7 +137,7 @@ end
 function Yomimon:onMostrarTraca()
     Estado.passarTempo(self.estado, os.time())
     local s = self.estado
-    -- sem Pokémon escolhido: as boas-vindas vêm antes
+    -- no Pokémon chosen yet: the welcome comes first
     if not s.boasvindas or not s.especie then
         return self:mostrarBoasVindas()
     end
@@ -136,18 +145,24 @@ function Yomimon:onMostrarTraca()
     return true
 end
 
---- so_escolha: abre só a lista de Pokémon (para trocar), sem as perguntas de instalação.
+--- so_escolha: opens only the Pokémon list (to switch), without the install questions.
 function Yomimon:mostrarBoasVindas(so_escolha)
     local BoasVindas = require("yomimon_welcome")
     self:mostrarTela(BoasVindas:new{
         traca = self,
         so_escolha = so_escolha == true,
-        ao_terminar = function() self:mostrarTela(YomimonScreen:new{ traca = self }) end,
+        ao_terminar = function()
+            self:mostrarTela(YomimonScreen:new{ traca = self })
+            if not G_reader_settings:isTrue("yomimon_about_seen") then
+                G_reader_settings:saveSetting("yomimon_about_seen", true)
+                self:mostrarSobre()
+            end
+        end,
     })
     return true
 end
 
--- Primeira abertura e "abrir ao iniciar" (só uma vez por sessão do KOReader, na biblioteca)
+-- First opening and "open at startup" (once per KOReader session, in the library)
 local ja_abriu_nesta_sessao = false
 
 function Yomimon:aoIniciar()
@@ -161,7 +176,7 @@ function Yomimon:aoIniciar()
     end
 end
 
--- Atalho por gesto: segurar o dedo no canto superior direito abre a Yomimon.
+-- Gesture shortcut: holding a finger on the top right corner opens Yomimon.
 function Yomimon:aplicarGesto()
     if not (self.ui and self.ui.registerTouchZones) then return end
     if self.ui.unregisterTouchZones then
@@ -177,7 +192,7 @@ function Yomimon:aplicarGesto()
     end
 end
 
--- Simple UI: está instalado? E o cartão da Yomimon está ligado na Home?
+-- Simple UI: is it installed? And is the Yomimon card on the Home?
 function Yomimon:temSimpleUI()
     local ok = pcall(require, "modules/moduleregistry")
     return ok
@@ -197,7 +212,7 @@ function Yomimon:cartaoSimpleUI(ligar)
     return v == true
 end
 
--- Leitura ------------------------------------------------------------------
+-- Reading ------------------------------------------------------------------
 
 function Yomimon:onPageUpdate(pageno)
     if not self.ui.document or type(pageno) ~= "number" then return end
@@ -206,9 +221,9 @@ function Yomimon:onPageUpdate(pageno)
     self.pagina_desde = os.time()
 end
 
---- Dá a página que estava aberta para a Yomimon comer.
--- Conta como as estatísticas do KOReader (uma vez por livro, tempo mínimo delas); só molda o Yomimon
--- (temas, personagens, traços, lembranças) se foi lida de verdade (yomimon_counting.lua).
+--- Gives the page that was open to Yomimon to eat.
+-- It counts like KOReader's statistics (once per book, their minimum time); it only shapes Yomimon
+-- (themes, characters, traits, memories) if it was really read (yomimon_counting.lua).
 function Yomimon:contarPaginaAtual()
     local p, desde = self.pagina, self.pagina_desde
     if not p or not desde then return end
@@ -220,7 +235,7 @@ function Yomimon:contarPaginaAtual()
     local nova = Contagem.primeiraVez(self.estado, livro, p, total, os.time())
     local texto = self:textoDaPagina(p)
     local reais = texto and Estado.contarLetras(texto) or LETRAS_ESTIMADAS
-    -- molda o Yomimon na primeira passagem que for leitura de verdade (pode ser depois de folhear)
+    -- shapes Yomimon on the first pass that is real reading (it may come after flipping through)
     local lida = not Contagem.jaLida(self.estado, livro, p)
         and Contagem.lidaDeVerdade(self.estado, tempo, reais, onde.capitulo, texto)
     if not nova and not lida then return end
@@ -229,14 +244,14 @@ function Yomimon:contarPaginaAtual()
     self:alimentar(letras, Estado.palavraMaisLonga(texto), onde, lida and texto or nil, nova)
 end
 
---- Livro e capítulo da página (para a "última refeição").
+--- Book and chapter of the page (for the "last meal").
 function Yomimon:ondeEstou(p)
     local onde = {}
     pcall(function()
         local props = self.ui.doc_props
         onde.livro = props and (props.display_title or props.title)
         onde.autor = props and props.authors and props.authors:gsub("\n.*", "")
-        onde.etiquetas = props and props.keywords  -- assunto do EPUB, uma etiqueta por linha (yomimon_data/genres.lua)
+        onde.etiquetas = props and props.keywords  -- the EPUB subject, one tag per line (yomimon_data/genres.lua)
         onde.arquivo = self.ui.document and self.ui.document.file
         if self.ui.toc then onde.capitulo = self.ui.toc:getTocTitleByPage(p) end
         local total = self.ui.document and self.ui.document:getPageCount()
@@ -249,9 +264,9 @@ function Yomimon:ondeEstou(p)
     return onde
 end
 
---- Progresso (0 a 1) em que a história acaba, pelo sumário (Diario.fimDaHistoria): notas, cronologia,
--- posfácio e propaganda depois dela não contam para terminar o livro. Refeito quando o total de páginas
--- muda (fonte, margens); nil quando o sumário não ajuda (aí vale o 98% do arquivo).
+--- Progress (0 to 1) where the story ends, from the table of contents (Diario.fimDaHistoria): notes, timeline,
+-- afterword and ads after it do not count towards finishing the book. Redone when the total of pages
+-- changes (font, margins); nil when the table of contents does not help (then the file's 98% applies).
 function Yomimon:fimDaHistoria(total)
     if self.fim_historia_total ~= total then
         self.fim_historia_total, self.fim_historia = total, nil
@@ -259,7 +274,7 @@ function Yomimon:fimDaHistoria(total)
         if toc and toc.fillToc then toc:fillToc() end
         local itens = {}
         for _, item in ipairs(toc and toc.toc or {}) do
-            local pagina = item.fixed_page or item.page  -- fixed_page: item fora de ordem corrigido pelo KOReader
+            local pagina = item.fixed_page or item.page  -- fixed_page: an out-of-order item corrected by KOReader
             if type(pagina) == "number" then
                 itens[#itens + 1] = { titulo = item.title, pagina = pagina, nivel = item.depth }
             end
@@ -270,8 +285,8 @@ function Yomimon:fimDaHistoria(total)
     return self.fim_historia
 end
 
---- Reserva para o fim do livro: você marcou o livro como terminado no KOReader (Diario.statusKOReader).
--- Devolve true quando isso terminou o livro agora.
+--- Fallback for the end of the book: you marked the book as finished in KOReader (Diario.statusKOReader).
+-- Returns true when that finished the book just now.
 function Yomimon:conferirTerminado()
     if not self.ui.document or self.estado.dev_simulacao then return false end
     local resumo = self.ui.doc_settings and self.ui.doc_settings:readSetting("summary")
@@ -306,13 +321,13 @@ function Yomimon:textoDaPagina(p)
         end
     end)
     if ok and type(texto) == "string" and texto ~= "" then return texto end
-    if not ok then logger.dbg("Yomimon: sem texto da página", p, texto) end
+    if not ok then logger.dbg("Yomimon: no text for the page", p, texto) end
 end
 
--- contar: false quando a página já foi contada e agora só está sendo digerida (sem contar de novo).
+-- contar: false when the page was already counted and is now only being digested (not counted again).
 function Yomimon:alimentar(letras, palavra, onde, texto, contar)
     if self.falha_teste then error("falha de teste injetada (modo dev: koreader/yomimon/falhar)") end
-    if self.estado.dev_simulacao then return end  -- simulação de demo: congelada, leitura real não entra
+    if self.estado.dev_simulacao then return end  -- demo simulation: frozen, real reading does not enter
     local agora = os.time()
     local ocorreu = contar ~= false and Estado.comer(self.estado, letras, palavra, agora, onde) or {}
     pcall(Memoria.digerir, self.estado, texto, onde, agora, contar)
@@ -333,7 +348,7 @@ function Yomimon:alimentar(letras, palavra, onde, texto, contar)
     end
 end
 
---- Baixa os sprites que faltam da espécie escolhida (só com o Wi-Fi já ligado: nunca pede para ligar).
+--- Downloads the missing sprites of the chosen species and of every registered one (only with Wi-Fi already on: it never asks to turn it on).
 function Yomimon:garantirSprites()
     if self.ui.document then return end
     local faltam = {}
@@ -353,9 +368,9 @@ function Yomimon:onNightModeChanged()
     pcall(function() require("yomimon_simpleui").sincronizarCritter(self) end)
 end
 
--- Modo dev: simulação de endgame ---------------------------------------------------
--- O estado simulado (koreader/yomimon/simulacao.lua, gerado por ferramentas/simular_endgame.lua)
--- entra no lugar do real, que fica guardado em settings/yomimon.lua ("estado_real") até voltar.
+-- Dev mode: endgame simulation ---------------------------------------------------
+-- The simulated state (koreader/yomimon/simulacao.lua, generated by ferramentas/simular_endgame.lua)
+-- takes the place of the real one, which stays saved in settings/yomimon.lua ("estado_real") until it comes back.
 
 function Yomimon:emSimulacao()
     return self.db:readSetting("estado_real") ~= nil
@@ -389,7 +404,7 @@ function Yomimon:carinho()
     return ok
 end
 
--- Persistência -------------------------------------------------------------
+-- Persistence -------------------------------------------------------------
 
 function Yomimon:salvar(com_imagem)
     self.db:saveSetting("estado", self.estado)
@@ -397,8 +412,8 @@ function Yomimon:salvar(com_imagem)
     if com_imagem then self:gerarImagem() end
 end
 
--- escolher = true só quando o Kindle vai dormir (aoDormir): nos outros redesenhos, que ninguém vê, a fala
--- é a última escolhida e nada se gasta (Estado.falaDescanso).
+-- escolher = true only when the Kindle goes to sleep (aoDormir): in the other redraws, which nobody sees, the
+-- phrase is the last one chosen and nothing is spent (Estado.falaDescanso).
 function Yomimon:gerarImagem(forcar, escolher)
     if not forcar and not self:telaDescansoAtiva() then return end
     if lfs.attributes(self.pasta, "mode") ~= "directory" then lfs.mkdir(self.pasta) end
@@ -407,7 +422,7 @@ function Yomimon:gerarImagem(forcar, escolher)
     self.paginas_sem_imagem = 0
 end
 
---- O Kindle vai dormir (chamado antes de o KOReader mostrar a tela de descanso): escolhe a fala e desenha a imagem.
+--- The Kindle is going to sleep (called before KOReader shows the sleep screen): picks the phrase and draws the image.
 function Yomimon:aoDormir()
     if not self:telaDescansoAtiva() then return end
     Estado.passarTempo(self.estado, os.time())
@@ -430,21 +445,21 @@ end
 function Yomimon:onResume()
     if self.pagina then self.pagina_desde = os.time() end
     Estado.passarTempo(self.estado, os.time())
-    self:gerarImagem() -- deixa pronta a imagem para a próxima vez que o Kindle dormir
+    self:gerarImagem() -- leaves the image ready for the next time the Kindle sleeps
 end
 
 function Yomimon:onFlushSettings()
     self:salvar(false)
 end
 
--- Tela de descanso -----------------------------------------------------------
+-- Sleep screen -----------------------------------------------------------
 
 function Yomimon:telaDescansoAtiva()
     return G_reader_settings:readSetting("screensaver_type") == "random_image"
         and G_reader_settings:readSetting("screensaver_dir") == self.pasta
 end
 
---- Liga ou desliga a Yomimon como tela de descanso, guardando a configuração anterior.
+--- Turns Yomimon on or off as the sleep screen, keeping the previous setting.
 function Yomimon:alternarTelaDescanso()
     if self:telaDescansoAtiva() then
         local ant = self.db:readSetting("tela_anterior") or {}
@@ -472,7 +487,7 @@ function Yomimon:alternarTelaDescanso()
     self:salvar(false)
 end
 
---- Modo dev: liga ou desliga a falha de teste na leitura (cria ou apaga koreader/yomimon/falhar).
+--- Dev mode: turns the test failure on or off in reading (creates or deletes koreader/yomimon/falhar).
 function Yomimon:alternarFalhaTeste()
     local arquivo = self.pasta .. "/falhar"
     if self.falha_teste then
@@ -487,7 +502,7 @@ function Yomimon:alternarFalhaTeste()
     return self.falha_teste
 end
 
--- Todo ponto em que o KOReader chama a Yomimon passa pelo guarda.
+-- Every point where KOReader calls Yomimon goes through the guard.
 Guarda.padrao:envolver(Yomimon, { "onPageUpdate", "onCloseDocument", "onSuspend", "onResume", "onFlushSettings",
     "onMostrarTraca", "aoIniciar", "mostrarBoasVindas", "onReaderReady", "aoDormir", "onCloseWidget" })
 

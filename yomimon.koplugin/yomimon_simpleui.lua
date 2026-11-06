@@ -1,8 +1,8 @@
 --[[--
-Integração com o Simple UI: um cartão da Yomimon na tela inicial e um botão de
-ação rápida com a carinha dela. Usa a API pública do Simple UI para plugins
-(moduleregistry e sui_quickactions); se o Simple UI não estiver instalado,
-nada acontece.
+Simple UI integration: a Yomimon card on the home screen and a quick-action button with its little face.
+Uses Simple UI's public plugin API (moduleregistry and sui_quickactions); if Simple UI is not installed,
+nothing happens.
+
 ]]
 
 local Device = require("device")
@@ -35,22 +35,22 @@ local Integracao = {}
 local MODULO_ID = "traca_cartao"
 local ACAO_ID = "traca_abrir"
 
---- Ícone SVG do botão: uma bola, igual para todas as espécies (o sprite delas é baixado, não vem no plugin).
+--- SVG icon of the button: a ball, the same for every species (their sprite is downloaded, it does not ship with the plugin).
 function Integracao.icone(traca)
     return traca.path .. "/icons/bola.svg"
 end
 
--- Cartão da tela inicial --------------------------------------------------------
+-- Home screen card --------------------------------------------------------
 
--- Texto do balão: o pensamento dela (as mesmas falas da tela principal). Fica o mesmo até
--- ela comer, dormir/acordar ou passarem 20 minutos, para não trocar a cada redesenho da Home.
+-- Balloon text: its thought (the same phrases as the main screen). It stays the same until
+-- it eats, sleeps/wakes or 20 minutes pass, so it does not change on every Home redraw.
 local TROCA_SEGUNDOS = 20 * 60
-local MAX_LINHAS = 2        -- o balão do cartão é pequeno: no máximo 2 linhas
-local TENTATIVAS = 12       -- quantas falas ela sorteia procurando uma que caiba (12 desde a Etapa 4 da voz:
-                            -- as falas que combinam com ela são as variantes, um pouco mais longas)
+local MAX_LINHAS = 2        -- the card's balloon is small: at most 2 lines
+local TENTATIVAS = 12       -- how many phrases it draws looking for one that fits (12 since step 4 of the voice:
+                            -- the phrases that match it are the variants, a bit longer)
 local cartao_cache = {}
 
--- Em quantas linhas o texto quebra nessa fonte e largura (o próprio TextBoxWidget diz).
+-- In how many lines the text wraps in this font and width (TextBoxWidget itself tells).
 local function contarLinhas(texto, face, largura)
     local ok, n = pcall(function()
         local c = TextBoxWidget:new{ text = texto, face = face, width = largura, alignment = "center" }
@@ -61,7 +61,7 @@ local function contarLinhas(texto, face, largura)
     return ok and n or math.huge
 end
 
--- linhas(texto): quantas linhas a fala ocupa no balão. Devolve o texto e as linhas.
+-- linhas(texto): how many lines the phrase takes in the balloon. Returns the text and the lines.
 local function textoDoCartao(traca, linhas)
     local s, agora = traca.estado, os.time()
     local e = Estado.expressao(s, agora)
@@ -79,11 +79,11 @@ local function fonte(tam_px)
     return Font:getFace("cfont", tam_px / (Screen:scaleBySize(1000) / 1000))
 end
 
--- Cartão: a Yomimon à esquerda e um balão de pixels (rabinho apontando para ela) à direita.
+-- Card: Yomimon on the left and a pixel balloon (tail pointing at it) on the right.
 local Cartao = Widget:extend{ traca = nil, largura = 0 }
 
 function Cartao:init()
-    self.u = math.max(2, math.floor(Screen:getWidth() / 618 * 3 + 0.5))   -- "pixel" do balão (3 pontos do Figma)
+    self.u = math.max(2, math.floor(Screen:getWidth() / 618 * 3 + 0.5))   -- the balloon's "pixel" (3 Figma points)
     self.escala = math.max(2, math.floor(Screen:getHeight() * 0.16 / Desenho.ALTURA))
     self.lado = self.escala * Desenho.ALTURA
     self.altura = self.lado
@@ -100,12 +100,12 @@ function Cartao:paintTo(bb, x, y)
     Desenho.pintarSprite(bb, Estado.sprite(s, agora), x, y, self.escala)
 
     local u, PRETO, BRANCO = self.u, Blitbuffer.COLOR_BLACK, Blitbuffer.COLOR_WHITE
-    local bx = x + self.lado + 4 * u          -- começo do balão (o rabinho fica antes)
-    local bw = math.floor((self.largura - (bx - x) - 2 * u) * 0.72)  -- não ocupa a largura toda
+    local bx = x + self.lado + 4 * u          -- start of the balloon (the tail comes before)
+    local bw = math.floor((self.largura - (bx - x) - 2 * u) * 0.72)  -- does not take the whole width
     local bh = math.floor(self.altura * 0.62)
     local by = y + math.floor((self.altura - bh) / 2)
     local function r(rx, ry, rw, rh, cor) bb:paintRect(rx, ry, rw, rh, cor) end
-    -- sombra, fundo e borda com cantos recortados
+    -- shadow, background and border with clipped corners
     r(bx + 3 * u, by + 2 * u, bw - 2 * u, bh, PRETO)
     r(bx + 2 * u, by + 3 * u, bw, bh - 2 * u, PRETO)
     r(bx + u, by + u, bw - 2 * u, bh - 2 * u, BRANCO)
@@ -113,7 +113,7 @@ function Cartao:paintTo(bb, x, y)
     r(bx + u, by + bh - u, bw - 2 * u, u, PRETO)
     r(bx, by + u, u, bh - 2 * u, PRETO)
     r(bx + bw - u, by + u, u, bh - 2 * u, PRETO)
-    -- rabinho apontando para a Yomimon
+    -- tail pointing at Yomimon
     local ty = by + math.floor(bh / 2) - u
     r(bx, ty - u, u, 4 * u, BRANCO)
     r(bx - u, ty - u, u, u, PRETO)
@@ -123,13 +123,13 @@ function Cartao:paintTo(bb, x, y)
     r(bx - u, ty + 2 * u, u, u, PRETO)
     r(bx - u, ty, u, 2 * u, BRANCO)
     r(bx - 2 * u, ty + u, u, u, BRANCO)
-    -- texto: pensamento dela, centralizado no balão, em no máximo 2 linhas (escolhe uma fala que caiba;
-    -- se nenhuma couber, fonte um pouco menor e, por último, "…")
+    -- text: its thought, centred in the balloon, in at most 2 lines (picks a phrase that fits;
+    -- if none fits, a slightly smaller font and, last, "…")
     local pad = 4 * u
     local face, largura = fonte(5 * u), bw - 2 * pad
     local ok, texto, n = pcall(textoDoCartao, self.traca, function(t) return contarLinhas(t, face, largura) end)
     if not ok then
-        logger.warn("Yomimon: falha ao escolher o texto do cartão:", texto)
+        logger.warn("Yomimon: could not pick the card text:", texto)
         texto, n = "…", 1
     end
     if (n or 0) > MAX_LINHAS then
@@ -149,7 +149,7 @@ function Cartao:paintTo(bb, x, y)
     caixa:free()
 end
 
--- Proteção: se o cartão falhar ao desenhar, a Home continua (o cartão fica em branco).
+-- Protection: if the card fails to draw, the Home carries on (the card stays blank).
 require("yomimon_guard").padrao:envolver(Cartao, { "paintTo" })
 
 local function criarModulo(traca)
@@ -174,7 +174,7 @@ local function criarModulo(traca)
             return ic
         end)
         if not ok then
-            logger.warn("Yomimon: falha ao montar o cartão do Simple UI:", cartao)
+            logger.warn("Yomimon: could not build the Simple UI card:", cartao)
             return nil
         end
         return cartao
@@ -191,16 +191,16 @@ local function criarModulo(traca)
     return M
 end
 
--- Registro ------------------------------------------------------------------------
+-- Registration ------------------------------------------------------------------------
 
 function Integracao.registrar(traca)
     local ok_reg, Registry = pcall(require, "modules/moduleregistry")
     if ok_reg and type(Registry) == "table" and Registry.register then
         local ok, err = pcall(Registry.register, criarModulo(traca))
-        if not ok then logger.warn("Yomimon: falha ao registrar o cartão no Simple UI:", err) end
+        if not ok then logger.warn("Yomimon: could not register the Simple UI card:", err) end
     end
 
-    -- O botão usa um módulo maior do Simple UI; registra depois que tudo carregou.
+    -- The button uses a bigger Simple UI module; register after everything has loaded.
     UIManager:nextTick(function()
         local ok_qa, QA = pcall(require, "features/sui_quickactions")
         if not (ok_qa and type(QA) == "table" and QA.register) then return end
@@ -213,14 +213,14 @@ function Integracao.registrar(traca)
             is_async_in_place = true,
             execute = function(_ctx) traca:onMostrarTraca() end,
         })
-        if not ok then logger.warn("Yomimon: falha ao registrar o botão no Simple UI:", err) end
+        if not ok then logger.warn("Yomimon: could not register the Simple UI button:", err) end
     end)
 end
 
--- Yomimon no lugar do Tiny Critter ---------------------------------------------------------
--- O Tiny Critter do Simple UI aceita critters do usuário em <settings>/simpleui/sui_critters/ (um PNG solto
--- serve para todos os humores) e frases em phrases.lua. O Yomimon grava o sprite da forma atual e frases
--- dele ali e escolhe esse critter: o balão, a conversa e o humor continuam sendo os do Simple UI.
+-- Yomimon in place of the Tiny Critter ---------------------------------------------------------
+-- Simple UI's Tiny Critter accepts the user's critters in <settings>/simpleui/sui_critters/ (a loose PNG
+-- serves every mood) and phrases in phrases.lua. Yomimon writes the sprite of its current form and its phrases
+-- there and picks that critter: the balloon, the chat and the mood stay Simple UI's own.
 
 local MARCA_FRASES = "-- yomimon"
 local HUMOR_DA_EXPRESSAO = { feliz = "happy", triste = "sad", dormindo = "sleepy", casulo = "sleepy", normal = "neutral" }
@@ -277,7 +277,7 @@ local function gravarSprite(traca, pasta)
     return true
 end
 
--- Não mexe num phrases.lua que o usuário escreveu: só no que o próprio Yomimon gravou.
+-- Does not touch a phrases.lua the user wrote: only what Yomimon itself wrote.
 local function gravarFrases(traca, pasta)
     local caminho = pasta .. "/phrases.lua"
     local f = io.open(caminho, "rb")
@@ -304,7 +304,7 @@ local function gravarFrases(traca, pasta)
     return true
 end
 
---- Instala (ou atualiza) o Yomimon como critter do Simple UI e o escolhe. Só deixa de agir se o usuário desligou a opção.
+--- Installs (or updates) Yomimon as a Simple UI critter and picks it. It only stops acting if the user turned the option off.
 function Integracao.sincronizarCritter(traca, forcar)
     if not forcar and G_reader_settings:isFalse("yomimon_critter") then return false end
     if not pcall(require, "modules/moduleregistry") then return false end
@@ -322,7 +322,7 @@ function Integracao.sincronizarCritter(traca, forcar)
         local engine = package.loaded["engines/sui_screen_engine"]
         if engine then engine.refreshAllLiveImmediate(false) end
     end)
-    if not ok then logger.warn("Yomimon: não instalou o critter no Simple UI:", err) end
+    if not ok then logger.warn("Yomimon: could not install the Simple UI critter:", err) end
     return ok
 end
 

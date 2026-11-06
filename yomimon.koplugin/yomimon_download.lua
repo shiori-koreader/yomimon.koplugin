@@ -11,7 +11,7 @@ local Sprite = require("yomimon_sprite")
 
 local Baixar = {}
 
--- Commit fixo do PokeAPI/sprites: a URL nunca muda de conteúdo.
+-- Pinned PokeAPI/sprites commit: the URL never changes content.
 local URL = "https://raw.githubusercontent.com/PokeAPI/sprites/1dd55c0436d2a5b6e324c0b780e1b1b416fbfb64"
     .. "/sprites/pokemon/versions/generation-v/black-white/%d.png"
 
@@ -44,7 +44,7 @@ local function caminho(dex)
     return string.format("%s/%d.txt", Baixar.pasta(), dex)
 end
 
---- Linhas do sprite já guardado, ou nil.
+--- Lines of the sprite already stored, or nil.
 function Baixar.carregar(dex)
     if carregados[dex] then return carregados[dex] end
     local arq = io.open(caminho(dex), "rb")
@@ -76,7 +76,7 @@ end
 local function decodificar(dados)
     local RenderImage = require("ui/renderimage")
     local bb = RenderImage:renderImageData(dados, #dados)
-    if not bb then return nil, "PNG ilegível" end
+    if not bb then return nil, "unreadable PNG" end
     local function pixel(x, y)
         local c = bb:getPixel(x, y):getColorRGB32()
         return c.r, c.g, c.b, c.alpha
@@ -90,7 +90,7 @@ local function caminhoDescricao(dex)
     return string.format("%s/%d.desc.txt", Baixar.pasta(), dex)
 end
 
---- Descrição da Pokédex em inglês (o PokeAPI não tem português), já guardada, ou nil.
+--- Pokédex description in English (PokeAPI has no Portuguese), already stored, or nil.
 function Baixar.descricao(dex)
     local arq = io.open(caminhoDescricao(dex), "rb")
     if not arq then return nil end
@@ -99,8 +99,8 @@ function Baixar.descricao(dex)
     return texto ~= "" and texto or nil
 end
 
--- A resposta do PokeAPI traz dezenas de textos; guarda só o inglês mais recente, numa linha só e sem acento
--- (a fonte pixel da tela não tem o "é" de "Pokémon").
+-- The PokeAPI answer carries dozens of texts; keep only the latest English one, on a single line and without
+-- accents (the screen's pixel font has no "é" for "Pokémon").
 function Baixar.extrairDescricao(dados)
     local entradas = require("json").decode(dados).flavor_text_entries or {}
     for i = #entradas, 1, -1 do
@@ -126,19 +126,19 @@ function Baixar.baixarDescricao(dex)
     return true
 end
 
---- Baixa, converte e guarda o sprite. Bloqueia até terminar (arquivos de ~1 KB). Devolve true ou nil, motivo.
+--- Downloads, converts and stores the sprite. Blocks until done (files of ~1 KB). Returns true or nil, reason.
 local function baixarSprite(dex)
     if Baixar.tem(dex) then return true end
     local ok, dados, err = pcall(buscar, dex)
     if not ok then dados, err = nil, dados end
     if not dados then
-        logger.warn("Yomimon: não baixou o sprite", dex, err)
+        logger.warn("Yomimon: could not download the sprite", dex, err)
         return nil, err
     end
     local okd, linhas, errd = pcall(decodificar, dados)
     if not okd then linhas, errd = nil, linhas end
     if not linhas then
-        logger.warn("Yomimon: não converteu o sprite", dex, errd)
+        logger.warn("Yomimon: could not convert the sprite", dex, errd)
         return nil, errd
     end
     require("util").makePath(Baixar.pasta())
@@ -150,14 +150,14 @@ local function baixarSprite(dex)
     return true
 end
 
---- Baixa o sprite e a descrição. A descrição é um extra: não conta no resultado.
+--- Downloads the sprite and the description. The description is an extra: it does not count in the result.
 function Baixar.baixar(dex)
     local ok, err = baixarSprite(dex)
     if ok then pcall(Baixar.baixarDescricao, dex) end
     return ok, err
 end
 
---- Baixa todas as formas de uma linha ({ dex, dex, … }). Devolve true se todas estão guardadas.
+--- Downloads every form of a line ({ dex, dex, … }). Returns true if all are stored.
 function Baixar.linha(dexes)
     local tudo = true
     for _, dex in ipairs(dexes) do

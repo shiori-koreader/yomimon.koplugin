@@ -1,7 +1,7 @@
 --[[--
-Converte uma imagem RGBA em um sprite de 64x64 no formato de texto do desenho (' ', '4', '3', '2', '1', '#').
+Converts an RGBA image into a 64x64 sprite in the drawing's text format (' ', '4', '3', '2', '1', '#').
 
-Lógica pura (sem dependências do KOReader), para rodar também no PC.
+Pure logic (no KOReader dependencies), so it also runs on the PC.
 ]]
 
 local Sprite = {}
@@ -10,10 +10,10 @@ Sprite.LADO = 64
 local MARGEM = 2
 local CABE = Sprite.LADO - 2 * MARGEM
 
--- parte da média no tom da célula; o resto vem do pixel mais escuro, que mantém o contorno do desenho
+-- starts from the average in the cell's tone; the rest comes from the darkest pixel, which keeps the outline
 local MEDIA = 0.5
 
--- limiares de luminância (0-255) para os tons EE, BB, 88, 55 e preto
+-- luminance thresholds (0-255) for the tones EE, BB, 88, 55 and black
 local TONS = { { 0xF6, "4" }, { 0xB8, "3" }, { 0x78, "2" }, { 0x3C, "1" } }
 
 local function tom(lum)
@@ -23,8 +23,8 @@ local function tom(lum)
     return "#"
 end
 
---- pixel(x, y) com x e y a partir de 0 devolve r, g, b, alfa (0-255). Devolve 64 linhas de 64 caracteres.
--- Sem canal alfa útil (tudo opaco), o fundo é a cor do canto superior esquerdo.
+--- pixel(x, y) with x and y from 0 returns r, g, b, alpha (0-255). Returns 64 lines of 64 characters.
+-- Without a useful alpha channel (all opaque), the background is the colour of the top left corner.
 function Sprite.converter(w, h, pixel)
     if not w or not h or w < 1 or h < 1 then return nil, "imagem vazia" end
     local lum, alfa = {}, {}
@@ -33,7 +33,7 @@ function Sprite.converter(w, h, pixel)
         for x = 0, w - 1 do
             local r, g, b, a = pixel(x, y)
             local i = y * w + x + 1
-            -- cor pré-multiplicada: soma o branco que falta para compor sobre o papel
+            -- premultiplied colour: adds the missing white to composite over the paper
             local c = (0.299 * r + 0.587 * g + 0.114 * b)
             if a < 255 then
                 opaco = false
@@ -62,7 +62,7 @@ function Sprite.converter(w, h, pixel)
             end
         end
     end
-    if x1 < 0 then return nil, "sem pixels visíveis" end
+    if x1 < 0 then return nil, "no visible pixels" end
     local bw, bh = x1 - x0 + 1, y1 - y0 + 1
     local escala = math.min(CABE / bw, CABE / bh, 1)
     local tw, th = math.max(1, math.floor(bw * escala + 0.5)), math.max(1, math.floor(bh * escala + 0.5))
@@ -102,7 +102,7 @@ function Sprite.converter(w, h, pixel)
     return linhas
 end
 
---- Lê um sprite guardado (uma linha por linha do desenho). Devolve nil se não tiver 64 linhas de 64 caracteres.
+--- Reads a stored sprite (one line per drawing line). Returns nil unless it has 64 lines of 64 characters.
 function Sprite.ler(texto)
     if type(texto) ~= "string" then return nil end
     local linhas = {}
@@ -121,7 +121,7 @@ function Sprite.guardar(linhas)
     return table.concat(linhas, "\n") .. "\n"
 end
 
---- Bola de reserva: usada enquanto o sprite do bichinho não foi baixado (ou sem internet).
+--- Fallback ball: used while the creature's sprite has not been downloaded (or without internet).
 function Sprite.bola()
     local lado, c = Sprite.LADO, (Sprite.LADO - 1) / 2
     local raio = 26
@@ -153,7 +153,7 @@ end
 
 local GRIS = { ["#"] = 0, ["1"] = 0x55, ["2"] = 0x88, ["3"] = 0xBB, ["4"] = 0xEE }
 
---- Menor retângulo que contém o desenho: x, y (a partir de 0), largura e altura; nil se estiver vazio.
+--- Smallest rectangle that contains the drawing: x, y (from 0), width and height; nil if empty.
 function Sprite.caixa(linhas)
     local x0, y0, x1, y1 = Sprite.LADO, Sprite.LADO, -1, -1
     for j, l in ipairs(linhas) do
@@ -168,7 +168,7 @@ function Sprite.caixa(linhas)
     return x0, y0, x1 - x0 + 1, y1 - y0 + 1
 end
 
---- Tom de cinza (0-255) de um caractere do desenho, ou nil se for fundo.
+--- Grey tone (0-255) of a drawing character, or nil for background.
 function Sprite.cinza(c)
     return GRIS[c]
 end

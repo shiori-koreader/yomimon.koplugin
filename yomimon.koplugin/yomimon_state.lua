@@ -1,8 +1,8 @@
 --[[--
-A vida da Yomimon: fome, humor, evolução e hibernação.
+Yomimon's life: hunger, mood, evolution and hibernation.
 
-Lógica pura (sem dependências do KOReader), para poder ser testada fora dele.
-Todos os tempos são em segundos desde a época (os.time()).
+Pure logic (no KOReader dependencies), so it can be tested outside it.
+All times are in seconds since the epoch (os.time()).
 ]]
 
 local Lingua = require("yomimon_language")
@@ -12,22 +12,22 @@ local T = Lingua.t
 
 local Estado = {}
 
-Estado.FOME_POR_HORA = 100 / 48     -- barriga cheia esvazia em 2 dias
-Estado.HUMOR_POR_HORA = 100 / 72    -- humor cheio some em 3 dias
-Estado.LETRAS_POR_PONTO = 300       -- 300 letras = +1 de barriga (uma página ≈ +5)
-Estado.HIBERNA_APOS = 3 * 24 * 3600 -- barriga vazia há 3 dias: se esconde na lombada
-Estado.CARINHO_INTERVALO = 3600     -- um carinho por hora conta
-Estado.REFEICAO_RECENTE = 120       -- fica "feliz" até 2 min depois de comer
-Estado.LENDO_AGORA = 30 * 60        -- leu nos últimos 30 min: está lendo (de noite, fica acordada)
-Estado.PAUSA_SESSAO = 30 * 60       -- pausa maior que isso começa outra sessão de leitura
-Estado.FALAS_RECENTES = 80          -- quantas falas recentes ela evita repetir (80 desde a Etapa 4 da voz: com o
-                                    -- sorteio com peso, as poucas falas que combinam com ela voltavam a cada 40)
+Estado.FOME_POR_HORA = 100 / 48     -- a full belly empties in 2 days
+Estado.HUMOR_POR_HORA = 100 / 72    -- a full mood fades in 3 days
+Estado.LETRAS_POR_PONTO = 300       -- 300 letters = +1 belly (a page ≈ +5)
+Estado.HIBERNA_APOS = 3 * 24 * 3600 -- empty belly for 3 days: it hides in the ball
+Estado.CARINHO_INTERVALO = 3600     -- one pet per hour counts
+Estado.REFEICAO_RECENTE = 120       -- stays "happy" for up to 2 min after eating
+Estado.LENDO_AGORA = 30 * 60        -- read in the last 30 min: it is reading (at night, it stays awake)
+Estado.PAUSA_SESSAO = 30 * 60       -- a pause longer than this starts another reading session
+Estado.FALAS_RECENTES = 80          -- how many recent phrases it avoids repeating (80 since step 4 of the voice: with the weighted
+                                    -- draw, the few phrases that match it came back every 40)
 
--- Cada espécie tem uma linha de 1 a 3 formas (yomimon_species.lua); a escolhida fica em s.especie (número da
--- Pokédex da forma inicial). Sem espécie escolhida (ainda nas boas-vindas) ela é uma bola.
--- temperamento: "jovem" (ansiosa, insegura) ou "velha" (carrancuda, sabe demais), nas formas finais.
-local MIN_LETRAS = { { 0 }, { 0, 300000 }, { 0, 150000, 600000 } }  -- 150000 letras ~ 100 páginas
--- Os bancos de falas ainda se organizam pelas fases da Yomimon (ninfa, jovem, adulta, anciã): cada forma usa uma.
+-- Each species has a line of 1 to 3 forms (yomimon_species.lua); the chosen one is kept in s.especie (the
+-- Pokédex number of the first form). Without a chosen species (still in the welcome) it is a ball.
+-- temperamento: "jovem" (anxious, insecure) or "velha" (grumpy, knows too much), in the final forms.
+local MIN_LETRAS = { { 0 }, { 0, 300000 }, { 0, 150000, 600000 } }  -- 150000 letters ~ 100 pages
+-- The phrase banks are still organised by Yomimon's old stages (ninfa, jovem, adulta, anciã): each form uses one.
 local FASE_DAS_FALAS = { { "jovem" }, { "ninfa", "adulta" }, { "ninfa", "jovem", "ancia" } }
 local formas_por_especie = {}
 
@@ -37,7 +37,7 @@ local function linhaDe(base)
     end
 end
 
---- Formas da espécie de `s`, da inicial à final: { nome = "p<dex>", dex, titulo, min, temperamento, aviso }.
+--- Forms of the species of `s`, from first to final: { nome = "p<dex>", dex, titulo, min, temperamento, aviso }.
 function Estado.formas(s)
     local base = s and s.especie
     local linha = base and linhaDe(base)
@@ -75,15 +75,15 @@ function Estado.novo(agora)
     }
 end
 
--- Campos que, quando existem, precisam ser tabelas.
+-- Fields that, when present, must be tables.
 local CAMPOS_TABELA = { "temas", "livros", "diario", "colecao", "resenhas", "tracos", "tracos_nivel",
                         "falas_recentes", "dia", "comentario_pendente", "sim_terminados", "sim_sublinhados",
                         "lembrancas", "lembranca_pendente", "vistas", "ritmo", "cartao_pendente", "gravado",
                         "cartoes_ditos", "influencias" }
 
---- Garante que um estado lido do disco tem todos os campos, com os tipos certos.
--- Campo básico ausente, de tipo errado ou NaN volta ao valor inicial; tabela de tipo errado é descartada;
--- barriga e humor ficam entre 0 e 100.
+--- Makes sure a state read from disk has all the fields, with the right types.
+-- A missing, wrong-typed or NaN basic field goes back to its initial value; a wrong-typed table is dropped;
+-- belly and mood stay between 0 and 100.
 function Estado.normalizar(s, agora)
     local base = Estado.novo(agora)
     if type(s) ~= "table" then return base end
@@ -99,17 +99,17 @@ function Estado.normalizar(s, agora)
     return s
 end
 
---- Aplica a passagem do tempo desde a última atualização.
+--- Applies the passing of time since the last update.
 function Estado.passarTempo(s, agora)
     local dt = agora - s.atualizado
-    if dt <= 0 then -- relógio voltou (ou nada passou): não pune
+    if dt <= 0 then -- clock went back (or nothing passed): no punishment
         s.atualizado = math.max(s.atualizado, agora)
         return
     end
     local horas = dt / 3600
     local barriga_antes = s.barriga
     s.barriga = limitar(s.barriga - horas * Estado.FOME_POR_HORA)
-    local fator = s.barriga < 20 and 2 or 1 -- com fome, o humor cai mais rápido
+    local fator = s.barriga < 20 and 2 or 1 -- when hungry, the mood drops faster
     s.humor = limitar(s.humor - horas * Estado.HUMOR_POR_HORA * fator)
     if s.barriga <= 0 then
         if not s.vazio_desde then
@@ -125,7 +125,7 @@ end
 
 function Estado.fase(s)
     local formas = Estado.formas(s)
-    if s.dev_fase then  -- modo dev: fase forçada só para teste
+    if s.dev_fase then  -- dev mode: stage forced just for testing
         for _, f in ipairs(formas) do if f.nome == s.dev_fase then return f end end
     end
     local atual = formas[1]
@@ -135,8 +135,8 @@ function Estado.fase(s)
     return atual
 end
 
---- Troca (ou escolhe) o Pokémon. O progresso de cada um fica guardado em s.colecao[base] (letras lidas
--- com ele) e volta quando ele é escolhido de novo. A primeira escolha herda as letras já lidas.
+--- Switches (or picks) the Pokémon. Each one's progress is kept in s.colecao[base] (letters read
+-- with it) and comes back when it is picked again. The first pick inherits the letters already read.
 function Estado.trocarEspecie(s, base)
     s.colecao = s.colecao or {}
     if s.especie then
@@ -147,7 +147,7 @@ function Estado.trocarEspecie(s, base)
     s.especie, s.dev_fase = base, nil
 end
 
---- Os Pokémon já escolhidos: { base, forma, estagio, total, letras, atual }, o de agora primeiro.
+--- The Pokémon already chosen: { base, forma, estagio, total, letras, atual }, the current one first.
 function Estado.colecao(s)
     local lista = {}
     for base, letras in pairs(s.colecao or {}) do
@@ -166,22 +166,22 @@ function Estado.colecao(s)
     return lista
 end
 
---- Próxima forma e quantas letras faltam (nil se já é a final).
+--- Next form and how many letters are missing (nil if it is already the final one).
 function Estado.proximaFase(s)
     for _, f in ipairs(Estado.formas(s)) do
         if s.letras < f.min then return f, f.min - s.letras end
     end
 end
 
---- Letras por página deste leitor (média do que ela comeu), ou 1.500 antes de ter base.
+--- Letters per page of this reader (the average of what it ate), or 1,500 before having a base.
 function Estado.letrasPorPagina(s)
     local p = s.paginas or 0
     if p < 20 then return 1500 end
     return math.max(500, math.min(4000, (s.letras_vida or s.letras or 0) / p))
 end
 
---- Progresso até a próxima forma.
--- Devolve { fase, proxima (nil na forma final), fracao 0..1, paginas que faltam }.
+--- Progress to the next form.
+-- Returns { fase, proxima (nil in the final form), fracao 0..1, paginas left }.
 function Estado.progressoFase(s)
     local fase = Estado.fase(s)
     local prox, faltam = Estado.proximaFase(s)
@@ -191,8 +191,8 @@ function Estado.progressoFase(s)
     return { fase = fase, proxima = prox, fracao = fracao, paginas = paginas }
 end
 
---- Alimenta com letras lidas. Retorna o que aconteceu: {evoluiu = fase, acordou = true}.
--- onde (opcional): { livro = "Título", capitulo = "Cap. VII" } da página comida.
+--- Feeds with letters read. Returns what happened: {evoluiu = fase, acordou = true}.
+-- onde (optional): { livro = "Title", capitulo = "Ch. VII" } of the page eaten.
 function Estado.comer(s, letras, palavra, agora, onde)
     Estado.passarTempo(s, agora)
     local ocorreu = {}
@@ -205,7 +205,7 @@ function Estado.comer(s, letras, palavra, agora, onde)
     s.barriga = limitar(s.barriga + pontos)
     s.humor = limitar(s.humor + pontos * 0.5)
     s.vazio_desde = nil
-    -- sessão: uma pausa longa começa outra
+    -- session: a long pause starts another
     if not s.ultima_refeicao or agora - s.ultima_refeicao > Estado.PAUSA_SESSAO then
         s.sessao_inicio, s.sessao_paginas = agora, 0
     end
@@ -220,7 +220,7 @@ function Estado.comer(s, letras, palavra, agora, onde)
     end
     local dia = os.date("%Y-%m-%d", agora)
     if s.hoje ~= dia then
-        -- sequência de dias seguidos lendo (s.hoje ainda é o último dia em que ela comeu)
+        -- streak of days reading in a row (s.hoje is still the last day it ate)
         local ontem = os.date("%Y-%m-%d", agora - 86400)
         s.sequencia = s.hoje == ontem and (s.sequencia or 1) + 1 or 1
         s.hoje, s.paginas_hoje = dia, 0
@@ -243,8 +243,8 @@ function Estado.totais(s)
     return s.paginas or 0, s.dias_lidos or 0
 end
 
--- Marcos (conquistas) ----------------------------------------------------------------
--- Cada marco: { titulo, descricao, atual, meta }. "atual >= meta" = conquistado.
+-- Milestones (achievements) ----------------------------------------------------------------
+-- Each milestone: { titulo, descricao, atual, meta }. "atual >= meta" = achieved.
 function Estado.marcos(s, extras)
     extras = extras or {}
     local paginas, livros = Estado.totais(s), extras.livros_terminados or 0
@@ -277,7 +277,7 @@ function Estado.marcos(s, extras)
     return out
 end
 
---- Faz carinho. Retorna false se já ganhou carinho na última hora.
+--- Pets it. Returns false if it already got a pet in the last hour.
 function Estado.carinho(s, agora)
     Estado.passarTempo(s, agora)
     if s.hibernando or agora - s.carinho_em < Estado.CARINHO_INTERVALO then
@@ -288,18 +288,18 @@ function Estado.carinho(s, agora)
     return true
 end
 
---- Você leu nos últimos minutos?
+--- Did you read in the last few minutes?
 function Estado.lendoAgora(s, agora)
     return s.ultima_refeicao ~= nil and agora - s.ultima_refeicao < Estado.LENDO_AGORA
 end
 
---- "normal", "feliz", "triste" ou "dormindo" ("casulo" quando hibernando).
--- dormir = true força o sono quando ela está bem (usado na tela de descanso).
+--- "normal", "feliz", "triste" or "dormindo" ("casulo" when hibernating).
+-- dormir = true forces sleep when it is well (used on the sleep screen).
 function Estado.expressao(s, agora, dormir)
     if s.hibernando then return "casulo" end
     if s.barriga < 25 or s.humor < 25 then return "triste" end
     local hora = s.dev_noite and 2 or tonumber(os.date("%H", agora))
-    -- de noite ela dorme, a não ser que você esteja lendo agora
+    -- at night it sleeps, unless you are reading right now
     if dormir or ((hora >= 23 or hora < 6) and not Estado.lendoAgora(s, agora)) then return "dormindo" end
     if (s.ultima_refeicao and agora - s.ultima_refeicao < Estado.REFEICAO_RECENTE) or s.humor >= 75 then
         return "feliz"
@@ -307,11 +307,11 @@ function Estado.expressao(s, agora, dormir)
     return "normal"
 end
 
--- Poses de dormir sorteadas na tela de descanso.
+-- Sleeping poses drawn on the sleep screen.
 Estado.POSES = { "", "_cobertor", "_estrelas" }
 
---- Nome do sprite (fase_expressão). pose (opcional, de Estado.POSES) enfeita quem dorme.
--- Quando o desenho daquela variação não existe, o desenho cai para o da fase.
+--- Sprite name (stage_expression). pose (optional, from Estado.POSES) decorates the sleeper.
+-- When the drawing of that variation does not exist, the drawing falls back to the stage's.
 function Estado.sprite(s, agora, dormir, pose)
     local e = Estado.expressao(s, agora, dormir)
     local nome = (e == "casulo" and "bola" or Estado.fase(s).nome) .. "_" .. e
@@ -319,8 +319,8 @@ function Estado.sprite(s, agora, dormir, pose)
     return nome
 end
 
---- Quadros da animação: dormindo respira e solta Zzz; acordada só respira,
--- e de vez em quando pisca (quando está normal).
+--- Animation frames: asleep it breathes and lets out Zzz; awake it only breathes,
+-- and now and then blinks (when it is normal).
 function Estado.quadros(s, agora, dormir)
     local e = Estado.expressao(s, agora, dormir)
     local fase = e == "casulo" and "bola" or Estado.fase(s).nome
@@ -335,27 +335,27 @@ function Estado.quadros(s, agora, dormir)
     return { a, b }
 end
 
--- Falas por temperamento e humor. "casulo" = escondida na lombada (hibernando).
--- "repouso" = tela de descanso (o Kindle dormindo).
+-- Phrases by temperament and mood. "casulo" = hidden in the ball (hibernating).
+-- "repouso" = sleep screen (the Kindle sleeping).
 local Content = Lingua.content("state")
 local FALAS, FALAS_LIVRO, FALAS_PERSONAGEM = Content.FALAS, Content.FALAS_LIVRO, Content.FALAS_PERSONAGEM
 local FALAS_MUDA_PERTO, FALAS_MUDA_IMINENTE = Content.FALAS_MUDA_PERTO, Content.FALAS_MUDA_IMINENTE
 
--- Falas sobre o que você está lendo (%s = livro, personagem ou número).
+-- Phrases about what you are reading (%s = book, character or number).
 
--- Perto de trocar de pele (crescer de fase). %d = páginas que faltam.
+-- Close to the next form (growing a stage). %d = pages left.
 
--- Lotes novos de frases (locales/<code>/data/extra.lua) somam às listas acima.
+-- New batches of phrases (locales/<code>/data/extra.lua) add to the lists above.
 Lingua.append({ FALAS = FALAS, FALAS_LIVRO = FALAS_LIVRO, FALAS_PERSONAGEM = FALAS_PERSONAGEM,
     FALAS_MUDA_PERTO = FALAS_MUDA_PERTO, FALAS_MUDA_IMINENTE = FALAS_MUDA_IMINENTE }, Lingua.extra("estado"))
 
--- s (opcional): a fala que combina com ela pesa mais (yomimon_voice.lua, PLANO-VOZ.md Etapa 4)
+-- s (optional): the phrase that matches it weighs more (yomimon_voice.lua, PLANO-VOZ.md step 4)
 local function sorteiaLista(lista, sorteio, s)
     return Voz.escolher(lista, s, sorteio)
 end
 
--- Brechas das falas geradas: livro, palavra, tema e um personagem do livro atual. Com um domínio
--- (yomimon_voice.lua), os núcleos com {gosto}, {cheiro}… também valem (o resolvedor troca as palavras).
+-- Gaps of the generated phrases: book, word, theme and a character of the current book. With a domain
+-- (yomimon_voice.lua), cores with {gosto}, {cheiro}… are also valid (the resolver swaps the words).
 local function dadosDaFala(s, sorteio, Memoria)
     local dados = { livro = s.ultimo_livro, palavra = s.ultima_palavra,
                     voz = function(t, sem_dominio) return Voz.resolver(t, s, sorteio, sem_dominio) end,
@@ -364,8 +364,8 @@ local function dadosDaFala(s, sorteio, Memoria)
         for slot in pairs(Voz.SLOTS) do dados[slot] = "{" .. slot .. "}" end
     end
     if Memoria then
-        -- palavras do próprio livro (Etapa 5): {palavra} e {marcante} sorteiam entre as marcantes do
-        -- livro atual; sem elas ainda, {palavra} é a última palavra longa comida e {marcante} fica sem dado
+        -- words of the book itself (step 5): {palavra} and {marcante} draw among the striking ones of the
+        -- current book; without them yet, {palavra} is the last long word eaten and {marcante} has no data
         local marc = s.ultimo_livro and Memoria.marcantes and Memoria.marcantes(s, s.ultimo_livro, 10) or {}
         if #marc > 0 then
             dados.marcante = marc[sorteio(#marc)]
@@ -384,14 +384,14 @@ local function chaveCurta(t)
     return h
 end
 
---- Sorteia uma fala. Devolve a fala e a chave para evitar repetição (o núcleo, nas geradas).
+--- Draws a phrase. Returns the phrase and the key to avoid repetition (the core, in the generated ones).
 local function sortearFala(s, agora, sorteio, dormir, tela)
     local e = Estado.expressao(s, agora, dormir)
     local temp = Estado.fase(s).temperamento
     local grupo = FALAS[temp]
-    -- tela de descanso: só sonho, mesmo com fome, triste, perto da muda ou escondida na lombada (fala de quem
-    -- está acordada quebra a cena); o ovo não sonha: só os barulhos de dentro da casca (as falas entre
-    -- parênteses; "Toc, toc. Lê mais um pouco" fica para quando você está lendo)
+    -- sleep screen: only dreams, even when hungry, sad, close to the next form or hidden in the ball (an awake
+    -- phrase breaks the scene)
+
     if dormir then
         if grupo._todas then
             local rachando = Estado.proximaFase(s) and Estado.progressoFase(s).paginas <= 10
@@ -410,8 +410,8 @@ local function sortearFala(s, agora, sorteio, dormir, tela)
         end
         return sorteiaLista(grupo.repouso, sorteio, s)
     end
-    -- um cartão da caixa (yomimon_cards.lua): na Home; na tela da Yomimon, se não coube na Home. Vem antes de
-    -- qualquer sorteio, para que tentar um cartão que não cabe na Home não mude as falas seguintes.
+    -- a card from the box (yomimon_cards.lua): on the Home; on the Yomimon screen, if it did not fit on the Home. It comes before
+    -- any draw, so trying a card that does not fit on the Home does not change the following phrases.
     if e ~= "dormindo" and e ~= "casulo" and not grupo._todas then
         local okCar, Cartoes = pcall(require, "yomimon_cards")
         local car = okCar and Cartoes.pendente(s, agora, tela)
@@ -420,7 +420,7 @@ local function sortearFala(s, agora, sorteio, dormir, tela)
             return car.texto
         end
     end
-    -- muda chegando: quantas páginas faltam para a próxima fase (a mesma conta do cartão de fase)
+    -- next form coming: how many pages are left (the same count as the stage card)
     local prox = Estado.proximaFase(s)
     if prox and e ~= "casulo" then
         local paginas = Estado.progressoFase(s).paginas
@@ -438,7 +438,7 @@ local function sortearFala(s, agora, sorteio, dormir, tela)
     local okF, Falas = pcall(require, "yomimon_speech")
     local okM, Memoria = pcall(require, "yomimon_memory")
     local dados = dadosDaFala(s, sorteio, okM and Memoria)
-    -- dormindo de noite: quase sempre um sonho gerado (com o livro, o tema e os personagens dela)
+    -- asleep at night: almost always a generated dream (with the book, the theme and its characters)
     if e == "dormindo" then
         if okF and sorteio(4) ~= 4 then
             local f, chave = Falas.sonhar(temp, dados, sorteio)
@@ -446,27 +446,27 @@ local function sortearFala(s, agora, sorteio, dormir, tela)
         end
         return sorteiaLista(grupo.dormindo, sorteio, s)
     end
-    -- uma lembrança nova (autor que volta, aniversário, nada tão sombrio desde…): a primeira fala, uma vez,
-    -- por até 24h
+    -- a new memory (author who returns, anniversary, nothing so gloomy since…): the first phrase, once,
+    -- for up to 24h
     local lem = s.lembranca_pendente
     if lem and not lem.usado and agora - (lem.t or 0) < 24 * 3600 then
         lem.usado = true
         return lem.texto
     end
-    -- acabou um capítulo: a primeira fala depois disso é sobre ele (uma vez só, por até 12h)
+    -- a chapter just ended: the first phrase after that is about it (once only, for up to 12h)
     local p = s.comentario_pendente
     if p and not p.usado and agora - (p.t or 0) < 12 * 3600 then
         p.usado = true
-        return p.texto  -- se ela disse isso há pouco, a regra de não repetir escolhe outra
+        return p.texto  -- if it said this a moment ago, the no-repeat rule picks another
     end
-    -- dados da sua leitura: hora, páginas de hoje, recorde, sequência, sessão, parte do livro. Os fortes
-    -- (madrugada, recorde, maratona, dias sumido) vêm antes das influências; os outros, depois.
+    -- your reading data: hour, pages today, record, streak, session, part of the book. The strong ones
+    -- (small hours, record, marathon, days away) come before the influences; the others, after.
     local okC, Contexto = pcall(require, "yomimon_context")
     local fc, forte
     if okC then fc, forte = Contexto.fala(s, agora, temp, sorteio) end
     if fc and forte and sorteio(10) <= 6 then return fc end
-    -- influências literárias e personalidade-base (yomimon_influences.lua), o repertório principal: a mais
-    -- forte escolhe a frase, a segunda pode entrar na mesma fala; sem influência, a personalidade-base
+    -- literary influences and base personality (yomimon_influences.lua), the main repertoire: the strongest
+    -- picks the phrase, the second may enter the same phrase; without influence, the base personality
     local okI, Influencias = pcall(require, "yomimon_influences")
     if okI then
         local hora = tonumber(os.date("%H", agora))
@@ -474,7 +474,7 @@ local function sortearFala(s, agora, sorteio, dormir, tela)
                        noite = hora >= 22 or hora < 5,
                        muda = (prox and Estado.progressoFase(s).paginas <= 60) and true or false,
                        fase = Estado.fase(s).fase_falas, tela = tela }
-        -- frases ditas há pouco ficam de fora; se não sobrar nenhuma, a vez passa para o resto
+        -- phrases said a moment ago stay out; if none is left, the turn passes to the rest
         local recentes = {}
         for _, h in ipairs(s.falas_recentes or {}) do recentes[h] = true end
         local function dita(chave) return recentes[chaveCurta(chave)] == true end
@@ -482,13 +482,13 @@ local function sortearFala(s, agora, sorteio, dormir, tela)
         if f then return f, chave end
     end
     if fc and not forte and sorteio(10) <= 3 then return fc end
-    -- o jeito que ela ficou com as suas leituras (amarga, medrosa, romântica, noturna…)
+    -- the way it ended up with your readings (bitter, fearful, romantic, nocturnal…)
     local okT, Tracos = pcall(require, "yomimon_traits")
     if okT then
         local f = Tracos.fala(s, temp, sorteio)
         if f then return f end
     end
-    -- às vezes ela fala do que você leu ou do que os livros fizeram com ela
+    -- sometimes it talks about what you read or what the books did to it
     local sorte = sorteio(10)
     if sorte == 1 then
         local f = okM and Memoria.fala(s, sorteio, temp)
@@ -500,12 +500,12 @@ local function sortearFala(s, agora, sorteio, dormir, tela)
     elseif sorte == 4 and dados.palavra then
         return string.format(grupo.palavra, dados.palavra)
     end
-    -- de mau humor, às vezes ela culpa algo que aconteceu no livro (causa inventada depois)
+    -- in a bad mood, sometimes it blames something that happened in the book (a cause invented afterwards)
     if e == "triste" and s.humor < 25 and sorteio(3) == 1 then
         local f = Voz.causa(s, temp, sorteio)
         if f then return f end
     end
-    -- na maioria das vezes, uma fala gerada para a fase
+    -- most of the time, a phrase generated for the stage
     if (e == "normal" or e == "feliz") and okF and sorteio(3) ~= 1 then
         local f, chave = Falas.gerar(Estado.fase(s).fase_falas, dados, sorteio)
         if f then return f, chave end
@@ -514,11 +514,11 @@ local function sortearFala(s, agora, sorteio, dormir, tela)
 end
 
 
---- Uma frase para o estado atual. sorteio(n) deve devolver um inteiro de 1 a n.
--- dormir = true é a tela de descanso (usa as falas de repouso e os sonhos).
--- Evita repetir as últimas falas (guarda só um número por fala, em s.falas_recentes; a chave é a frase
--- antes de escolher a variante de traço, então as variantes de uma mesma frase contam como uma só).
--- tela: "home" (só por Estado.falaQueCabe), "traca" ou nil; decide se um cartão da caixa pode sair.
+--- A phrase for the current state. sorteio(n) must return an integer from 1 to n.
+-- dormir = true is the sleep screen (uses the rest phrases and the dreams).
+-- Avoids repeating the last phrases (stores only a number per phrase, in s.falas_recentes; the key is the phrase
+-- before choosing the trait variant, so the variants of one phrase count as one).
+-- tela: "home" (only by Estado.falaQueCabe), "traca" or nil; decides whether a card from the box may come out.
 function Estado.fala(s, agora, sorteio, dormir, tela)
     sorteio = sorteio or math.random
     local recentes = s.falas_recentes or {}
@@ -535,10 +535,10 @@ function Estado.fala(s, agora, sorteio, dormir, tela)
     while #recentes > Estado.FALAS_RECENTES do table.remove(recentes, 1) end
     s.falas_recentes = recentes
     local final = (Voz.resolver(texto, s, sorteio))
-    -- o cartão saiu nesta fala: na tela da Yomimon, está dito; na Home, quem decide é falaQueCabe (se coube)
+    -- the card came out in this phrase: on the Yomimon screen, it is said; on the Home, falaQueCabe decides (if it fit)
     if car and car.usado and not car_usado then
         if final ~= car.texto then
-            car.usado = car_usado  -- a regra de não repetir escolheu outra
+            car.usado = car_usado  -- the no-repeat rule picked another
         elseif tela ~= "home" then
             local okCar, Cartoes = pcall(require, "yomimon_cards")
             if okCar then Cartoes.dito(s, car, agora) end
@@ -547,10 +547,10 @@ function Estado.fala(s, agora, sorteio, dormir, tela)
     return final
 end
 
---- A fala da tela de descanso. Só é escolhida quando o Kindle vai dormir (escolher = true): aí entra nas
--- recentes e pode usar a lembrança ou o comentário de capítulo. Os redesenhos que ninguém vê (a cada 10
--- páginas, ao acordar, ao fechar o livro) repetem a última escolhida, sem gastar nada; se ainda não houve
--- nenhuma, sorteiam uma e devolvem o estado como estava.
+--- The sleep-screen phrase. Only chosen when the Kindle goes to sleep (escolher = true): then it enters the
+-- recent ones and may use the memory or the chapter comment. Redraws nobody sees (every 10
+-- pages, on waking, on closing the book) repeat the last one chosen, spending nothing; if there was
+-- none yet, they draw one and return the state as it was.
 function Estado.falaDescanso(s, agora, escolher, sorteio)
     if escolher then
         s.fala_descanso = Estado.fala(s, agora, sorteio, true)
@@ -568,12 +568,12 @@ function Estado.falaDescanso(s, agora, escolher, sorteio)
     return texto
 end
 
---- Uma fala que caiba num espaço pequeno (o cartão da Home): linhas(texto) diz quantas linhas ela ocupa.
--- Sorteia de novo (até `tentativas`) quando passa de `max_linhas`, sem efeito colateral das tentativas:
--- só a fala escolhida entra nas recentes, e lembrança ou comentário de capítulo que não couber continua
--- guardado para a tela principal (onde há espaço). Devolve o texto e quantas linhas ele ocupa; se nada
--- couber, a mais curta das tentativas. É a fala da Home: o cartão da caixa sai aqui primeiro; se não
--- couber, fica marcado (nao_coube) e espera a tela da Yomimon.
+--- A phrase that fits a small space (the Home card): linhas(texto) says how many lines it takes.
+-- Draws again (up to `tentativas`) when it exceeds `max_linhas`, without side effects from the attempts:
+-- only the chosen phrase enters the recent ones, and a memory or chapter comment that does not fit stays
+-- stored for the main screen (where there is room). Returns the text and how many lines it takes; if nothing
+-- fits, the shortest of the attempts. It is the Home phrase: the box card comes out here first; if it does not
+-- fit, it is marked (nao_coube) and waits for the Yomimon screen.
 function Estado.falaQueCabe(s, agora, linhas, max_linhas, tentativas, sorteio)
     local function copia(t) local o = {} for i, v in ipairs(t or {}) do o[i] = v end return o end
     local lem, com, car = s.lembranca_pendente, s.comentario_pendente, s.cartao_pendente
@@ -589,7 +589,7 @@ function Estado.falaQueCabe(s, agora, linhas, max_linhas, tentativas, sorteio)
             if not melhor or n < n_melhor then melhor, n_melhor = texto, n end
         end
     end
-    -- lembrança/comentário que apareceu numa tentativa e não coube: continua guardado
+    -- memory/comment that showed up in an attempt and did not fit: stays stored
     if lem and lem.texto ~= escolhido then lem.usado = orig.lem end
     if com and com.texto ~= escolhido then com.usado = orig.com end
     if car and not orig.car then
@@ -597,7 +597,7 @@ function Estado.falaQueCabe(s, agora, linhas, max_linhas, tentativas, sorteio)
             local okCar, Cartoes = pcall(require, "yomimon_cards")
             if okCar then Cartoes.dito(s, car, agora) end
         else
-            if car.usado then car.nao_coube = true end  -- apareceu numa tentativa e não coube
+            if car.usado then car.nao_coube = true end  -- showed up in an attempt and did not fit
             car.usado = orig.car
         end
     end
@@ -608,13 +608,13 @@ function Estado.falaQueCabe(s, agora, linhas, max_linhas, tentativas, sorteio)
     return escolhido, n_esc
 end
 
---- Páginas comidas hoje (zera à meia-noite).
+--- Pages eaten today (resets at midnight).
 function Estado.paginasHoje(s, agora)
     if s.hoje ~= os.date("%Y-%m-%d", agora) then return 0 end
     return s.paginas_hoje or 0
 end
 
---- Quantas das 4 bolinhas estão cheias para um valor de 0 a 100.
+--- How many of the 4 little dots are full for a value from 0 to 100.
 function Estado.bolinhas(valor)
     return math.max(0, math.min(4, math.ceil((valor or 0) / 25 - 1e-9)))
 end
@@ -640,7 +640,7 @@ function Estado.rotuloHumor(s)
     return rotulo(ROTULO_HUMOR[Estado.fase(s).temperamento], s.humor)
 end
 
---- Conta letras num texto UTF-8 (letras ASCII + um por caractere acentuado).
+--- Counts letters in a UTF-8 text (ASCII letters + one per accented character).
 function Estado.contarLetras(texto)
     if type(texto) ~= "string" then return 0 end
     local _, ascii = texto:gsub("%a", "")
@@ -648,10 +648,10 @@ function Estado.contarLetras(texto)
     return ascii + multibyte
 end
 
---- A palavra mais comprida (até 20 bytes) do texto, ou nil.
+--- The longest word (up to 20 bytes) of the text, or nil.
 function Estado.palavraMaisLonga(texto)
     if type(texto) ~= "string" then return nil end
-    -- travessões, aspas curvas, reticências e « » não fazem parte de palavras
+    -- dashes, curly quotes, ellipses and « » are not part of words
     texto = texto:gsub("\226\128[\128-\191]", " "):gsub("\194[\160-\191]", " ")
     local melhor
     for p in texto:gmatch("[%a\128-\255]+") do

@@ -1,14 +1,14 @@
 --[[--
-Guarda: nenhum erro da Yomimon pode interromper a leitura.
+Guard: no Yomimon error may interrupt reading.
 
-Todo ponto em que o KOReader chama a Yomimon (eventos de página, dormir/acordar, abrir a tela,
-desenhar, toques, animação, cartão da Home) passa por aqui. Um erro vira uma linha no log e
-a chamada simplesmente não acontece. Depois de LIMITE erros NO MESMO ponto de entrada durante a
-sessão (ex.: 3 páginas falhando), a Yomimon inteira se cala até o KOReader reiniciar e avisa uma vez.
-Acertos no meio não zeram a conta: um bug real costuma falhar só às vezes (ex.: só nas páginas que
-contam como lidas), e virar páginas rápidas dá certo entre uma falha e outra.
+Every point where KOReader calls Yomimon (page events, sleep/wake, opening the screen,
+painting, taps, animation, the Home card) goes through here. An error becomes a log line and
+the call simply does not happen. After LIMITE errors AT THE SAME entry point during the
+session (e.g. 3 failing pages), the whole Yomimon goes quiet until KOReader restarts and warns once.
+Successes in between do not reset the count: a real bug usually fails only sometimes (e.g. only on pages
+that count as read), and quick page turns work between one failure and the next.
 
-Lógica pura (sem KOReader): main.lua configura como registrar e como avisar.
+Pure logic (no KOReader): main.lua configures how to log and how to warn.
 ]]
 
 local Guarda = {}
@@ -27,12 +27,12 @@ function Guarda.novo(opcoes)
     }, Guarda)
 end
 
---- Define como registrar erros e como avisar quando desligar (main.lua chama ao iniciar).
+--- Defines how to log errors and how to warn when shutting down (main.lua calls it at startup).
 function Guarda:configurar(registrar, ao_desligar)
     self.registrar, self.ao_desligar = registrar, ao_desligar
 end
 
---- Chama fn(...) protegida. Devolve true e os resultados, ou false se falhou ou está desligada.
+--- Calls fn(...) protected. Returns true and the results, or false if it failed or is switched off.
 function Guarda:chamar(nome, fn, ...)
     if self.desligada then return false end
     local args = empacotar(...)
@@ -47,8 +47,8 @@ function Guarda:chamar(nome, fn, ...)
     return false
 end
 
---- Troca métodos de `tabela` por versões protegidas. Se falhar (ou estiver desligada) e houver
--- `alternativa`, ela roda no lugar com os mesmos argumentos (ex.: desenhar uma tela simples).
+--- Replaces methods of `tabela` with protected versions. If one fails (or is switched off) and there is an
+-- `alternativa`, it runs instead with the same arguments (e.g. drawing a simple screen).
 function Guarda:envolver(tabela, nomes, alternativa)
     for _, nome in ipairs(nomes) do
         local original = rawget(tabela, nome)
@@ -65,7 +65,7 @@ function Guarda:envolver(tabela, nomes, alternativa)
     end
 end
 
--- Um guarda para a sessão inteira do KOReader (todos os módulos usam o mesmo).
+-- One guard for the whole KOReader session (all modules share it).
 Guarda.padrao = Guarda.novo()
 
 return Guarda

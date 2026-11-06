@@ -1,11 +1,11 @@
 --[[--
-Tela da Yomimon, desenhada como no Figma ("Yomimon Agent Sprites", 618x824).
+Yomimon screen, drawn as in Figma ("Yomimon Agent Sprites", 618x824).
 
-Tudo é pintado direto na tela em coordenadas do Figma multiplicadas por K
-(no Paperwhite 1236x1648, K = 2). A fonte é a Silkscreen (OFL), em fonts/.
+Everything is painted straight on the screen in Figma coordinates multiplied by K
+(on the Paperwhite 1236x1648, K = 2). The font is Silkscreen (OFL), in fonts/.
 
-Toques: no bichinho = carinho; segurar no bichinho = menu (tela de descanso,
-idioma); no X = fechar.
+Taps: on the creature = pet it; hold on the creature = menu (sleep screen,
+language); on the X = close.
 ]]
 
 local Blitbuffer = require("ffi/blitbuffer")
@@ -26,17 +26,17 @@ local Estado = require("yomimon_state")
 local Memoria = require("yomimon_memory")
 local Tracos = require("yomimon_traits")
 
-local QUADRO_SEGUNDOS = 1.2      -- tempo entre quadros da animação
-local ANIMACAO_MINUTOS = 5       -- animação normal para sozinha depois disso
+local QUADRO_SEGUNDOS = 1.2      -- time between animation frames
+local ANIMACAO_MINUTOS = 5       -- the normal animation stops by itself after this
 
-local LARG, ALT = 618, 824       -- tamanho do frame no Figma
+local LARG, ALT = 618, 824       -- size of the Figma frame
 
 local PRETO = Blitbuffer.COLOR_BLACK
 local BRANCO = Blitbuffer.COLOR_WHITE
 local CINZA_55 = Blitbuffer.Color8(0x55)
 local CINZA_BB = Blitbuffer.Color8(0xBB)
 
--- Ícones do cartão de status, em pontos do Figma (x, y, largura, altura), relativos ao cartão.
+-- Icons of the status card, in Figma points (x, y, width, height), relative to the card.
 local ICONE_LIVRO = {
     { 17, 17, 12, 3 }, { 35, 17, 12, 3 }, { 14, 20, 3, 3 }, { 29, 20, 6, 3 }, { 47, 20, 3, 3 },
     { 14, 23, 3, 3 }, { 29, 23, 6, 3 }, { 47, 23, 3, 3 }, { 14, 26, 3, 3 }, { 29, 26, 6, 3 },
@@ -51,7 +51,7 @@ local ICONE_CARA = {
     { 25, 86, 15, 3 },
 }
 
--- Ampulheta do cartão de fase (relativa ao cartão).
+-- Hourglass of the stage card (relative to the card).
 local ICONE_AMPULHETA = {
     { 14, 79, 10, 2 }, { 14, 81, 2, 2 }, { 22, 81, 2, 2 }, { 16, 83, 2, 2 }, { 20, 83, 2, 2 },
     { 18, 85, 2, 2 }, { 16, 87, 2, 2 }, { 20, 87, 2, 2 }, { 14, 89, 2, 2 }, { 18, 89, 2, 2 },
@@ -59,8 +59,8 @@ local ICONE_AMPULHETA = {
 }
 
 local YomimonScreen = InputContainer:extend{
-    traca = nil,    -- instância do plugin
-    mensagem = nil, -- fala especial (ex.: resposta ao carinho)
+    traca = nil,    -- plugin instance
+    mensagem = nil, -- special phrase (e.g. the answer to a pet)
 }
 
 function YomimonScreen:init()
@@ -74,11 +74,11 @@ function YomimonScreen:init()
     self.covers_fullscreen = true
     local tam = Screen:getSize()
     self.dimen = Geom:new{ x = 0, y = 0, w = tam.w, h = tam.h }
-    -- escala do Figma para a tela, e margem para centralizar se a proporção não bater
+    -- Figma-to-screen scale, and margin to centre when the proportion does not match
     self.k = math.min(tam.w / LARG, tam.h / ALT)
     self.ox = math.floor((tam.w - LARG * self.k) / 2)
     self.oy = math.floor((tam.h - ALT * self.k) / 2)
-    -- fator que o KOReader aplica aos tamanhos de fonte; compensado em face()
+    -- factor KOReader applies to font sizes; compensated in face()
     self.fator_fonte = Screen:scaleBySize(1000) / 1000
     self.faces = {}
     self.tick = function() self:proximoQuadro() end
@@ -86,13 +86,13 @@ function YomimonScreen:init()
     self:iniciarAnimacao()
 end
 
--- Utilidades de desenho ---------------------------------------------------------
+-- Drawing utilities ---------------------------------------------------------
 
 function YomimonScreen:px(v)
     return math.floor(v * self.k + 0.5)
 end
 
---- Face da Silkscreen com altura `tam` em pontos do Figma.
+--- Silkscreen face with height `tam` in Figma points.
 function YomimonScreen:face(negrito, tam)
     local chave = (negrito and "b" or "r") .. tam
     if not self.faces[chave] then
@@ -115,7 +115,7 @@ function YomimonScreen:retangulos(bb, lista, dx, dy, cor)
     for _, r in ipairs(lista) do self:ret(bb, dx + r[1], dy + r[2], r[3], r[4], cor) end
 end
 
---- Texto com a fonte pixel. Devolve a largura em pontos do Figma.
+--- Text in the pixel font. Returns the width in Figma points.
 function YomimonScreen:texto(bb, str, x, y, negrito, tam, cor, centro_x)
     local w = TextWidget:new{ text = str, face = self:face(negrito, tam), fgcolor = cor or PRETO, padding = 0 }
     local tw = w:getSize().w
@@ -125,7 +125,7 @@ function YomimonScreen:texto(bb, str, x, y, negrito, tam, cor, centro_x)
     return tw / self.k
 end
 
---- Largura de um texto em pontos do Figma, sem pintar.
+--- Width of a text in Figma points, without painting.
 function YomimonScreen:larguraTexto(str, negrito, tam)
     local w = TextWidget:new{ text = str, face = self:face(negrito, tam), padding = 0 }
     local tw = w:getSize().w
@@ -133,9 +133,9 @@ function YomimonScreen:larguraTexto(str, negrito, tam)
     return tw / self.k
 end
 
---- Texto com as letras mais juntas (kerning reduzido em `aperto` pontos por letra).
--- Pares que pedem ajuste extra, em pixels da Silkscreen (1/8 do tamanho da fonte).
--- LV: o L é vazio à direita em cima e o V afina embaixo; sem ajuste, o vão fica dobrado.
+--- Text with the letters closer together (kerning reduced by `aperto` points per letter).
+-- Pairs that need extra adjustment, in Silkscreen pixels (1/8 of the font size).
+-- LV: the L is empty on the top right and the V thins at the bottom; without adjustment the gap is doubled.
 local KERNING = { LV = 1 }
 
 function YomimonScreen:textoApertado(bb, str, x, y, negrito, tam, aperto)
@@ -147,7 +147,7 @@ function YomimonScreen:textoApertado(bb, str, x, y, negrito, tam, aperto)
     end
 end
 
---- Caixa com cantos recortados (borda de 3), fundo branco e sombra deslocada (como no Figma).
+--- Box with clipped corners (border of 3), white background and offset shadow (as in Figma).
 function YomimonScreen:cartao(bb, x, y, w, h, sombra)
     if sombra then
         self:ret(bb, x + 9, y + 6, w - 6, h, PRETO)
@@ -185,12 +185,12 @@ local function maiusculas(s)
     return s:upper()
 end
 
--- Partes da tela ----------------------------------------------------------------
+-- Parts of the screen ----------------------------------------------------------------
 
---- Balão de fala (Figma 28:5911): borda de 3, sombra de pixels à direita e embaixo,
--- rabinho no meio. Texto em Silkscreen Regular com 16 de respiro em cima e embaixo;
--- a altura cresce com o número de linhas.
---- Mede o balão: largura W (454, ou 560 para frases de 3+ linhas), altura H e a caixa de texto.
+--- Speech balloon (Figma 28:5911): border of 3, pixel shadow on the right and below,
+-- tail in the middle. Text in Silkscreen Regular with 16 of padding on top and bottom;
+-- the height grows with the number of lines.
+--- Measures the balloon: width W (454, or 560 for phrases of 3+ lines), height H and the text box.
 function YomimonScreen:medirBalao(fala)
     local function caixaPara(W)
         return TextBoxWidget:new{
@@ -203,7 +203,7 @@ function YomimonScreen:medirBalao(fala)
     linha:free()
     local W = 454
     local caixa = caixaPara(W)
-    if caixa:getSize().h / self.k > lh * 2.5 then  -- 3 linhas ou mais: alarga
+    if caixa:getSize().h / self.k > lh * 2.5 then  -- 3 lines or more: widen
         caixa:free()
         W = 560
         caixa = caixaPara(W)
@@ -212,28 +212,28 @@ function YomimonScreen:medirBalao(fala)
     return { W = W, H = th + 35, caixa = caixa }
 end
 
---- Balão principal (Figma 28:5911): borda de 3, sombra de pixels, rabinho no meio embaixo.
--- topo: y do balão; sem topo, a ponta do rabinho fica em y = 234. m: medida já feita (opcional).
+--- Main balloon (Figma 28:5911): border of 3, pixel shadow, tail in the middle at the bottom.
+-- topo: y of the balloon; without it, the tail tip is at y = 234. m: measure already done (optional).
 function YomimonScreen:balao(bb, fala, bx, topo, m)
     m = m or self:medirBalao(fala)
     local W, H = m.W, m.H
-    bx = bx or ((LARG - (W + 6)) / 2)        -- centralizado contando a sombra de 6
+    bx = bx or ((LARG - (W + 6)) / 2)        -- centred counting the shadow of 6
     local by = topo or (234 - (H + 15))
-    local t = math.floor(W / 2) - 7          -- começo do rabinho
+    local t = math.floor(W / 2) - 7          -- start of the tail
     local function r(x, y, w, h, cor) self:ret(bb, bx + x, by + y, w, h, cor) end
-    r(3, 3, W - 6, H - 3, BRANCO)            -- fundo
-    r(6, 0, W - 12, 3, PRETO)                -- topo
+    r(3, 3, W - 6, H - 3, BRANCO)            -- background
+    r(6, 0, W - 12, 3, PRETO)                -- top
     r(3, 3, 3, 3, PRETO); r(W - 6, 3, 3, 3, PRETO)
-    r(0, 6, 3, H - 9, PRETO)                 -- lado esquerdo
+    r(0, 6, 3, H - 9, PRETO)                 -- left side
     r(3, H - 3, 3, 3, PRETO)
-    r(W - 3, 6, 3, H - 3, PRETO)             -- lado direito
+    r(W - 3, 6, 3, H - 3, PRETO)             -- right side
     r(W - 6, H - 3, 3, 6, PRETO)
-    r(W, 9, 3, H - 3, PRETO)                 -- sombra à direita
+    r(W, 9, 3, H - 3, PRETO)                 -- shadow on the right
     r(W + 3, 12, 3, H - 6, PRETO)
     r(6, H, W - 12, 3, PRETO)                -- base
-    r(9, H + 3, W - 9, 3, PRETO)             -- sombra embaixo
+    r(9, H + 3, W - 9, 3, PRETO)             -- shadow below
     r(12, H + 6, W - 9, 3, PRETO)
-    r(t, H + 6, 3, 3, PRETO)                 -- rabinho
+    r(t, H + 6, 3, 3, PRETO)                 -- tail
     r(t + 4, H + 9, 9, 3, PRETO); r(t + 7, H + 12, 3, 3, PRETO)
     r(t + 1, H, 15, 3, BRANCO); r(t + 4, H + 3, 9, 3, BRANCO); r(t + 7, H + 6, 3, 3, BRANCO)
     m.caixa:paintTo(bb, self.ox + self:px(bx + 28), self.oy + self:px(by + 19))
@@ -241,8 +241,8 @@ function YomimonScreen:balao(bb, fala, bx, topo, m)
 end
 
 function YomimonScreen:prepararSprite()
-    -- O sprite (64x64) ocupa ~295 pontos no Figma, centrado em (309.5, 412.5);
-    -- escala inteira para os pixels ficarem nítidos.
+    -- The sprite (64x64) takes ~295 points in Figma, centred at (309.5, 412.5);
+    -- integer scale so the pixels stay sharp.
     local escala = math.max(1, math.floor(295 * self.k / Desenho.LARGURA))
     local lado = escala * Desenho.LARGURA
     self.sprite_escala = escala
@@ -278,7 +278,7 @@ function YomimonScreen:paintTo(bb, x, y)
     if self.menu_aberto then self:pintarMenu(bb) end
 end
 
---- Área tocável, em pontos do Figma.
+--- Tappable area, in Figma points.
 function YomimonScreen:alvo(x, y, w, h, acao)
     table.insert(self.alvos, {
         rect = Geom:new{ x = self.ox + self:px(x), y = self.oy + self:px(y), w = self:px(w), h = self:px(h) },
@@ -299,21 +299,21 @@ function YomimonScreen:cabecalho(bb)
         self:textoApertado(bb, T"YOMIMON", 20, 10, true, 44, 6)
     end
     if self.traca.estado.dev_simulacao and not self.exportando then self:texto(bb, T"SIMULATION", 20, 56, false, 10, CINZA_55) end
-    -- botão ARQUIVO com setinha em pixels
+    -- ARCHIVE button with a pixel arrow
     self:cartao(bb, 403, 16, 140, 39, true)
     self:texto(bb, T"ARCHIVE", 417, 25, true, 14)
     self:ret(bb, 517, 31, 12, 3, PRETO)
     self:ret(bb, 520, 34, 6, 3, PRETO)
     self:ret(bb, 522, 37, 2, 3, PRETO)
     self:alvo(398, 6, 152, 60, function() self.menu_aberto = not self.menu_aberto end)
-    -- fechar
+    -- close
     self:cartao(bb, 555, 16, 42, 39, true)
     self:texto(bb, "X", 0, 12, true, 32, PRETO, 576)
     self:alvo(550, 6, 64, 60, function() self:onClose(); return "fechou" end)
     self.camada = "conteudo"
 end
 
--- Menu ARQUIVO ------------------------------------------------------------------
+-- ARCHIVE menu ------------------------------------------------------------------
 
 local ITENS_MENU = {
     { "casa", T"YOMIMON", T"YOUR CURRENT POKÉMON" },
@@ -363,14 +363,14 @@ function YomimonScreen:entrar(modo)
     self:atualizar()
 end
 
--- Tela inicial ------------------------------------------------------------------
+-- Home screen ------------------------------------------------------------------
 
 function YomimonScreen:pintarCasa(bb, s, agora)
-    -- balão com a fala (sorteada uma vez por abertura, para não mudar a cada redesenho)
+    -- balloon with the phrase (drawn once per opening, so it does not change on every redraw)
     if not self.fala then self.fala = Estado.fala(s, agora, nil, nil, "traca") end
-    -- a Yomimon fica sempre no lugar do Figma; o balão cresce para cima (e se alarga nas
-    -- frases longas), sem nunca passar do cabeçalho
-    -- o rabinho fica logo acima da cabeça real do desenho (fases pequenas: o balão desce)
+    -- Yomimon always stays at Figma's spot; the balloon grows upwards (and widens for long
+    -- phrases), never going past the header
+    -- the tail sits right above the drawing's real head (small stages: the balloon comes down)
     local m = self:medirBalao(self.mensagem or self.fala)
     local nome = self.quadro_atual or Estado.sprite(s, agora)
     local cabeca = (self.sprite_rect.y - self.oy) / self.k + Desenho.topoReal(nome) * self.sprite_escala / self.k
@@ -378,14 +378,14 @@ function YomimonScreen:pintarCasa(bb, s, agora)
     local topo = math.max(70, ponta - (m.H + 15))
     self:balao(bb, self.mensagem or self.fala, nil, topo, m)
 
-    -- a Yomimon
+    -- Yomimon
     local r = self.sprite_rect
     Desenho.pintarSprite(bb, self.quadro_atual or Estado.sprite(s, agora), r.x, r.y, self.sprite_escala)
 
     self:cartoesStatus(bb, s, agora)
 end
 
--- Navegação de páginas (caderno e diário) -------------------------------------
+-- Page navigation (notebook and diary) -------------------------------------
 
 function YomimonScreen:navegacao(bb, total)
     if total <= 1 then return end
@@ -399,8 +399,8 @@ function YomimonScreen:navegacao(bb, total)
     self:alvo(508, 738, 100, 64, function() self.pag = math.min(total, self.pag + 1) end)
 end
 
---- Balão com o rabinho à esquerda (Figma 37:7072): mesma borda e sombra do balão
--- principal; a altura cresce com o texto e o balão fica centrado em `centro_y`.
+--- Balloon with the tail on the left (Figma 37:7072): same border and shadow as the
+-- main balloon; the height grows with the text and the balloon is centred on `centro_y`.
 function YomimonScreen:balaoLateral(bb, texto, bx, W, centro_y, tam)
     local caixa = TextBoxWidget:new{
         text = maiusculas(texto), face = self:face(false, tam or 13), width = self:px(W - 56),
@@ -409,17 +409,17 @@ function YomimonScreen:balaoLateral(bb, texto, bx, W, centro_y, tam)
     local H = th + 35
     local by = centro_y - H / 2
     local function r(x, y, w, h, cor) self:ret(bb, bx + x, by + y, w, h, cor) end
-    r(3, 3, W - 6, H - 3, BRANCO)                         -- fundo
-    r(6, 0, W - 12, 3, PRETO)                             -- topo
+    r(3, 3, W - 6, H - 3, BRANCO)                         -- background
+    r(6, 0, W - 12, 3, PRETO)                             -- top
     r(3, 3, 3, 3, PRETO); r(W - 6, 3, 3, 3, PRETO)
-    r(0, 6, 3, H - 9, PRETO)                              -- lado esquerdo
+    r(0, 6, 3, H - 9, PRETO)                              -- left side
     r(3, H - 3, 3, 3, PRETO)
-    r(W - 3, 6, 3, H - 3, PRETO)                          -- lado direito
+    r(W - 3, 6, 3, H - 3, PRETO)                          -- right side
     r(W - 6, H - 3, 3, 6, PRETO)
-    r(W, 9, 3, H - 3, PRETO); r(W + 3, 12, 3, H - 6, PRETO)          -- sombra à direita
+    r(W, 9, 3, H - 3, PRETO); r(W + 3, 12, 3, H - 6, PRETO)          -- shadow on the right
     r(6, H, W - 12, 3, PRETO)                                         -- base
-    r(9, H + 3, W - 9, 3, PRETO); r(12, H + 6, W - 9, 3, PRETO)      -- sombra embaixo
-    -- rabinho à esquerda, no meio da altura
+    r(9, H + 3, W - 9, 3, PRETO); r(12, H + 6, W - 9, 3, PRETO)      -- shadow below
+    -- tail on the left, at mid height
     local ty = math.floor(H / 2) - 1
     r(0, ty - 6, 3, 15, BRANCO)
     r(-3, ty - 3, 3, 9, BRANCO); r(-6, ty, 3, 3, BRANCO)
@@ -429,7 +429,7 @@ function YomimonScreen:balaoLateral(bb, texto, bx, W, centro_y, tam)
     caixa:free()
 end
 
---- Carinha da Yomimon com um balão ao lado (usado nas telas do arquivo).
+--- Yomimon's little face with a balloon beside it (used in the archive screens).
 function YomimonScreen:rodapeFala(bb, s, texto, y)
     local escala = math.max(1, math.floor(110 * self.k / Desenho.LARGURA))
     Desenho.pintarSprite(bb, Estado.fase(s).nome, self.ox + self:px(14), self.oy + self:px(y), escala)
@@ -437,7 +437,7 @@ function YomimonScreen:rodapeFala(bb, s, texto, y)
     self:balaoLateral(bb, texto, 14 + lado + 16, LARG - (14 + lado + 16) - 20, y + lado / 2)
 end
 
--- Caderno: os sublinhados e notas do KOReader, organizados por livro ---------------
+-- Notebook: KOReader's highlights and notes, organised by book ---------------
 
 function YomimonScreen:carregarSublinhados()
     local s = self.traca.estado
@@ -445,7 +445,7 @@ function YomimonScreen:carregarSublinhados()
     self.livro_aberto = nil
 end
 
---- Sublinhados e notas do KOReader, agrupados por livro (mais recente primeiro).
+--- KOReader's highlights and notes, grouped by book (most recent first).
 function YomimonScreen.lerSublinhados()
     local livros = {}
     pcall(function()
@@ -482,7 +482,7 @@ function YomimonScreen:pintarCaderno(bb, s)
     end
     if self.livro_aberto then return self:pintarSublinhado(bb, s, livros[self.livro_aberto]) end
 
-    -- estante: 2 colunas x 3 linhas de caixinhas
+    -- shelf: 2 columns x 3 rows of little boxes
     local por_pag = 6
     local total = math.ceil(#livros / por_pag)
     self.pag = math.max(1, math.min(self.pag or 1, total))
@@ -493,7 +493,7 @@ function YomimonScreen:pintarCaderno(bb, s)
         local x = 20 + (k % 2) * 299
         local y = 92 + math.floor(k / 2) * 208
         self:cartao(bb, x, y, 279, 188, true)
-        self:ret(bb, x + 16, y + 16, 6, 30, PRETO)  -- lombada em pixels
+        self:ret(bb, x + 16, y + 16, 6, 30, PRETO)  -- spine in pixels
         self:ret(bb, x + 22, y + 16, 3, 30, CINZA_BB)
         local titulo = TextBoxWidget:new{
             text = maiusculas(L.livro), face = self:face(true, 14), width = self:px(220),
@@ -521,7 +521,7 @@ function YomimonScreen:pintarCaderno(bb, s)
 end
 
 function YomimonScreen:pintarSublinhado(bb, s, L)
-    -- voltar para a estante
+    -- back to the shelf
     self:cartao(bb, 20, 82, 150, 38, true)
     self:texto(bb, T"< BOOKS", 0, 92, true, 13, PRETO, 95)
     self:alvo(14, 76, 162, 50, function()
@@ -539,7 +539,7 @@ function YomimonScreen:pintarSublinhado(bb, s, L)
     self.pag = math.max(1, math.min(self.pag or 1, total))
     local item = L.itens[self.pag]
     self:cartao(bb, 20, 136, 578, 392, true)
-    self:ret(bb, 44, 154, 18, 6, PRETO)  -- aspas em pixels
+    self:ret(bb, 44, 154, 18, 6, PRETO)  -- quotation marks in pixels
     self:ret(bb, 44, 160, 6, 12, PRETO)
     self:ret(bb, 68, 154, 18, 6, PRETO)
     self:ret(bb, 68, 160, 6, 12, PRETO)
@@ -558,7 +558,7 @@ function YomimonScreen:pintarSublinhado(bb, s, L)
         cap:free()
     end
 
-    -- comentário com contexto
+    -- comment with context
     local no_cap = 0
     for _, it in ipairs(L.itens) do if it.capitulo and it.capitulo == item.capitulo then no_cap = no_cap + 1 end end
     local pers = Memoria.personagens(s, L.livro, 10)
@@ -570,14 +570,14 @@ function YomimonScreen:pintarSublinhado(bb, s, L)
     self:navegacao(bb, total)
 end
 
--- Diário: memórias e o que os livros fizeram com ela --------------------------------
+-- Diary: memories and what the books did to it --------------------------------
 
 local MESES = {}
 for m in T"JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC":gmatch("%S+") do MESES[#MESES + 1] = m end
 
 function YomimonScreen:pintarDiario(bb, s)
     local y = 88
-    -- "biblioteca interior" resumida: quem ela virou
+    -- summarised "inner library": who it became
     local a, b = Memoria.ambivalente(s)
     local resumo
     if a then
@@ -585,7 +585,7 @@ function YomimonScreen:pintarDiario(bb, s)
     elseif s.tema_dominante then
         resumo = string.format(T"OBSESSED WITH %s", maiusculas(Memoria.tema(s.tema_dominante, "por")))
     end
-    -- o jeito que ela ficou com as suas leituras (até 2 traços; 1 quando já está dividida)
+    -- the way it ended up with your readings (up to 2 traits; 1 when it is already divided)
     local jeito = Tracos.rotulos(s.tracos, a and 1 or 2)
     if #jeito > 0 then resumo = (resumo and (resumo .. " · ") or "") .. table.concat(jeito, " · ") end
     resumo = resumo or T"NO OPINIONS YET. READ MORE."
@@ -619,10 +619,10 @@ function YomimonScreen:pintarDiario(bb, s)
     self:navegacao(bb, total)
 end
 
---- Cartões de barriga/humor e de fase (rodapé da tela principal).
+--- Belly/mood and stage cards (footer of the main screen).
 function YomimonScreen:cartoesStatus(bb, s, agora)
-    -- cartão de status: barriga e humor
-    -- os dois cartões (380 + 20 de espaço + 174, mais 6 de sombra) centralizados na tela
+    -- status card: belly and mood
+    -- the two cards (380 + 20 of space + 174, plus 6 of shadow) centred on the screen
     local cx, cy = (LARG - 580) / 2, 696
     self:cartao(bb, cx, cy, 380, 104, true)
     self:retangulos(bb, ICONE_LIVRO, cx, cy, PRETO)
@@ -635,7 +635,7 @@ function YomimonScreen:cartoesStatus(bb, s, agora)
     self:bolinhas(bb, cx + 244, cy + 16, Estado.bolinhas(s.barriga))
     self:bolinhas(bb, cx + 244, cy + 62, Estado.bolinhas(s.humor))
 
-    -- cartão de forma: nome, páginas que faltam para a próxima forma e a barra até lá
+    -- form card: name, pages left for the next form and the bar up to it
     local ix, iy, larg = cx + 400, 696, 146
     self:cartao(bb, ix, iy, 174, 104, true)
     local pf = Estado.progressoFase(s)
@@ -649,7 +649,7 @@ function YomimonScreen:cartoesStatus(bb, s, agora)
     local nw = self:texto(bb, num, ix + 14, iy + 26, true, tam_num)
     self:texto(bb, linha1, ix + 14 + nw + 6, iy + 30, false, 10, CINZA_55)
     self:texto(bb, alvo, ix + 14 + nw + 6, iy + 43, true, 10)
-    -- barra: trilho cinza e o progresso em preto
+    -- bar: grey track and the progress in black
     self:ret(bb, ix + 14, iy + 64, larg, 6, CINZA_BB)
     local cheio = math.floor(larg * pf.fracao + 0.5)
     if cheio > 0 then self:ret(bb, ix + 14, iy + 64, cheio, 6, PRETO) end
@@ -657,14 +657,14 @@ function YomimonScreen:cartoesStatus(bb, s, agora)
     self:texto(bb, string.format(T"%s PAGES READ", Desenho.milhar(s.paginas)), ix + 30, iy + 77, false, 10, CINZA_55)
 end
 
---- Tela de descanso: o balão e a Yomimon dormindo, sozinhos, no meio da tela (sem cartões desde 29/10/2026:
--- a imagem é desenhada quando o Kindle dorme, e de manhã barriga, humor e "pág. hoje" já seriam de ontem).
--- Pinta numa imagem e salva em PNG; o KOReader mostra quando o Kindle dorme.
--- escolher = true só quando o Kindle vai dormir: a fala é escolhida agora (Estado.falaDescanso); nos outros
--- redesenhos, repete a última.
+--- Sleep screen: the balloon and Yomimon asleep, alone, in the middle of the screen (no cards since 29/10/2026:
+-- the image is drawn when the Kindle sleeps, and in the morning belly, mood and "pages today" would already be yesterday's).
+-- Paints on an image and saves it as PNG; KOReader shows it when the Kindle sleeps.
+-- escolher = true only when the Kindle goes to sleep: the phrase is chosen now (Estado.falaDescanso); in the other
+-- redraws, it repeats the last one.
 function YomimonScreen.gerarTelaDescanso(s, caminho, agora, escolher)
     local sw, sh = Screen:getWidth(), Screen:getHeight()
-    local w, h = math.min(sw, sh), math.max(sw, sh)  -- sempre em pé
+    local w, h = math.min(sw, sh), math.max(sw, sh)  -- always portrait
     local bb = Blitbuffer.new(w, h, Blitbuffer.TYPE_BB8)
     bb:fill(BRANCO)
     local k = math.min(w / LARG, h / ALT)
@@ -672,15 +672,15 @@ function YomimonScreen.gerarTelaDescanso(s, caminho, agora, escolher)
         k = k, ox = math.floor((w - LARG * k) / 2), oy = math.floor((h - ALT * k) / 2),
         fator_fonte = Screen:scaleBySize(1000) / 1000, faces = {},
     }, { __index = YomimonScreen })
-    -- o bichinho dormindo: o sprite da forma atual com os "z" (ou a bola, se o sprite não foi baixado).
-    -- 64 de altura, no tamanho do pixel da Home.
+    -- the sleeping creature: the sprite of the current form with the "z"s (or the ball, if the sprite was not downloaded).
+    -- 64 high, at the Home's pixel size.
     local nome = Estado.sprite(s, agora, true)
     local escala = math.max(1, math.floor(295 * k / Desenho.LARGURA))
     local L = Desenho.sprite(nome)
     local larg = #L[1] * escala
-    local topo_real = Desenho.topoReal(nome) * escala           -- linhas vazias acima da antena
+    local topo_real = Desenho.topoReal(nome) * escala           -- empty lines above the head
     local alt_real = #L * escala - topo_real
-    -- balão e Yomimon como um grupo, igual à Home (rabinho 30 acima da cabeça), no meio da tela
+    -- balloon and Yomimon as a group, like the Home (tail 30 above the head), in the middle of the screen
     local fala = Estado.falaDescanso(s, agora, escolher)
     local m = p:medirBalao(fala)
     local grupo = m.H + 15 + 30 + alt_real / k
@@ -693,9 +693,9 @@ function YomimonScreen.gerarTelaDescanso(s, caminho, agora, escolher)
     return ok, err
 end
 
--- Conquistas: resumo, marcos e estante por ano -------------------------------------
+-- Achievements: summary, milestones and shelf by year --------------------------------------
 
---- Livros marcados como terminados no KOReader (ou lidos até o fim), com a data.
+--- Books marked as finished in KOReader (or read to the end), with the date.
 function YomimonScreen.livrosTerminados()
     local lista = {}
     pcall(function()
@@ -720,7 +720,7 @@ end
 
 function YomimonScreen:pintarConquistas(bb, s)
     local terminados = self.terminados or {}
-    -- página 1: resumo + marcos; páginas seguintes: estante por ano
+    -- page 1: summary + milestones; following pages: shelf by year
     local anos, por_ano = {}, {}
     for _, L in ipairs(terminados) do
         local ano = L.data:sub(1, 4)
@@ -735,12 +735,12 @@ function YomimonScreen:pintarConquistas(bb, s)
             paginas_estante[#paginas_estante + 1] = { ano = ano, total = #lista, de = i, lista = lista }
         end
     end
-    local total = 2 + #paginas_estante  -- 2 páginas de marcos
+    local total = 2 + #paginas_estante  -- 2 pages of milestones
     self.pag = math.max(1, math.min(self.pag or 1, total))
 
     if self.pag <= 2 then
         if self.pag == 1 then
-            -- cartão-resumo
+            -- summary card
             self:cartao(bb, 20, 86, 578, 96, true)
             local function bloco(x, valor, rotulo)
                 self:texto(bb, valor, x, 100, true, 28)
@@ -763,7 +763,7 @@ function YomimonScreen:pintarConquistas(bb, s)
             local x = 20 + (k % 2) * 299
             local y = y0 + math.floor(k / 2) * 104
             self:cartao(bb, x, y, 279, 88, true)
-            -- selo: quadrado cheio se conquistado, vazio (cinza) se não
+            -- seal: filled square if achieved, empty (grey) if not
             local sx, sy = x + 16, y + 26
             if m.feito then
                 self:ret(bb, sx + 3, sy, 20, 26, PRETO); self:ret(bb, sx, sy + 3, 26, 20, PRETO)
@@ -784,7 +784,7 @@ function YomimonScreen:pintarConquistas(bb, s)
         for i = P.de, math.min(P.de + 8, #P.lista) do
             local L = P.lista[i]
             self:cartao(bb, 20, y, 578, 62, true)
-            self:ret(bb, 36, y + 14, 6, 34, PRETO); self:ret(bb, 42, y + 14, 3, 34, CINZA_BB)  -- lombada
+            self:ret(bb, 36, y + 14, 6, 34, PRETO); self:ret(bb, 42, y + 14, 3, 34, CINZA_BB)  -- spine
             local t = TextBoxWidget:new{
                 text = maiusculas(L.titulo), face = self:face(true, 13), width = self:px(420),
                 height = self:px(18), height_overflow_show_ellipsis = true,
@@ -800,9 +800,9 @@ function YomimonScreen:pintarConquistas(bb, s)
     self:navegacao(bb, total)
 end
 
--- Linhagem: a geração viva e os memoriais das anteriores ---------------------------
+-- Pokédex: the Pokémon already chosen and the progress each one kept ---------------------------
 
---- Pokédex: os Pokémon já escolhidos, cada um com o progresso que guardou; tocar em um troca para ele.
+--- Pokédex: the Pokémon already chosen, each with the progress it kept; tapping one switches to it.
 function YomimonScreen:pintarPokedex(bb, s)
     local lista = Estado.colecao(s)
     local itens = {}
@@ -843,9 +843,9 @@ function YomimonScreen:pintarPokedex(bb, s)
     self:navegacao(bb, total)
 end
 
--- Cartões de texto (memorial) --------------------------------------------------------
+-- Text cards ---------------------------------------------------------------------
 
---- Altura (em pontos do Figma) que um texto ocupa numa largura, com a fonte pixel.
+--- Height (in Figma points) a text takes at a width, with the pixel font.
 function YomimonScreen:alturaTexto(texto, negrito, tam, largura)
     local t = TextBoxWidget:new{ text = texto, face = self:face(negrito, tam), width = self:px(largura) }
     local h = t:getSize().h / self.k
@@ -853,7 +853,7 @@ function YomimonScreen:alturaTexto(texto, negrito, tam, largura)
     return h
 end
 
---- Cartão com rótulo e texto, da altura do texto (até altura_max). Devolve o y logo abaixo.
+--- Card with a label and text, as tall as the text (up to altura_max). Returns the y right below.
 function YomimonScreen:caixaTexto(bb, y, rotulo, texto, altura_max)
     texto = maiusculas(texto)
     local altura = math.min(altura_max, math.ceil(self:alturaTexto(texto, false, 13, 530)) + 52)
@@ -868,7 +868,7 @@ function YomimonScreen:caixaTexto(bb, y, rotulo, texto, altura_max)
     return y + altura + 18
 end
 
---- Modo dev: salva cada tela em PNG (koreader/yomimon/demo), na resolução do aparelho.
+--- Dev mode: saves each screen as PNG (koreader/yomimon/demo), at the device's resolution.
 function YomimonScreen:exportarTelas(pasta)
     local lfs = require("libs/libkoreader-lfs")
     local DataStorage = require("datastorage")
@@ -879,7 +879,7 @@ function YomimonScreen:exportarTelas(pasta)
     local bb = Blitbuffer.new(Screen:getWidth(), Screen:getHeight(), Blitbuffer.TYPE_BB8)
     local s = self.traca.estado
     local n, falhas = 0, 0
-    self.exportando = true  -- sem o selo SIMULAÇÃO nas imagens
+    self.exportando = true  -- without the SIMULATION seal on the images
     local function foto(nome, preparar)
         local ok = pcall(function()
             self.menu_aberto = false
@@ -900,8 +900,8 @@ function YomimonScreen:exportarTelas(pasta)
     foto("conquistas-2", function() self.pag = 2 end)
     foto("estante", function() self.pag = 3 end)
     foto("percepcao", function() self:entrar("percepcao") end)
-    -- demonstração: falas e sonhos escolhidos (dev_falas e dev_sonhos, postos no estado simulado), uma tela
-    -- para cada, no lugar dos sorteados
+    -- demo: phrases and dreams chosen (dev_falas and dev_sonhos, put in the simulated state), one screen
+    -- for each, in place of the drawn ones
     for i, f in ipairs(s.dev_falas or {}) do
         foto("casa-" .. i, function() self:entrar("casa"); self.mensagem = nil; self.fala = f end)
     end
@@ -918,8 +918,8 @@ function YomimonScreen:exportarTelas(pasta)
     return n, pasta, falhas
 end
 
---- Modo dev: exporta as telas de cada simulação em koreader/yomimon/simulacoes/*.lua, cada uma na sua pasta em
--- koreader/yomimon/demo/<nome do arquivo>/. Não salva nada: no fim volta o estado que estava aberto.
+--- Dev mode: exports the screens of each simulation in koreader/yomimon/simulacoes/*.lua, each in its own folder in
+-- koreader/yomimon/demo/<file name>/. Saves nothing: at the end the state that was open comes back.
 function YomimonScreen:exportarSimulacoes()
     local lfs = require("libs/libkoreader-lfs")
     local DataStorage = require("datastorage")
@@ -941,7 +941,7 @@ function YomimonScreen:exportarSimulacoes()
             traca.estado = Estado.normalizar(sim, os.time())
             traca.estado.dev_simulacao = true
             Estado.passarTempo(traca.estado, os.time())
-            self.fala, self.quadro_atual = nil, nil  -- nada da simulação anterior
+            self.fala, self.quadro_atual = nil, nil  -- nothing from the previous simulation
             local n, _, x = self:exportarTelas(base .. "/demo/" .. (f:gsub("%.lua$", "")))
             sims, telas, falhas = sims + 1, telas + n, falhas + x
         else
@@ -953,7 +953,7 @@ function YomimonScreen:exportarSimulacoes()
     return sims, telas, falhas
 end
 
--- Painel dev: o que ela percebeu do livro atual ----------------------------------------
+-- Dev panel: what it noticed about the current book ----------------------------------------
 
 local NOMES_EVENTO = { morte = T"DEATH", casamento = T"WEDDING", viagem = T"JOURNEY", carta = T"LETTER",
     tempestade = T"STORM", doenca = T"ILLNESS", festa = T"PARTY", briga = T"FIGHT", fuga = T"ESCAPE", crime = T"CRIME" }
@@ -1014,7 +1014,7 @@ function YomimonScreen:atualizar()
     UIManager:setDirty(self, "ui")
 end
 
--- Animação ------------------------------------------------------------------------
+-- Animation ------------------------------------------------------------------------
 
 function YomimonScreen:iniciarAnimacao()
     self.quadros = Desenho.quadros(Estado.quadros(self.traca.estado, os.time()))
@@ -1050,7 +1050,7 @@ function YomimonScreen:reiniciar()
     self:atualizar()
 end
 
--- Toques ----------------------------------------------------------------------------
+-- Taps ----------------------------------------------------------------------------
 
 function YomimonScreen:carinho()
     if self.traca:carinho() then
@@ -1067,7 +1067,7 @@ function YomimonScreen:onTap(_, ges)
     local pos = ges and ges.pos
     if not pos then return end
     local alvos = self.alvos or {}
-    for i = #alvos, 1, -1 do  -- os desenhados por último (menu) têm prioridade
+    for i = #alvos, 1, -1 do  -- the ones drawn last (menu) take priority
         local a = alvos[i]
         if (not self.menu_aberto or a.camada ~= "conteudo") and pos:intersectWith(a.rect) then
             if a.acao() ~= "fechou" then self:atualizar() end
@@ -1133,7 +1133,7 @@ function YomimonScreen:menuIdioma()
     UIManager:show(dialogo)
 end
 
---- Modo dev: só existe se o arquivo koreader/yomimon/dev existir. Muda fase e humor para teste.
+--- Dev mode: only exists if the file koreader/yomimon/dev exists. Changes stage and mood for testing.
 function YomimonScreen:menuDev(fechar_anterior)
     local s = self.traca.estado
     local dialogo
@@ -1178,7 +1178,7 @@ function YomimonScreen:menuDev(fechar_anterior)
                 end },
             },
             (function()
-                -- carregar sempre lê o arquivo de novo (o estado real fica guardado na primeira vez)
+                -- loading always reads the file again (the real state is stored the first time)
                 local linha = {
                     { text = T"Endgame simulation", callback = function()
                         UIManager:close(dialogo)
@@ -1250,7 +1250,7 @@ end
 
 function YomimonScreen.devLigado()
     local okV, Versao = pcall(require, "yomimon_version")
-    if okV and type(Versao) == "table" and Versao.publica then return false end  -- versão da comunidade: nunca
+    if okV and type(Versao) == "table" and Versao.publica then return false end  -- community version: never
     local lfs = require("libs/libkoreader-lfs")
     local DataStorage = require("datastorage")
     return lfs.attributes(DataStorage:getDataDir() .. "/yomimon/dev", "mode") == "file"
@@ -1274,8 +1274,8 @@ function YomimonScreen:onClose()
     return true
 end
 
--- Proteção: um erro ao desenhar, tocar ou animar não pode travar o KOReader. Se falhar, a tela
--- mostra um aviso simples e qualquer toque fecha (para nunca prender o leitor numa tela quebrada).
+-- Protection: an error when drawing, tapping or animating cannot freeze KOReader. If it fails, the screen
+-- shows a simple notice and any tap closes it (so the reader is never stuck on a broken screen).
 local Guarda = require("yomimon_guard")
 Guarda.padrao:envolver(YomimonScreen, { "paintTo", "onTap", "onHold", "proximoQuadro" }, function(nome, self, bb, x, y)
     if nome == "paintTo" then

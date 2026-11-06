@@ -8,10 +8,6 @@
 
 *Em português: [README.pt-BR.md](README.pt-BR.md).*
 
-> **Status: early version (0.1.0), not yet tested on a real device.** The creature picker, evolution lines and sprite download are in; the text
-> banks are still being adapted from the original (some lines may still sound like the old creature). See the
-> [CHANGELOG](CHANGELOG.md).
-
 Yomimon (*yomi* 読み, "reading", plus "-mon") keeps track of the pages you really read and reacts to them: finished
 books, reading habits, the time of day you read. It runs on your e-reader with **no AI**, and your reading never
 leaves the device. The only network use is a one-time download of the sprite of the creature you choose.
@@ -25,6 +21,13 @@ leaves the device. The only network use is a one-time download of the sprite of 
 - The sprite is downloaded on the device (only for the chosen creature and its evolutions), converted to a small
   grayscale grid and cached in `koreader/yomimon/sprites/`, outside the plugin folder, so a plugin update keeps them. No creature artwork is stored in this repository.
   Until the download works, a plain ball is shown.
+
+## Languages
+
+The interface and the phrases come in English and Brazilian Portuguese. *Yomimon > Language* lets you pick one, or
+follow the KOReader language. Each language is a folder in `yomimon.koplugin/locales/`, and anything a folder does not
+provide falls back to English, so adding a language means adding a folder: see
+[locales/README.md](yomimon.koplugin/locales/README.md).
 
 ## Install
 
