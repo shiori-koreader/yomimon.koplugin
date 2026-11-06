@@ -23,14 +23,13 @@ leaves the device. The only network use is a one-time download of the sprite of 
 - No egg, no death and no lineage: once it reaches its final form it stays with you for good.
 - It still gets hungry when you stop reading, and goes back into its ball if you stay away for days.
 - The sprite is downloaded on the device (only for the chosen creature and its evolutions), converted to a small
-  grayscale grid and cached in `yomimon.koplugin/sprites/` (so they are lost if you replace the plugin folder; they download again). No creature artwork is stored in this repository.
+  grayscale grid and cached in `koreader/yomimon/sprites/`, outside the plugin folder, so a plugin update keeps them. No creature artwork is stored in this repository.
   Until the download works, a plain ball is shown.
 
 ## Install
 
 - **With Storefront** (recommended): install Yomimon from the Storefront plugin store. Updates appear there when a
-  new GitHub release is published. The downloaded sprites live inside the plugin folder, so they are fetched again
-  after an update (Wi-Fi needed once).
+  new GitHub release is published. The downloaded sprites live in `koreader/yomimon/sprites/`, so an update keeps them.
 - **By hand**: download `yomimon.koplugin-v<version>.zip` from the
   [latest release](https://github.com/shiori-koreader/yomimon.koplugin/releases/latest) and unzip it into
   `koreader/plugins/`. Restart KOReader.

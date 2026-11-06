@@ -13,6 +13,8 @@
 - The critter image has one fixed height, so the Simple UI decorations keep the same size for every species; its
   background is white in light mode and transparent in night mode.
 - The Simple UI and Bookshelf cards use the UI font.
+- The sprite cache moved to `koreader/yomimon/sprites/`, so a plugin update no longer wipes it; sprites cached
+  inside the plugin folder by earlier versions are moved there on first use.
 - Module and data files renamed to English; the UI defaults to Portuguese unless English is chosen in the menu.
 
 ## 0.1.0 (2026-11-05)

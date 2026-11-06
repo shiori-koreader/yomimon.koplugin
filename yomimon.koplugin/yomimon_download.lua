@@ -1,6 +1,7 @@
 --[[--
-Sprites baixados no aparelho: busca o PNG de uma espécie, converte para a grade de 64x64 e guarda em
-<pasta do plugin>/sprites/<dex>.txt. Nenhuma arte vem no plugin: o cache é criado no aparelho.
+Sprites downloaded on the device: fetches the PNG of a species, converts it to the 64x64 grid and caches it in
+koreader/yomimon/sprites/<dex>.txt, outside the plugin folder so a plugin update keeps it. No artwork ships with
+the plugin: the cache is built on the device.
 ]]
 
 local lfs = require("libs/libkoreader-lfs")
@@ -16,11 +17,27 @@ local URL = "https://raw.githubusercontent.com/PokeAPI/sprites/1dd55c0436d2a5b6e
 
 local carregados = {}
 
--- Pasta do plugin, tirada do próprio arquivo (como em yomimon_drawing.lua).
 local PASTA_PLUGIN = debug.getinfo(1, "S").source:match("^@(.*)/[^/]*$") or "plugins/yomimon.koplugin"
+local PASTA = require("datastorage"):getDataDir() .. "/yomimon/sprites"
+
+-- Versions up to 0.1.1 cached inside the plugin folder, which an update wipes: bring those files over once.
+local migrado = false
+local function migrarCacheAntigo()
+    local antiga = PASTA_PLUGIN .. "/sprites"
+    if lfs.attributes(antiga, "mode") ~= "directory" then return end
+    require("util").makePath(PASTA)
+    for nome in lfs.dir(antiga) do
+        if nome:match("%.txt$") then os.rename(antiga .. "/" .. nome, PASTA .. "/" .. nome) end
+    end
+    lfs.rmdir(antiga)
+end
 
 function Baixar.pasta()
-    return PASTA_PLUGIN .. "/sprites"
+    if not migrado then
+        migrado = true
+        pcall(migrarCacheAntigo)
+    end
+    return PASTA
 end
 
 local function caminho(dex)
@@ -84,7 +101,7 @@ end
 
 -- A resposta do PokeAPI traz dezenas de textos; guarda só o inglês mais recente, numa linha só e sem acento
 -- (a fonte pixel da tela não tem o "é" de "Pokémon").
-local function extrairDescricao(dados)
+function Baixar.extrairDescricao(dados)
     local entradas = require("json").decode(dados).flavor_text_entries or {}
     for i = #entradas, 1, -1 do
         local e = entradas[i]
@@ -99,9 +116,9 @@ function Baixar.baixarDescricao(dex)
     if Baixar.descricao(dex) then return true end
     local ok, dados = pcall(buscar, dex, URL_ESPECIE)
     if not ok or not dados then return nil end
-    local okd, texto = pcall(extrairDescricao, dados)
+    local okd, texto = pcall(Baixar.extrairDescricao, dados)
     if not okd or not texto or texto == "" then return nil end
-    lfs.mkdir(Baixar.pasta())
+    require("util").makePath(Baixar.pasta())
     local arq = io.open(caminhoDescricao(dex), "wb")
     if not arq then return nil end
     arq:write(texto)
@@ -124,7 +141,7 @@ local function baixarSprite(dex)
         logger.warn("Yomimon: não converteu o sprite", dex, errd)
         return nil, errd
     end
-    lfs.mkdir(Baixar.pasta())
+    require("util").makePath(Baixar.pasta())
     local arq, erro = io.open(caminho(dex), "wb")
     if not arq then return nil, erro end
     arq:write(Sprite.guardar(linhas))

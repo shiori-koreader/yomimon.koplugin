@@ -65,3 +65,19 @@ Lingua.force("xx")
 assert(Lingua.t("BACK") == "BACK", "unknown locale falls back to English")
 assert(Lingua.content("state") and Lingua.format().thousands == ",")
 print("ok languages")
+
+-- Pokédex description: keeps the latest English entry on one line, without characters the pixel font lacks.
+package.loaded["libs/libkoreader-lfs"] = {}
+package.loaded["logger"] = { warn = function() end }
+package.loaded["datastorage"] = { getDataDir = function() return "." end }
+package.loaded["json"] = { decode = function()
+    return { flavor_text_entries = {
+        { language = { name = "es" }, flavor_text = "Hola" },
+        { language = { name = "en" }, flavor_text = "Old text." },
+        { language = { name = "en" }, flavor_text = "Spends 18 hours\nsleeping.\f  The Pok\195\169mon\226\128\148teleports." },
+        { language = { name = "fr" }, flavor_text = "Salut" },
+    } }
+end }
+local Baixar = require("yomimon_download")
+assert(Baixar.extrairDescricao("{}") == "Spends 18 hours sleeping. The Pokemon-teleports.", Baixar.extrairDescricao("{}"))
+print("ok description")

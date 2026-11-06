@@ -11,3 +11,13 @@ jobs:
       - run: lua tests/yomimon_test.lua
       - run: lua scripts/check_locales.lua
       - run: python3 scripts/package.py
+  lint:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: "5.1"
+      - uses: leafo/gh-actions-luarocks@v4
+      - run: luarocks install luacheck && luacheck .

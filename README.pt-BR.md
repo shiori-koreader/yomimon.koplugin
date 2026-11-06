@@ -27,8 +27,7 @@ planos, um download único do sprite do bichinho escolhido), e sua leitura nunca
 ## Instalação
 
 - **Pelo Storefront** (recomendado): instale o Yomimon na loja de plugins do Storefront. As atualizações aparecem
-  lá quando uma nova versão é publicada no GitHub. Os sprites baixados ficam dentro da pasta do plugin, então
-  baixam de novo depois de uma atualização (precisa de Wi-Fi uma vez).
+  lá quando uma nova versão é publicada no GitHub. Os sprites baixados ficam em `koreader/yomimon/sprites/`, então uma atualização não os apaga.
 - **À mão**: baixe `yomimon.koplugin-v<versão>.zip` na
   [última versão](https://github.com/shiori-koreader/yomimon.koplugin/releases/latest) e descompacte em
   `koreader/plugins/`. Reinicie o KOReader.
