@@ -6,7 +6,7 @@ reviews, which pass from life to life) and remembers:
                           who returns (series), the longest book, the fastest read;
   level B (measured perception) third book in a row with the same dominant theme.
   level C (stored, mute)  probable genre and aura of the protagonist go in the review; "nothing so gloomy (or
-                          light) since X" is computed but does not speak (CLIMA_FALA = false): the weather average
+                          light) since X" is computed but does not speak (WEATHER_SPEECH = false): the weather average
                           of a whole book puts Hamlet, Romeo and Juliet and Frankenstein among the lightest
                           of the corpus. See ferramentas/validacao/MEMORIA-VINCULO.md.
 
@@ -16,102 +16,102 @@ s.lembrancas, which the memory ruler checks against what really happened.
 Pure logic (no KOReader), testable outside it.
 ]]
 
-local Lingua = require("yomimon_language")
+local Language = require("yomimon_language")
 
 local L = {}
 
 local MAX = 200
-local PAGINA_PERSONAGEM = 40   -- pages of the book before looking for a returning character
-local PASSO_PERSONAGEM = 20    -- and afterwards only every 20 pages: the character list weighs the whole book,
+local CHARACTER_PAGE = 40   -- pages of the book before looking for a returning character
+local CHARACTER_STEP = 20    -- and afterwards only every 20 pages: the character list weighs the whole book,
                                -- and redone on every page it made page 700 of Moby Dick 50 times slower
-local PAGINA_CLIMA = 60        -- pages before comparing the book's weather with the history
-local LIVROS_NO_MEIO = 2       -- "since X" only if there were at least 2 books after X
-local DIAS_DESDE = 30          -- and if X finished at least 30 days ago
-local BASE_RECORDE = 3         -- records only with at least 3 books finished before
-local MARGEM_RAPIDO = 1.2      -- "the fastest" only if 20% faster than the previous best (a short book
+local WEATHER_PAGE = 60        -- pages before comparing the book's weather with the history
+local BOOKS_BETWEEN = 2       -- "since X" only if there were at least 2 books after X
+local DAYS_SINCE = 30          -- and if X finished at least 30 days ago
+local RECORD_BASE = 3         -- records only with at least 3 books finished before
+local FAST_MARGIN = 1.2      -- "the fastest" only if 20% faster than the previous best (a short book
                                -- ends on an incomplete day and lowers the average: without a margin, every long book won)
-L.CLIMA_FALA = false           -- level C: "nothing so gloomy/light since" computed, but mute
+L.WEATHER_SPEECH = false           -- level C: "nothing so gloomy/light since" computed, but mute
 
-local function mes(t) return Lingua.format().months[tonumber(os.date("%m", t))] end
+local function month(t) return Language.format().months[tonumber(os.date("%m", t))] end
 
-local function preencher(modelo, v)
-    return (modelo:gsub("{([%w_]+)}", function(k) return v[k] ~= nil and tostring(v[k]) or ("{" .. k .. "}") end))
+local function fill(template, v)
+    return (template:gsub("{([%w_]+)}", function(k) return v[k] ~= nil and tostring(v[k]) or ("{" .. k .. "}") end))
 end
-local function banco() return require("yomimon_diary").banco().lembranca or {} end
+local function bank() return require("yomimon_diary").bank().recollection or {} end
 
 --- Records a memory: diary, Home (once) and s.lembrancas.
-local function lembrar(s, M, tipo, livro, agora, dados, v)
-    local lista = banco()[tipo]
-    if not lista or #lista == 0 then return nil end
-    local texto = preencher(lista[math.random(#lista)], v or dados)
-    s.lembrancas = s.lembrancas or {}
-    s.lembrancas[#s.lembrancas + 1] = { tipo = tipo, livro = livro, t = agora, dados = dados }
-    while #s.lembrancas > MAX do table.remove(s.lembrancas, 1) end
-    M.anotar(s, agora, texto)
-    s.lembranca_pendente = { texto = texto, t = agora }
-    return texto
+local function remember(s, M, kind, book, now, data, v)
+    local list = bank()[kind]
+    if not list or #list == 0 then return nil end
+    local textValue = fill(list[math.random(#list)], v or data)
+    s.memories = s.memories or {}
+    s.memories[#s.memories + 1] = { kind = kind, book = book, t = now, data = data }
+    while #s.memories > MAX do table.remove(s.memories, 1) end
+    M.note(s, now, textValue)
+    s.pending_memory = { textValue = textValue, t = now }
+    return textValue
 end
 
-local function jaLembrou(Lv, tipo)
-    Lv.lembrou = Lv.lembrou or {}
-    if Lv.lembrou[tipo] then return true end
-    Lv.lembrou[tipo] = true
+local function alreadyRemembered(Lv, kind)
+    Lv.remembered = Lv.remembered or {}
+    if Lv.remembered[kind] then return true end
+    Lv.remembered[kind] = true
     return false
 end
 
-local function terminados(s, livro)
+local function finishedList(s, book)
     local out = {}
-    for _, r in ipairs(s.resenhas or {}) do if r.livro ~= livro then out[#out + 1] = r end end
+    for _, r in ipairs(s.reviews or {}) do if r.book ~= book then out[#out + 1] = r end end
     return out
 end
 
 -- Level A ----------------------------------------------------------------------------------
 
 --- Start of a book: author again, with the count of how many of theirs there were. Returns the text (or nil).
-function L.inicioLivro(s, M, livro, onde, agora)
-    local autor = onde and onde.autor
-    if not autor or autor == "" then return nil end
-    local vistos, n = {}, 1
-    for _, r in ipairs(terminados(s, livro)) do
-        if r.autor == autor and not vistos[r.livro] then vistos[r.livro] = true; n = n + 1 end
+function L.bookStart(s, M, book, where, now)
+    local author = where and where.author
+    if not author or author == "" then return nil end
+    local seenItems, n = {}, 1
+    for _, r in ipairs(finishedList(s, book)) do
+        if r.author == author and not seenItems[r.book] then seenItems[r.book] = true; n = n + 1 end
     end
     if n < 2 then return nil end
-    local Lv = s.livros and s.livros[livro]
-    if Lv and jaLembrou(Lv, "autor") then return nil end
-    return lembrar(s, M, "autor", livro, agora, { autor = autor, n = n }, { autor = autor, n = n, livro = livro })
+    local Lv = s.books and s.books[book]
+    if Lv and alreadyRemembered(Lv, "author") then return nil end
+    return remember(s, M, "author", book, now, { author = author, n = n }, { author = author, n = n, book = book })
 end
 
 --- Once a day: anniversary of a finished book (same day and month, a year before).
-local function aniversario(s, M, livro, agora)
-    local hoje = os.date("%Y-%m-%d", agora)
-    if s.lembranca_dia == hoje then return end
-    s.lembranca_dia = hoje
-    local md, ano = os.date("%m-%d", agora), tonumber(os.date("%Y", agora))
-    for _, r in ipairs(s.resenhas or {}) do
-        if r.fim and os.date("%m-%d", r.fim) == md and tonumber(os.date("%Y", r.fim)) == ano - 1 and r.aniversario ~= ano then
-            r.aniversario = ano
-            lembrar(s, M, "aniversario", livro, agora, { livro = r.livro }, { livro = r.livro })
+local function anniversary(s, M, book, now)
+    local today = os.date("%Y-%m-%d", now)
+    if s.memory_day == today then return end
+    s.memory_day = today
+    local md, year = os.date("%m-%d", now), tonumber(os.date("%Y", now))
+    for _, r in ipairs(s.reviews or {}) do
+        if r.ending and os.date("%m-%d", r.ending) == md and tonumber(os.date("%Y", r.ending)) == year - 1 and r.anniversary ~= year then
+            r.anniversary = year
+            remember(s, M, "anniversary", book, now, { book = r.book }, { book = r.book })
             return
         end
     end
 end
 
 --- Character who returns from a previous book (series). Does not apply on a re-read.
-local function personagem(s, M, Lv, livro, agora)
-    if Lv.relendo or (Lv.paginas or 0) < PAGINA_PERSONAGEM or (Lv.lembrou and Lv.lembrou.personagem) then return end
-    if Lv.paginas % PASSO_PERSONAGEM ~= 0 or #(s.resenhas or {}) == 0 then return end
-    local info = M.personagensInfo(s, livro)
+local function character(s, M, Lv, book, now)
+    if Lv.rereading or (Lv.pages or 0) < CHARACTER_PAGE or (Lv.remembered and Lv.remembered.character) then return end
+    if Lv.pages % CHARACTER_STEP ~= 0 or #(s.reviews or {}) == 0 then return end
+    local info = M.charactersInfo(s, book)
     for i = 1, math.min(3, #info) do
-        local nome = info[i].nome
-        local formas = {}  -- "Holmes" in the old review counts for "Sherlock Holmes" now, and vice versa
-        for _, f in ipairs(info[i].formas or { nome }) do formas[f] = true end
-        for k = #(s.resenhas or {}), 1, -1 do
-            local r = s.resenhas[k]
-            if r.livro ~= livro then
-                for _, p in ipairs(r.personagens or {}) do
-                    if formas[p] then
-                        jaLembrou(Lv, "personagem")
-                        lembrar(s, M, "personagem", livro, agora, { nome = nome, de = r.livro }, { nome = nome, livro = r.livro })
+        local nameText = info[i].nameText
+        local forms = {}  -- "Holmes" in the old review counts for "Sherlock Holmes" now, and vice versa
+        for _, f in ipairs(info[i].forms or { nameText }) do forms[f] = true end
+        for k = #(s.reviews or {}), 1, -1 do
+            local r = s.reviews[k]
+            if r.book ~= book then
+                for _, p in ipairs(r.characters or {}) do
+                    if forms[p] then
+                        alreadyRemembered(Lv, "character")
+                        remember(s, M, "character", book, now, { nameText = nameText, de = r.book }, { nameText = nameText, book = r.book })
                         return
                     end
                 end
@@ -123,98 +123,98 @@ end
 -- Level B ----------------------------------------------------------------------------------
 
 --- The book's weather so far compared with the history: "nothing so gloomy since X" or "the gloomiest".
-local function climaDesde(s, M, Lv, livro, agora)
-    if (Lv.paginas or 0) < PAGINA_CLIMA or (Lv.lembrou and Lv.lembrou.clima) then return end
-    jaLembrou(Lv, "clima")
-    local media = (Lv.clima or 0) / math.max(1, Lv.paginas)
-    local cal = M.CLIMA_CALIBRACAO and M.CLIMA_CALIBRACAO.livros
+local function weatherSince(s, M, Lv, book, now)
+    if (Lv.pages or 0) < WEATHER_PAGE or (Lv.remembered and Lv.remembered.weather) then return end
+    alreadyRemembered(Lv, "weather")
+    local media = (Lv.weather or 0) / math.max(1, Lv.pages)
+    local cal = M.WEATHER_CALIBRATION and M.WEATHER_CALIBRATION.books
     if not cal then return end
-    local escuro = media <= cal.sombrio
-    if not escuro and media < cal.leve then return end
-    local ant = terminados(s, livro)
-    local function tanto(r) if escuro then return r.clima <= media else return r.clima >= media end end
-    local alvo
-    for k = #ant, 1, -1 do if tanto(ant[k]) then alvo = k; break end end
-    if alvo then
-        local no_meio = #ant - alvo
-        local dias = ((Lv.inicio or agora) - (ant[alvo].fim or agora)) / 86400
-        if no_meio >= LIVROS_NO_MEIO and dias >= DIAS_DESDE then
-            local r = ant[alvo]
-            Lv.clima_desde = { tipo = escuro and "sombrio_desde" or "leve_desde", livro = r.livro }
-            if L.CLIMA_FALA then
-                lembrar(s, M, Lv.clima_desde.tipo, livro, agora, { livro = r.livro }, { livro = r.livro, mes = mes(r.fim) })
+    local dark = media <= cal.gloomy
+    if not dark and media < cal.light then return end
+    local ant = finishedList(s, book)
+    local function so_much(r) if dark then return r.weather <= media else return r.weather >= media end end
+    local target
+    for k = #ant, 1, -1 do if so_much(ant[k]) then target = k; break end end
+    if target then
+        local no_meio = #ant - target
+        local days = ((Lv.beginning or now) - (ant[target].ending or now)) / 86400
+        if no_meio >= BOOKS_BETWEEN and days >= DAYS_SINCE then
+            local r = ant[target]
+            Lv.weather_since = { kind = dark and "gloomy_since" or "light_since", book = r.book }
+            if L.WEATHER_SPEECH then
+                remember(s, M, Lv.weather_since.kind, book, now, { book = r.book }, { book = r.book, month = month(r.ending) })
             end
         end
-    elseif #ant >= BASE_RECORDE then
-        Lv.clima_desde = { tipo = escuro and "mais_sombrio" or "mais_leve" }
-        if L.CLIMA_FALA then lembrar(s, M, Lv.clima_desde.tipo, livro, agora, {}, { livro = livro }) end
+    elseif #ant >= RECORD_BASE then
+        Lv.weather_since = { kind = dark and "gloomiest" or "lighter" }
+        if L.WEATHER_SPEECH then remember(s, M, Lv.weather_since.kind, book, now, {}, { book = book }) end
     end
 end
 
 --- Each page read.
-function L.pagina(s, M, Lv, livro, agora)
-    aniversario(s, M, livro, agora)
+function L.page(s, M, Lv, book, now)
+    anniversary(s, M, book, now)
     if Lv then
-        personagem(s, M, Lv, livro, agora)
-        climaDesde(s, M, Lv, livro, agora)
+        character(s, M, Lv, book, now)
+        weatherSince(s, M, Lv, book, now)
     end
 end
 
 --- End of a book (after the review is stored): records and theme series.
 -- serie: how many books in a row before this one had the same dominant theme.
-function L.fimLivro(s, M, livro, agora, serie)
-    local cur = s.resenhas and s.resenhas[#s.resenhas]
-    if not cur or cur.livro ~= livro then return end
+function L.bookEnd(s, M, book, now, series)
+    local cur = s.reviews and s.reviews[#s.reviews]
+    if not cur or cur.book ~= book then return end
     local ant = {}
-    for i = 1, #s.resenhas - 1 do ant[#ant + 1] = s.resenhas[i] end
-    if cur.tema and (serie or 0) >= 2 then
-        lembrar(s, M, "serie_tema", livro, agora, { tema = cur.tema, n = serie + 1 },
-            { tema = M.tema(cur.tema), de_tema = M.tema(cur.tema, "de"), n = serie + 1 })
+    for i = 1, #s.reviews - 1 do ant[#ant + 1] = s.reviews[i] end
+    if cur.theme and (series or 0) >= 2 then
+        remember(s, M, "theme_series", book, now, { theme = cur.theme, n = series + 1 },
+            { theme = M.theme(cur.theme), of_theme = M.theme(cur.theme, "de"), n = series + 1 })
     end
-    if #ant >= BASE_RECORDE then
-        local function ppd(r) return r.paginas / math.max(1, r.dias or 1) end
-        local longo, rapido = true, true
+    if #ant >= RECORD_BASE then
+        local function ppd(r) return r.pages / math.max(1, r.days or 1) end
+        local long, fast = true, true
         for _, r in ipairs(ant) do
-            if r.paginas >= cur.paginas then longo = false end
-            if ppd(r) * MARGEM_RAPIDO >= ppd(cur) then rapido = false end
+            if r.pages >= cur.pages then long = false end
+            if ppd(r) * FAST_MARGIN >= ppd(cur) then fast = false end
         end
-        if longo then lembrar(s, M, "recorde_longo", livro, agora, {}, { livro = livro, n = cur.paginas }) end
-        if rapido then lembrar(s, M, "recorde_rapido", livro, agora, {}, { livro = livro }) end
+        if long then remember(s, M, "longest_record", book, now, {}, { book = book, n = cur.pages }) end
+        if fast then remember(s, M, "fastest_record", book, now, {}, { book = book }) end
     end
 end
 
 -- Level C (stored, mute) -----------------------------------------------------------------
 
-local GENEROS = {
+local GENRES = {
     terror = { "medo", "noite", "morte", "loucura" }, romance = { "amor", "familia" },
-    aventura = { "mar", "viagem", "animais" }, ficcao_cientifica = { "ciencia" },
+    aventura = { "mar", "viagem", "animais" }, science_fiction = { "ciencia" },
     tragedia = { "vinganca", "politica", "morte" },
 }
 local AURAS = {
-    sombrio = { "medo", "morte", "loucura", "noite" }, romantico = { "amor" }, aventureiro = { "mar", "viagem", "guerra" },
-    poderoso = { "politica", "dinheiro" }, intelectual = { "saber", "ciencia", "arte" }, familiar = { "familia" },
+    gloomy = { "medo", "morte", "loucura", "noite" }, romantico = { "amor" }, adventurer = { "mar", "viagem", "guerra" },
+    powerful = { "politica", "dinheiro" }, intellectual = { "saber", "ciencia", "arte" }, familiar = { "familia" },
 }
-local function melhor(temas, grupos)
+local function best(themes, groups)
     local tot = 0
-    for _, c in pairs(temas or {}) do tot = tot + c end
+    for _, c in pairs(themes or {}) do tot = tot + c end
     if tot <= 0 then return nil end
     local l = {}
-    for g, ts in pairs(grupos) do
+    for g, ts in pairs(groups) do
         local v = 0
-        for _, t in ipairs(ts) do v = v + (temas[t] or 0) / tot end
+        for _, t in ipairs(ts) do v = v + (themes[t] or 0) / tot end
         l[#l + 1] = { g, v }
     end
     table.sort(l, function(a, b) return a[2] > b[2] end)
     return l
 end
 --- Probable genre (≥ 30% of the themes and 8 points ahead) or nil. NOT used in phrases: right ~75% of the time.
-function L.genero(temas)
-    local l = melhor(temas, GENEROS)
+function L.gender(themes)
+    local l = best(themes, GENRES)
     if l and l[1][2] >= 0.30 and l[1][2] - (l[2] and l[2][2] or 0) >= 0.08 then return l[1][1] end
 end
 --- Aura of a character by the themes of the pages where they appear. NOT used in phrases yet.
-function L.aura(temas)
-    local l = melhor(temas, AURAS)
+function L.aura(themes)
+    local l = best(themes, AURAS)
     return l and l[1][1] or nil
 end
 

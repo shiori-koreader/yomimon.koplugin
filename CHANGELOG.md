@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.1.0 (2026-11-06)
+
+- The whole code base is now in English: module, function, variable and field names, constants, saved-state
+  fields, string ids (stages, trait poles, moods), the `{gap}` and `<trait:...>` marks inside phrases, the dev-mode
+  file names, and the gesture, Simple UI and settings ids (`yomimon_show`, `yomimon_card`, `yomimon_open`...).
+- **Progress from 1.0.x is not carried over**: the saved state uses new field names, so Yomimon starts fresh
+  (the old `settings/yomimon.lua` is simply ignored). Sprites already downloaded are kept. The Simple UI home card
+  and quick-menu button and any gesture bound to Yomimon have to be set up again.
+- What stays Portuguese on purpose: the theme, event, subject and influence ids (`mar`, `morte`, `festa`,
+  `misterio`...), because they are the same words the book analysis matches in Portuguese text.
+- Checked against the 1.0.2 code: the same 7,200 phrases per language, a 160-page reading session (diary,
+  reviews, milestones) and the loading of every module.
+
 ## 1.0.2 (2026-11-06)
 
 - Fixed a crash when opening the language menu (the folder scan did not pass the directory handle to the loop).

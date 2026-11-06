@@ -19,7 +19,7 @@ Start by copying `locales/en/` to `yomimon_locales/<code>/` and translating in p
   (`T"Back"`), so a missing key shows the English text. `lua scripts/check_locales.lua` lists what is untranslated.
 - **content/** and **data/** keep the structure of the English files: only the phrases change. Keep the `%s` and
   `{name}` gaps and the `<trait:text|other>` choices as they are.
-- `content/memory.lua` may define `NOMES` (each theme with its article, as English does) when the language does
+- `content/memory.lua` may define `NAMES` (each theme with its article, as English does) when the language does
   not use the built-in Portuguese article-plus-preposition grammar.
 
 Language-neutral data (`yomimon_data/`, the sentiment lexicons) is not part of a locale.

@@ -1,10 +1,10 @@
 --[[--
-Palavras do nome composto dos livros (inglês, Yomimon), usadas por yomimon_vector.lua. Mesma estrutura de
-vetor_pt.lua; em inglês os adjetivos não têm gênero (m e f iguais).
+Words of the books' compound name (English, Yomimon), used by yomimon_vector.lua. Same structure as
+the Portuguese one; in English the adjectives have no gender (m and f are equal).
 ]]
 
 return {
-    nomes = {
+    names = {
         amor = { "a love story", "m" },
         mar = { "a sea story", "m" },
         viagem = { "a book of the road", "m" },
@@ -30,24 +30,24 @@ return {
         saber = { "a book of ideas", "m" },
         tempo = { "a book about time", "m" },
     },
-    peca = { "a play about %s", "m" },
-    tema_curto = {
+    play = { "a play about %s", "m" },
+    short_theme = {
         morte = "death", amor = "love", guerra = "war", mar = "the sea", fe = "God", dinheiro = "money",
         loucura = "madness", tempo = "time", cidade = "the city", natureza = "the woods", comida = "food",
         familia = "family", infancia = "childhood", politica = "politics", ciencia = "science", solidao = "solitude",
         arte = "art", animais = "animals", noite = "the night", viagem = "the road", vinganca = "revenge",
         liberdade = "freedom", saber = "knowledge", medo = "fear",
     },
-    adjetivos = {
-        sombrio = { m = "dark", f = "dark" },
-        luminoso = { m = "bright", f = "bright" },
-        falante = { m = "talkative", f = "talkative" },
-        calado = { m = "quiet", f = "quiet" },
-        agitado = { m = "restless", f = "restless" },
-        parado = { m = "still", f = "still" },
+    adjectives = {
+        gloomy = { m = "dark", f = "dark" },
+        bright = { m = "bright", f = "bright" },
+        speaker = { m = "talkative", f = "talkative" },
+        quiet = { m = "quiet", f = "quiet" },
+        restless = { m = "restless", f = "restless" },
+        still = { m = "still", f = "still" },
     },
     e = " and ",
-    cheiro = "with a whiff of %s",
-    frases = { longas = "in long sentences", curtas = "in short sentences" },
-    primeira = { m = "told in the first person", f = "told in the first person" },
+    smell = "with a whiff of %s",
+    sentences = { long_ones = "in long sentences", shorts = "in short sentences" },
+    first = { m = "told in the first person", f = "told in the first person" },
 }

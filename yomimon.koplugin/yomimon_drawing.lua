@@ -11,36 +11,36 @@ local TextWidget = require("ui/widget/textwidget")
 local Widget = require("ui/widget/widget")
 local Screen = Device.screen
 
-local Estado = require("yomimon_state")
-local Baixar = require("yomimon_download")
+local State = require("yomimon_state")
+local Download = require("yomimon_download")
 local Sprite = require("yomimon_sprite")
 
 -- "p<dex>" is the species' downloaded sprite; "bola" is the fallback while it does not exist.
-local Sprites = { bola = Sprite.bola() }
-setmetatable(Sprites, { __index = function(_, nome)
-    local dex = type(nome) == "string" and nome:match("^p(%d+)$")
-    return dex and Baixar.carregar(tonumber(dex)) or nil
+local Sprites = { ball = Sprite.ball() }
+setmetatable(Sprites, { __index = function(_, nameText)
+    local dex = type(nameText) == "string" and nameText:match("^p(%d+)$")
+    return dex and Download.loadFile(tonumber(dex)) or nil
 end })
 
-local Desenho = {}
+local Drawing = {}
 
 -- Plugin folder, taken from the file itself ("plugins/yomimon.koplugin", or another name, or an absolute path).
-local PASTA = debug.getinfo(1, "S").source:match("^@(.*)/[^/]*$") or "plugins/yomimon.koplugin"
+local FOLDER = debug.getinfo(1, "S").source:match("^@(.*)/[^/]*$") or "plugins/yomimon.koplugin"
 
 --- Path of a font in the `fontes` folder for KOReader's Font:getFace, which searches from its own fonts
 -- folder (./fonts). Works with any plugin folder name.
-function Desenho.caminhoFonte(arquivo)
-    if PASTA:sub(1, 1) == "/" then
-        return string.rep("../", 16) .. PASTA:sub(2) .. "/fonts/" .. arquivo  -- goes up to the root and comes down
+function Drawing.fontPath(file_path)
+    if FOLDER:sub(1, 1) == "/" then
+        return string.rep("../", 16) .. FOLDER:sub(2) .. "/fonts/" .. file_path  -- goes up to the root and comes down
     end
-    return "../" .. (PASTA:gsub("^%./", "")) .. "/fonts/" .. arquivo
+    return "../" .. (FOLDER:gsub("^%./", "")) .. "/fonts/" .. file_path
 end
 
 -- All drawings are 64x64 pixels.
-Desenho.LARGURA, Desenho.ALTURA = 64, 64
+Drawing.WIDTH, Drawing.HEIGHT = 64, 64
 
 -- Figma's 5 tones (exact e-ink levels) + the old grey.
-local CORES = {
+local COLOURS = {
     ["#"] = Blitbuffer.COLOR_BLACK,
     ["1"] = Blitbuffer.Color8(0x55),
     ["2"] = Blitbuffer.Color8(0x88),
@@ -50,171 +50,171 @@ local CORES = {
 }
 
 --- Lines of a drawing (to know its size).
-function Desenho.sprite(nome)
-    return Sprites[Desenho.resolver(nome)]
+function Drawing.sprite(nameText)
+    return Sprites[Drawing.resolver(nameText)]
 end
 
-local topos = {}
+local tops = {}
 --- First line with pixels in the drawing (where the head starts).
-function Desenho.topoReal(nome)
-    local real = Desenho.resolver(nome)
-    if topos[real] == nil then
-        topos[real] = 0
+function Drawing.realTop(nameText)
+    local real = Drawing.resolver(nameText)
+    if tops[real] == nil then
+        tops[real] = 0
         for i, l in ipairs(Sprites[real] or {}) do
-            if l:find("[^ ]") then topos[real] = i - 1; break end
+            if l:find("[^ ]") then tops[real] = i - 1; break end
         end
     end
-    return topos[real]
+    return tops[real]
 end
 
 --- Name of a drawing that exists: its own or, if that variation
 -- (e.g. "p1_feliz") does not exist, the form's drawing ("p1"); without it, the ball.
-function Desenho.resolver(nome)
-    if nome and Sprites[nome] then return nome end
-    local fase = nome and nome:match("^([^_]+)")
-    if fase and Sprites[fase] then return fase end
-    return "bola"
+function Drawing.resolver(nameText)
+    if nameText and Sprites[nameText] then return nameText end
+    local stage = nameText and nameText:match("^([^_]+)")
+    if stage and Sprites[stage] then return stage end
+    return "ball"
 end
 
 --- Animation frames that really exist, or nil if there is nothing to animate.
-function Desenho.quadros(lista)
-    if not lista then return nil end
-    local reais, diferentes, visto = {}, 0, {}
-    for i, nome in ipairs(lista) do
-        reais[i] = Desenho.resolver(nome)
-        if not visto[reais[i]] then visto[reais[i]] = true; diferentes = diferentes + 1 end
+function Drawing.frames(list)
+    if not list then return nil end
+    local real_ones, different, seen = {}, 0, {}
+    for i, nameText in ipairs(list) do
+        real_ones[i] = Drawing.resolver(nameText)
+        if not seen[real_ones[i]] then seen[real_ones[i]] = true; different = different + 1 end
     end
-    if diferentes < 2 then return nil end
-    return reais
+    if different < 2 then return nil end
+    return real_ones
 end
 
---- Paints the sprite `nome` with each pixel becoming a square of `escala` px.
+--- Paints the sprite `nameText` with each pixel becoming a square of `scale` px.
 -- In night mode KOReader inverts the whole screen; the sprite is drawn already inverted to keep its usual
--- look (white card) instead of becoming a negative. Does not apply when recording images (Desenho.gravando).
-function Desenho.pintarSprite(bb, nome, x, y, escala)
-    local linhas = Sprites[Desenho.resolver(nome)]
-    if not linhas then return end
-    local noturno = Screen.night_mode and not Desenho.gravando
-    if noturno then
-        bb:paintRect(x, y, Desenho.LARGURA * escala, Desenho.ALTURA * escala, Blitbuffer.COLOR_WHITE)
+-- look (white card) instead of becoming a negative. Does not apply when recording images (Drawing.gravando).
+function Drawing.paintSprite(bb, nameText, x, y, scale)
+    local lines = Sprites[Drawing.resolver(nameText)]
+    if not lines then return end
+    local nocturnal_one = Screen.night_mode and not Drawing.recording
+    if nocturnal_one then
+        bb:paintRect(x, y, Drawing.WIDTH * scale, Drawing.HEIGHT * scale, Blitbuffer.COLOR_WHITE)
     end
-    for j, linha in ipairs(linhas) do
+    for j, line in ipairs(lines) do
         -- joins neighbouring pixels of the same colour into a single rectangle
-        local i, n = 1, #linha
+        local i, n = 1, #line
         while i <= n do
-            local c = linha:sub(i, i)
+            local c = line:sub(i, i)
             local k = i
-            while k < n and linha:sub(k + 1, k + 1) == c do k = k + 1 end
-            local cor = CORES[c]
+            while k < n and line:sub(k + 1, k + 1) == c do k = k + 1 end
+            local cor = COLOURS[c]
             if cor then
-                bb:paintRect(x + (i - 1) * escala, y + (j - 1) * escala, (k - i + 1) * escala, escala, cor)
+                bb:paintRect(x + (i - 1) * scale, y + (j - 1) * scale, (k - i + 1) * scale, scale, cor)
             end
             i = k + 1
         end
     end
-    if noturno then bb:invertRect(x, y, Desenho.LARGURA * escala, Desenho.ALTURA * escala) end
+    if nocturnal_one then bb:invertRect(x, y, Drawing.WIDTH * scale, Drawing.HEIGHT * scale) end
 end
 
 --- Runs fn(...) without the night-mode inversion (to record images to a file).
-function Desenho.gravar(fn, ...)
-    Desenho.gravando = true
+function Drawing.writeRecord(fn, ...)
+    Drawing.recording = true
     local ok, a, b = pcall(fn, ...)
-    Desenho.gravando = false
+    Drawing.recording = false
     if not ok then error(a, 0) end
     return a, b
 end
 
 --- Widget that shows a sprite.
-Desenho.SpriteWidget = Widget:extend{
-    nome = nil,
-    escala = 8,
+Drawing.SpriteWidget = Widget:extend{
+    nameText = nil,
+    scale = 8,
 }
 
-function Desenho.SpriteWidget:getSize()
-    return Geom:new{ w = Desenho.LARGURA * self.escala, h = Desenho.ALTURA * self.escala }
+function Drawing.SpriteWidget:getSize()
+    return Geom:new{ w = Drawing.WIDTH * self.scale, h = Drawing.HEIGHT * self.scale }
 end
 
-function Desenho.SpriteWidget:paintTo(bb, x, y)
-    self.dimen = Geom:new{ x = x, y = y, w = Desenho.LARGURA * self.escala, h = Desenho.ALTURA * self.escala }
-    Desenho.pintarSprite(bb, self.nome, x, y, self.escala)
+function Drawing.SpriteWidget:paintTo(bb, x, y)
+    self.dimen = Geom:new{ x = x, y = y, w = Drawing.WIDTH * self.scale, h = Drawing.HEIGHT * self.scale }
+    Drawing.paintSprite(bb, self.nameText, x, y, self.scale)
 end
 
---- Integer scale that makes the sprite fit in `largura` x `altura`.
-function Desenho.escalaPara(largura, altura)
-    return math.max(1, math.floor(math.min(largura / Desenho.LARGURA, altura / Desenho.ALTURA)))
+--- Integer scale that makes the sprite fit in `widthPx` x `heightPx`.
+function Drawing.scaleFor(widthPx, heightPx)
+    return math.max(1, math.floor(math.min(widthPx / Drawing.WIDTH, heightPx / Drawing.HEIGHT)))
 end
 
-local function pintarBarra(bb, x, y, w, h, fracao)
-    local borda = math.max(2, math.floor(h / 8))
+local function paintBar(bb, x, y, w, h, fraction)
+    local edge = math.max(2, math.floor(h / 8))
     bb:paintRect(x, y, w, h, Blitbuffer.COLOR_BLACK)
-    bb:paintRect(x + borda, y + borda, w - 2 * borda, h - 2 * borda, Blitbuffer.COLOR_WHITE)
-    local cheio = math.floor((w - 4 * borda) * math.max(0, math.min(1, fracao)))
-    if cheio > 0 then
-        bb:paintRect(x + 2 * borda, y + 2 * borda, cheio, h - 4 * borda, Blitbuffer.COLOR_DARK_GRAY)
+    bb:paintRect(x + edge, y + edge, w - 2 * edge, h - 2 * edge, Blitbuffer.COLOR_WHITE)
+    local full_one = math.floor((w - 4 * edge) * math.max(0, math.min(1, fraction)))
+    if full_one > 0 then
+        bb:paintRect(x + 2 * edge, y + 2 * edge, full_one, h - 4 * edge, Blitbuffer.COLOR_DARK_GRAY)
     end
 end
 
-local function textoCentrado(bb, texto, face, largura_tela, y, largura_max)
+local function centeredText(bb, textValue, face, screen_width, y, max_width)
     local w = TextBoxWidget:new{
-        text = texto,
+        text = textValue,
         face = face,
-        width = largura_max,
+        width = max_width,
         alignment = "center",
     }
     local tam = w:getSize()
-    w:paintTo(bb, math.floor((largura_tela - tam.w) / 2), y)
+    w:paintTo(bb, math.floor((screen_width - tam.w) / 2), y)
     w:free()
     return tam.h
 end
 
-local function milhar(n)  -- 1.234 or 1,234, by language
+local function thousands(n)  -- 1.234 or 1,234, by language
     local sep = require("yomimon_language").format().thousands
     local s = tostring(math.floor(n))
     local r = s:reverse():gsub("(%d%d%d)", "%1" .. sep):reverse()
     return (r:gsub("^%p", ""))
 end
-Desenho.milhar = milhar
+Drawing.thousands = thousands
 
---- Generates the sleep-screen image (greyscale PNG) at `caminho`.
-function Desenho.gerarTelaDescanso(s, caminho, agora)
+--- Generates the sleep-screen image (greyscale PNG) at `path`.
+function Drawing.generateSleepScreen(s, path, now)
     local sw, sh = Screen:getWidth(), Screen:getHeight()
     local w, h = math.min(sw, sh), math.max(sw, sh) -- the sleep screen is always portrait
     local bb = Blitbuffer.new(w, h, Blitbuffer.TYPE_BB8)
     bb:fill(Blitbuffer.COLOR_WHITE)
 
-    local margem = math.floor(w * 0.08)
-    local escala = Desenho.escalaPara(w - 2 * margem, h * 0.45)
-    local sprite_w, sprite_h = Desenho.LARGURA * escala, Desenho.ALTURA * escala
+    local margin = math.floor(w * 0.08)
+    local scale = Drawing.scaleFor(w - 2 * margin, h * 0.45)
+    local sprite_w, sprite_h = Drawing.WIDTH * scale, Drawing.HEIGHT * scale
     local y = math.floor(h * 0.16)
 
-    y = y + textoCentrado(bb, "Yomimon", Font:getFace("tfont", 34), w, math.floor(h * 0.06), w - 2 * margem)
-    local pose = Estado.POSES[math.random(#Estado.POSES)]
-    Desenho.pintarSprite(bb, Estado.sprite(s, agora, true, pose), math.floor((w - sprite_w) / 2), y, escala)
+    y = y + centeredText(bb, "Yomimon", Font:getFace("tfont", 34), w, math.floor(h * 0.06), w - 2 * margin)
+    local pose = State.POSES[math.random(#State.POSES)]
+    Drawing.paintSprite(bb, State.sprite(s, now, true, pose), math.floor((w - sprite_w) / 2), y, scale)
     y = y + sprite_h + math.floor(h * 0.04)
 
-    y = y + textoCentrado(bb, Estado.fala(s, agora, nil, true), Font:getFace("cfont", 26), w, y, w - 2 * margem)
+    y = y + centeredText(bb, State.speech(s, now, nil, true), Font:getFace("cfont", 26), w, y, w - 2 * margin)
     y = y + math.floor(h * 0.04)
 
-    local face_rotulo = Font:getFace("cfont", 20)
-    local barra_w = math.floor((w - 2 * margem) * 0.62)
+    local face_label = Font:getFace("cfont", 20)
+    local barra_w = math.floor((w - 2 * margin) * 0.62)
     local barra_h = math.floor(h * 0.022)
-    for _, item in ipairs({ { "Barriga", s.barriga }, { "Humor", s.humor } }) do
-        local rotulo = TextWidget:new{ text = item[1], face = face_rotulo }
-        local rw = rotulo:getSize()
-        local x0 = math.floor((w - (barra_w + rw.w + margem / 2)) / 2)
-        rotulo:paintTo(bb, x0, y + math.floor((barra_h - rw.h) / 2))
-        rotulo:free()
-        pintarBarra(bb, x0 + rw.w + math.floor(margem / 2), y, barra_w, barra_h, item[2] / 100)
+    for _, item in ipairs({ { "Barriga", s.belly }, { "Humor", s.mood } }) do
+        local label = TextWidget:new{ text = item[1], face = face_label }
+        local rw = label:getSize()
+        local x0 = math.floor((w - (barra_w + rw.w + margin / 2)) / 2)
+        label:paintTo(bb, x0, y + math.floor((barra_h - rw.h) / 2))
+        label:free()
+        paintBar(bb, x0 + rw.w + math.floor(margin / 2), y, barra_w, barra_h, item[2] / 100)
         y = y + barra_h + math.floor(h * 0.02)
     end
 
-    local fase = Estado.fase(s)
-    local rodape = string.format("%s · %s letras comidas", fase.titulo, milhar(s.letras))
-    textoCentrado(bb, rodape, Font:getFace("cfont", 18), w, h - math.floor(h * 0.08), w - 2 * margem)
+    local stage = State.stage(s)
+    local footer = string.format("%s · %s letras comidas", stage.titleText, thousands(s.letters))
+    centeredText(bb, footer, Font:getFace("cfont", 18), w, h - math.floor(h * 0.08), w - 2 * margin)
 
-    local ok, err = pcall(bb.writePNG, bb, caminho)
+    local ok, err = pcall(bb.writePNG, bb, path)
     bb:free()
     return ok, err
 end
 
-return Desenho
+return Drawing

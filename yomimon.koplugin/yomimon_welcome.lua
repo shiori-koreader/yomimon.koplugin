@@ -18,59 +18,59 @@ local UIManager = require("ui/uimanager")
 local Blitbuffer = require("ffi/blitbuffer")
 local Screen = Device.screen
 
-local Desenho = require("yomimon_drawing")
+local Drawing = require("yomimon_drawing")
 local T = require("yomimon_language").t
-local Estado = require("yomimon_state")
-local Especies = require("yomimon_species")
-local Baixar = require("yomimon_download")
+local State = require("yomimon_state")
+local Species = require("yomimon_species")
+local Download = require("yomimon_download")
 local YomimonScreen = require("yomimon_screen")
 
 local okKit, Kit = pcall(require, "lib/bookshelf_module_kit")
-local tem_bookshelf = okKit and type(Kit) == "table" and Kit.setOnHomeShelf ~= nil
+local has_bookshelf = okKit and type(Kit) == "table" and Kit.setOnHomeShelf ~= nil
 local MODULO_BOOKSHELF = "yomimon"
 
-local LARG, ALT = 618, 824
-local PRETO, BRANCO = Blitbuffer.COLOR_BLACK, Blitbuffer.COLOR_WHITE
-local CINZA_55, CINZA_BB = Blitbuffer.Color8(0x55), Blitbuffer.Color8(0xBB)
+local WIDE, ALT = 618, 824
+local BLACK, WHITE = Blitbuffer.COLOR_BLACK, Blitbuffer.COLOR_WHITE
+local GREY_55, GREY_BB = Blitbuffer.Color8(0x55), Blitbuffer.Color8(0xBB)
 
-local POR_PAGINA = 8
-local LETRAS = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
+local PER_PAGE = 8
+local LETTERS = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
                  "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" }
 
 -- Silkscreen has no ♀, ♂ or ’.
-local function rotulo(nome)
-    return (nome:gsub("♀", " F"):gsub("♂", " M"):gsub("’", "'"):upper())
+local function label(nameText)
+    return (nameText:gsub("♀", " F"):gsub("♂", " M"):gsub("’", "'"):upper())
 end
 
-local function listaOrdenada()
-    local itens = {}
-    for _, linha in ipairs(Especies.linhas) do
-        local ultimo = linha[#linha]
-        itens[#itens + 1] = {
-            base = linha[1], linha = linha,
-            nome = rotulo(Especies.nomes[linha[1]]),
-            final = ultimo ~= linha[1] and rotulo(Especies.nomes[ultimo]) or nil,
+local function sortedList()
+    local items = {}
+    for _, line in ipairs(Species.lines) do
+        local last = line[#line]
+        items[#items + 1] = {
+            base = line[1], line = line,
+            nameText = label(Species.names[line[1]]),
+            final = last ~= line[1] and label(Species.names[last]) or nil,
         }
     end
-    table.sort(itens, function(a, b) return a.nome < b.nome end)
-    return itens
+    table.sort(items, function(a, b) return a.nameText < b.nameText end)
+    return items
 end
 
-local BoasVindas = InputContainer:extend{
-    traca = nil,
+local Welcome = InputContainer:extend{
+    plugin = nil,
     passo = 1,
-    pagina = 1,
-    escolha = nil,      -- list item picked (screen 2)
-    so_escolha = false, -- only switch Pokémon: ends on screen 2, without the install questions
-    ao_terminar = nil,  -- function called at the end
+    page = 1,
+    choice = nil,      -- list item picked (screen 2)
+    pick_only = false, -- only switch Pokémon: ends on screen 2, without the install questions
+    on_finish = nil,  -- function called at the end
 }
 
 -- components borrowed from the Yomimon screen
-for _, nome in ipairs({ "px", "face", "ret", "texto", "larguraTexto", "cartao", "medirBalao", "balao", "alvo" }) do
-    BoasVindas[nome] = YomimonScreen[nome]
+for _, nameText in ipairs({ "px", "face", "ret", "textValue", "textWidth", "card", "measureBalloon", "balloon", "target" }) do
+    Welcome[nameText] = YomimonScreen[nameText]
 end
 
-function BoasVindas:init()
+function Welcome:init()
     if Device:isTouchDevice() then
         self.ges_events.Tap = { GestureRange:new{ ges = "tap", range = function() return self.dimen end } }
     end
@@ -80,273 +80,273 @@ function BoasVindas:init()
     self.covers_fullscreen = true
     local tam = Screen:getSize()
     self.dimen = Geom:new{ x = 0, y = 0, w = tam.w, h = tam.h }
-    self.k = math.min(tam.w / LARG, tam.h / ALT)
-    self.ox = math.floor((tam.w - LARG * self.k) / 2)
+    self.k = math.min(tam.w / WIDE, tam.h / ALT)
+    self.ox = math.floor((tam.w - WIDE * self.k) / 2)
     self.oy = math.floor((tam.h - ALT * self.k) / 2)
-    self.fator_fonte = Screen:scaleBySize(1000) / 1000
+    self.font_factor = Screen:scaleBySize(1000) / 1000
     self.faces = {}
-    self.itens = listaOrdenada()
-    self.letras_com = {}
-    for _, it in ipairs(self.itens) do self.letras_com[it.nome:sub(1, 1)] = true end
+    self.items = sortedList()
+    self.letters_with = {}
+    for _, it in ipairs(self.items) do self.letters_with[it.nameText:sub(1, 1)] = true end
     self.op = {
-        iniciar = G_reader_settings:isTrue("yomimon_open_at_startup"),
-        gesto = G_reader_settings:isTrue("yomimon_gesture"),
-        cartao = self.traca:cartaoSimpleUI(),
-        estante = tem_bookshelf and Kit.onHomeShelf and Kit.onHomeShelf(MODULO_BOOKSHELF) or false,
+        begin = G_reader_settings:isTrue("yomimon_open_at_startup"),
+        gesture = G_reader_settings:isTrue("yomimon_gesture"),
+        card = self.plugin:simpleUICard(),
+        shelf = has_bookshelf and Kit.onHomeShelf and Kit.onHomeShelf(MODULO_BOOKSHELF) or false,
     }
 end
 
 --- Centred sprite, with the balloon right above the real head (as on the main screen).
-function BoasVindas:sprite(bb, nome, fala, centro_y, tamanho)
-    local escala = math.max(1, math.floor(tamanho * self.k / Desenho.LARGURA))
-    local lado = escala * Desenho.LARGURA
-    local x = self.ox + self:px(LARG / 2) - math.floor(lado / 2)
-    local y = self.oy + self:px(centro_y) - math.floor(lado / 2)
-    Desenho.pintarSprite(bb, nome, x, y, escala)
-    local cabeca = (y - self.oy) / self.k + Desenho.topoReal(nome) * escala / self.k
-    local m = self:medirBalao(fala)
-    self:balao(bb, fala, nil, math.max(24, cabeca - 30 - (m.H + 15)), m)
+function Welcome:sprite(bb, nameText, speech, center_y, size)
+    local scale = math.max(1, math.floor(size * self.k / Drawing.WIDTH))
+    local side = scale * Drawing.WIDTH
+    local x = self.ox + self:px(WIDE / 2) - math.floor(side / 2)
+    local y = self.oy + self:px(center_y) - math.floor(side / 2)
+    Drawing.paintSprite(bb, nameText, x, y, scale)
+    local head = (y - self.oy) / self.k + Drawing.realTop(nameText) * scale / self.k
+    local m = self:measureBalloon(speech)
+    self:balloon(bb, speech, nil, math.max(24, head - 30 - (m.H + 15)), m)
 end
 
 --- Big button (card with shadow) with centred text.
-function BoasVindas:botao(bb, texto, y, acao)
-    self:cartao(bb, 20, y, 578, 80, true)
-    self:texto(bb, texto, 0, y + 24, true, 24, PRETO, LARG / 2)
-    self:alvo(14, y - 6, 590, 92, acao)
+function Welcome:button(bb, textValue, y, action)
+    self:card(bb, 20, y, 578, 80, true)
+    self:textValue(bb, textValue, 0, y + 24, true, 24, BLACK, WIDE / 2)
+    self:target(14, y - 6, 590, 92, action)
 end
 
 --- Option with a check box (pixel square, filled when on).
-function BoasVindas:opcao(bb, y, titulo, detalhe, ligada, acao, desativada)
-    self:cartao(bb, 20, y, 578, 74, true)
+function Welcome:option(bb, y, titleText, detail, switched_on, action, disabled)
+    self:card(bb, 20, y, 578, 74, true)
     local cx, cy = 40, y + 24
-    if ligada then
-        self:ret(bb, cx + 3, cy, 20, 26, PRETO)
-        self:ret(bb, cx, cy + 3, 26, 20, PRETO)
-        self:ret(bb, cx + 6, cy + 6, 3, 3, BRANCO)
+    if switched_on then
+        self:ret(bb, cx + 3, cy, 20, 26, BLACK)
+        self:ret(bb, cx, cy + 3, 26, 20, BLACK)
+        self:ret(bb, cx + 6, cy + 6, 3, 3, WHITE)
     else
-        local cor = desativada and CINZA_BB or PRETO
+        local cor = disabled and GREY_BB or BLACK
         self:ret(bb, cx + 3, cy, 20, 3, cor); self:ret(bb, cx + 3, cy + 23, 20, 3, cor)
         self:ret(bb, cx, cy + 3, 3, 20, cor); self:ret(bb, cx + 23, cy + 3, 3, 20, cor)
     end
-    self:texto(bb, titulo, 86, y + 16, true, 15, desativada and CINZA_BB or PRETO)
-    self:texto(bb, detalhe, 86, y + 42, false, 10, desativada and CINZA_BB or CINZA_55)
-    if not desativada then self:alvo(14, y - 4, 590, 82, acao) end
+    self:textValue(bb, titleText, 86, y + 16, true, 15, disabled and GREY_BB or BLACK)
+    self:textValue(bb, detail, 86, y + 42, false, 10, disabled and GREY_BB or GREY_55)
+    if not disabled then self:target(14, y - 4, 590, 82, action) end
 end
 
 --- The species of the chosen letter (all of them when none is chosen).
-function BoasVindas:visiveis()
-    if not self.letra then return self.itens end
-    local lista = {}
-    for _, it in ipairs(self.itens) do
-        if it.nome:sub(1, 1) == self.letra then lista[#lista + 1] = it end
+function Welcome:visible_ones()
+    if not self.letter then return self.items end
+    local list = {}
+    for _, it in ipairs(self.items) do
+        if it.nameText:sub(1, 1) == self.letter then list[#list + 1] = it end
     end
-    return lista
+    return list
 end
 
-function BoasVindas:totalPaginas()
-    return math.max(1, math.ceil(#self:visiveis() / POR_PAGINA))
+function Welcome:totalPages()
+    return math.max(1, math.ceil(#self:visible_ones() / PER_PAGE))
 end
 
 --- Shows only the tapped letter; tapping it again goes back to the whole list.
-function BoasVindas:filtrarLetra(letra)
-    self.letra = self.letra ~= letra and letra or nil
-    self.pagina = 1
+function Welcome:filterLetter(letter)
+    self.letter = self.letter ~= letter and letter or nil
+    self.page = 1
 end
 
-function BoasVindas:pintarLista(bb)
-    self:texto(bb, T"PICK YOUR POKÉMON", 0, 22, true, 24, PRETO, LARG / 2)
-    for i, letra in ipairs(LETRAS) do
+function Welcome:paintList(bb)
+    self:textValue(bb, T"PICK YOUR POKÉMON", 0, 22, true, 24, BLACK, WIDE / 2)
+    for i, letter in ipairs(LETTERS) do
         local col, lin = (i - 1) % 13, math.floor((i - 1) / 13)
         local lx, ly = 21 + col * 44, 70 + lin * 44
-        local tem = self.letras_com[letra]
-        local escolhida = self.letra == letra
-        self:cartao(bb, lx, ly, 40, 38, false)
-        if escolhida then self:ret(bb, lx + 2, ly + 2, 36, 34, PRETO) end
-        self:texto(bb, letra, 0, ly + 8, true, 18, escolhida and BRANCO or (tem and PRETO or CINZA_BB), lx + 20)
-        if tem then self:alvo(lx - 2, ly - 2, 44, 42, function() self:filtrarLetra(letra) end) end
+        local has = self.letters_with[letter]
+        local picked = self.letter == letter
+        self:card(bb, lx, ly, 40, 38, false)
+        if picked then self:ret(bb, lx + 2, ly + 2, 36, 34, BLACK) end
+        self:textValue(bb, letter, 0, ly + 8, true, 18, picked and WHITE or (has and BLACK or GREY_BB), lx + 20)
+        if has then self:target(lx - 2, ly - 2, 44, 42, function() self:filterLetter(letter) end) end
     end
-    local itens = self:visiveis()
-    local primeiro = (self.pagina - 1) * POR_PAGINA
-    for n = 1, POR_PAGINA do
-        local it = itens[primeiro + n]
+    local items = self:visible_ones()
+    local first_one = (self.page - 1) * PER_PAGE
+    for n = 1, PER_PAGE do
+        local it = items[first_one + n]
         if not it then break end
         local y = 170 + (n - 1) * 68
-        self:cartao(bb, 20, y, 578, 58, true)
-        self:texto(bb, it.nome, 40, y + 16, true, 20)
+        self:card(bb, 20, y, 578, 58, true)
+        self:textValue(bb, it.nameText, 40, y + 16, true, 20)
         if it.final then
-            self:texto(bb, "> " .. it.final, 590 - self:larguraTexto("> " .. it.final, false, 12), y + 22, false, 12, CINZA_55)
+            self:textValue(bb, "> " .. it.final, 590 - self:textWidth("> " .. it.final, false, 12), y + 22, false, 12, GREY_55)
         end
-        self:alvo(14, y - 4, 590, 66, function() self.escolha, self.passo = it, 2 end)
+        self:target(14, y - 4, 590, 66, function() self.choice, self.passo = it, 2 end)
     end
     local ny = 730
-    if self.so_escolha then
-        self:cartao(bb, 250, ny, 118, 52, true)
-        self:texto(bb, T"EXIT", 0, ny + 14, true, 16, PRETO, 309)
-        self:alvo(244, ny - 6, 130, 64, function() self:onClose(); if self.ao_terminar then self.ao_terminar() end end)
+    if self.pick_only then
+        self:card(bb, 250, ny, 118, 52, true)
+        self:textValue(bb, T"EXIT", 0, ny + 14, true, 16, BLACK, 309)
+        self:target(244, ny - 6, 130, 64, function() self:onClose(); if self.on_finish then self.on_finish() end end)
     end
-    self:cartao(bb, 20, ny, 90, 52, true)
-    self:texto(bb, "<", 0, ny + 10, true, 28, PRETO, 65)
-    self:alvo(14, ny - 6, 102, 64, function() self.pagina = math.max(1, self.pagina - 1) end)
-    self:cartao(bb, 508, ny, 90, 52, true)
-    self:texto(bb, ">", 0, ny + 10, true, 28, PRETO, 553)
-    self:alvo(502, ny - 6, 102, 64, function() self.pagina = math.min(self:totalPaginas(), self.pagina + 1) end)
-    self:texto(bb, string.format("%d/%d", self.pagina, self:totalPaginas()), 0, self.so_escolha and ny + 62 or ny + 16, false, 16, PRETO, LARG / 2)
+    self:card(bb, 20, ny, 90, 52, true)
+    self:textValue(bb, "<", 0, ny + 10, true, 28, BLACK, 65)
+    self:target(14, ny - 6, 102, 64, function() self.page = math.max(1, self.page - 1) end)
+    self:card(bb, 508, ny, 90, 52, true)
+    self:textValue(bb, ">", 0, ny + 10, true, 28, BLACK, 553)
+    self:target(502, ny - 6, 102, 64, function() self.page = math.min(self:totalPages(), self.page + 1) end)
+    self:textValue(bb, string.format("%d/%d", self.page, self:totalPages()), 0, self.pick_only and ny + 62 or ny + 16, false, 16, BLACK, WIDE / 2)
 end
 
 --- Pokédex description in a card, wrapped to at most 4 lines (the last ends in "..." if it does not fit).
-function BoasVindas:pintarDescricao(bb, texto, y)
-    local largura, linhas, atual = 510, {}, ""
-    for palavra in texto:gmatch("%S+") do
-        local candidata = atual == "" and palavra or atual .. " " .. palavra
-        if atual ~= "" and self:larguraTexto(candidata, false, 11) > largura then
-            linhas[#linhas + 1], atual = atual, palavra
+function Welcome:paintDescription(bb, textValue, y)
+    local widthPx, lines, current = 510, {}, ""
+    for word in textValue:gmatch("%S+") do
+        local candidate = current == "" and word or current .. " " .. word
+        if current ~= "" and self:textWidth(candidate, false, 11) > widthPx then
+            lines[#lines + 1], current = current, word
         else
-            atual = candidata
+            current = candidate
         end
     end
-    if atual ~= "" then linhas[#linhas + 1] = atual end
-    if #linhas > 4 then
-        linhas[4] = linhas[4]:gsub("%s*%S+$", "") .. "..."
-        for i = #linhas, 5, -1 do linhas[i] = nil end
+    if current ~= "" then lines[#lines + 1] = current end
+    if #lines > 4 then
+        lines[4] = lines[4]:gsub("%s*%S+$", "") .. "..."
+        for i = #lines, 5, -1 do lines[i] = nil end
     end
-    self:cartao(bb, 20, y, 578, 20 + #linhas * 16, false)
-    for i, linha in ipairs(linhas) do
-        self:texto(bb, linha, 40, y + 10 + (i - 1) * 16, false, 11, PRETO)
+    self:card(bb, 20, y, 578, 20 + #lines * 16, false)
+    for i, line in ipairs(lines) do
+        self:textValue(bb, line, 40, y + 10 + (i - 1) * 16, false, 11, BLACK)
     end
 end
 
-function BoasVindas:pintarConfirmacao(bb)
-    local it = self.escolha
-    local forma = Especies.nomes[it.base]
-    local baixado = self:spriteBaixado(it)
-    local nome = baixado and "p" .. it.base or "bola"
-    local fala = baixado and string.format(T"%s! Good pick. I'll keep an eye on your reading.", forma)
-        or string.format(T"(%s hasn't arrived yet: the picture downloads when Wi-Fi is on)", forma)
-    local descricao = Baixar.descricao(it.base)
-    if descricao then
-        self:sprite(bb, nome, fala, 375, 230)
-        self:pintarDescricao(bb, descricao, 500)
+function Welcome:paintConfirmation(bb)
+    local it = self.choice
+    local form = Species.names[it.base]
+    local downloaded = self:spriteDownloaded(it)
+    local nameText = downloaded and "p" .. it.base or "ball"
+    local speech = downloaded and string.format(T"%s! Good pick. I'll keep an eye on your reading.", form)
+        or string.format(T"(%s hasn't arrived yet: the picture downloads when Wi-Fi is on)", form)
+    local description = Download.description(it.base)
+    if description then
+        self:sprite(bb, nameText, speech, 375, 230)
+        self:paintDescription(bb, description, 500)
     else
-        self:sprite(bb, nome, fala, 430, 295)
+        self:sprite(bb, nameText, speech, 430, 295)
     end
-    if not baixado then
-        self:botao(bb, T"DOWNLOAD (WI-FI)", 590, function() self:baixarSprites() end)
+    if not downloaded then
+        self:button(bb, T"DOWNLOAD (WI-FI)", 590, function() self:downloadSprites() end)
     end
-    self:botao(bb, T"PICK THIS ONE", 690, function() self:escolher() end)
-    self:cartao(bb, 20, 760, 120, 40, true)
-    self:texto(bb, T"BACK", 0, 770, true, 14, PRETO, 80)
-    self:alvo(14, 754, 132, 52, function() self.passo = 1 end)
+    self:button(bb, T"PICK THIS ONE", 690, function() self:pick() end)
+    self:card(bb, 20, 760, 120, 40, true)
+    self:textValue(bb, T"BACK", 0, 770, true, 14, BLACK, 80)
+    self:target(14, 754, 132, 52, function() self.passo = 1 end)
 end
 
-function BoasVindas:spriteBaixado(it)
-    for _, dex in ipairs(it.linha) do
-        if not Baixar.tem(dex) then return false end
+function Welcome:spriteDownloaded(it)
+    for _, dex in ipairs(it.line) do
+        if not Download.has(dex) then return false end
     end
     return true
 end
 
 -- Shows "Downloading…" before blocking the screen with the download (files of ~1 KB, but the connection may take a while).
-function BoasVindas:baixar(linha)
-    local aviso = InfoMessage:new{ text = T"Downloading the picture…" }
-    UIManager:show(aviso)
+function Welcome:download(line)
+    local notice = InfoMessage:new{ text = T"Downloading the picture…" }
+    UIManager:show(notice)
     UIManager:forceRePaint()
-    pcall(Baixar.linha, linha)
-    UIManager:close(aviso)
+    pcall(Download.line, line)
+    UIManager:close(notice)
 end
 
-function BoasVindas:baixarSprites()
-    local it = self.escolha
+function Welcome:downloadSprites()
+    local it = self.choice
     NetworkMgr:runWhenOnline(function()
-        self:baixar(it.linha)
+        self:download(it.line)
         UIManager:setDirty(self, "ui")
     end)
 end
 
-function BoasVindas:escolher()
-    local it = self.escolha
-    Estado.trocarEspecie(self.traca.estado, it.base)
-    if not self:spriteBaixado(it) and NetworkMgr:isOnline() then self:baixar(it.linha) end
-    if NetworkMgr:isOnline() then pcall(Baixar.baixarDescricao, it.base) end
-    pcall(function() require("yomimon_simpleui").sincronizarCritter(self.traca) end)
-    if self.so_escolha then
-        self.traca:salvar(true)
+function Welcome:pick()
+    local it = self.choice
+    State.switchSpecies(self.plugin.state, it.base)
+    if not self:spriteDownloaded(it) and NetworkMgr:isOnline() then self:download(it.line) end
+    if NetworkMgr:isOnline() then pcall(Download.downloadDescription, it.base) end
+    pcall(function() require("yomimon_simpleui").syncCritter(self.plugin) end)
+    if self.pick_only then
+        self.plugin:save(true)
         UIManager:close(self)
-        if self.ao_terminar then self.ao_terminar() end
+        if self.on_finish then self.on_finish() end
         return
     end
     self.passo = 3
 end
 
-function BoasVindas:paintTo(bb, x, y)
+function Welcome:paintTo(bb, x, y)
     self.dimen.x, self.dimen.y = x, y
-    bb:paintRect(x, y, self.dimen.w, self.dimen.h, BRANCO)
-    self.alvos = {}
-    self.camada = "conteudo"
+    bb:paintRect(x, y, self.dimen.w, self.dimen.h, WHITE)
+    self.targets = {}
+    self.layer = "conteudo"
     if self.passo == 1 then
-        self:pintarLista(bb)
+        self:paintList(bb)
 
     elseif self.passo == 2 then
-        self:pintarConfirmacao(bb)
+        self:paintConfirmation(bb)
 
     else
-        local s = self.traca.estado
-        local f = Estado.fase(s)
-        self:sprite(bb, self:spriteBaixado({ linha = { f.dex or 0 } }) and f.nome or "bola",
+        local s = self.plugin.state
+        local f = State.stage(s)
+        self:sprite(bb, self:spriteDownloaded({ line = { f.dex or 0 } }) and f.nameText or "ball",
             T"Where will you find me? Choose. I'll wait.", 245, 170)
-        self:opcao(bb, 360, T"OPEN AT STARTUP", T"YOMIMON APPEARS WHEN KOREADER OPENS",
-            self.op.iniciar, function() self.op.iniciar = not self.op.iniciar end)
-        self:opcao(bb, 440, T"GESTURE SHORTCUT", T"HOLD YOUR FINGER ON THE TOP RIGHT CORNER",
-            self.op.gesto, function() self.op.gesto = not self.op.gesto end)
-        local tem_sui = self.traca:temSimpleUI()
-        self:opcao(bb, 520, T"HOME SCREEN CARD", tem_sui and T"IN PLACE OF SIMPLE UI'S CRITTER" or T"SIMPLE UI NOT INSTALLED",
-            tem_sui and self.op.cartao, function() self.op.cartao = not self.op.cartao end, not tem_sui)
-        self:opcao(bb, 600, T"BOOKSHELF CARD", tem_bookshelf and T"ON THE FIRST SHELF WITH BOOKS" or T"BOOKSHELF NOT INSTALLED",
-            tem_bookshelf and self.op.estante, function() self.op.estante = not self.op.estante end, not tem_bookshelf)
-        self:botao(bb, T"DONE", 696, function() self:terminar() end)
+        self:option(bb, 360, T"OPEN AT STARTUP", T"YOMIMON APPEARS WHEN KOREADER OPENS",
+            self.op.begin, function() self.op.begin = not self.op.begin end)
+        self:option(bb, 440, T"GESTURE SHORTCUT", T"HOLD YOUR FINGER ON THE TOP RIGHT CORNER",
+            self.op.gesture, function() self.op.gesture = not self.op.gesture end)
+        local has_sui = self.plugin:hasSimpleUI()
+        self:option(bb, 520, T"HOME SCREEN CARD", has_sui and T"IN PLACE OF SIMPLE UI'S CRITTER" or T"SIMPLE UI NOT INSTALLED",
+            has_sui and self.op.card, function() self.op.card = not self.op.card end, not has_sui)
+        self:option(bb, 600, T"BOOKSHELF CARD", has_bookshelf and T"ON THE FIRST SHELF WITH BOOKS" or T"BOOKSHELF NOT INSTALLED",
+            has_bookshelf and self.op.shelf, function() self.op.shelf = not self.op.shelf end, not has_bookshelf)
+        self:button(bb, T"DONE", 696, function() self:finish() end)
     end
 end
 
-function BoasVindas:terminar()
-    local s = self.traca.estado
-    s.boasvindas = true
-    G_reader_settings:saveSetting("yomimon_open_at_startup", self.op.iniciar or nil)
-    G_reader_settings:saveSetting("yomimon_gesture", self.op.gesto or nil)
-    self.traca:aplicarGesto()
-    if self.traca:temSimpleUI() then self.traca:cartaoSimpleUI(self.op.cartao) end
-    if tem_bookshelf then pcall(Kit.setOnHomeShelf, MODULO_BOOKSHELF, self.op.estante) end
-    self.traca:salvar(false)
-    self.alvos = nil
+function Welcome:finish()
+    local s = self.plugin.state
+    s.welcome = true
+    G_reader_settings:saveSetting("yomimon_open_at_startup", self.op.begin or nil)
+    G_reader_settings:saveSetting("yomimon_gesture", self.op.gesture or nil)
+    self.plugin:applyGesture()
+    if self.plugin:hasSimpleUI() then self.plugin:simpleUICard(self.op.card) end
+    if has_bookshelf then pcall(Kit.setOnHomeShelf, MODULO_BOOKSHELF, self.op.shelf) end
+    self.plugin:save(false)
+    self.targets = nil
     UIManager:close(self)
-    if self.ao_terminar then self.ao_terminar() end
+    if self.on_finish then self.on_finish() end
 end
 
-function BoasVindas:onTap(_, ges)
+function Welcome:onTap(_, ges)
     local pos = ges and ges.pos
     if not pos then return end
-    for i = #(self.alvos or {}), 1, -1 do
-        local a = self.alvos[i]
+    for i = #(self.targets or {}), 1, -1 do
+        local a = self.targets[i]
         if pos:intersectWith(a.rect) then
-            a.acao()
-            if self.alvos then UIManager:setDirty(self, "ui") end
+            a.action()
+            if self.targets then UIManager:setDirty(self, "ui") end
             return true
         end
     end
     return true
 end
 
-function BoasVindas:onClose()
+function Welcome:onClose()
     UIManager:close(self)  -- closing midway: no Pokémon chosen; the questions come back later
     return true
 end
 
 -- Protection (as on the Yomimon screen): if it fails, a tap closes it.
-require("yomimon_guard").padrao:envolver(BoasVindas, { "paintTo", "onTap" }, function(nome, self, bb, x, y)
-    if nome == "paintTo" then
-        bb:paintRect(x, y, self.dimen.w, self.dimen.h, BRANCO)
-    elseif nome == "onTap" then
+require("yomimon_guard").default:wrap(Welcome, { "paintTo", "onTap" }, function(nameText, self, bb, x, y)
+    if nameText == "paintTo" then
+        bb:paintRect(x, y, self.dimen.w, self.dimen.h, WHITE)
+    elseif nameText == "onTap" then
         UIManager:close(self)
         return true
     end
 end)
 
-return BoasVindas
+return Welcome

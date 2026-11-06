@@ -2,68 +2,68 @@
 package.path = "yomimon.koplugin/?.lua;" .. package.path
 unpack = unpack or table.unpack
 
-local Estado = require("yomimon_state")
+local State = require("yomimon_state")
 local Sprite = require("yomimon_sprite")
 
 local t0 = 1000000
 
-local s = Estado.normalizar(nil, t0)
-assert(Estado.fase(s).nome == "bola", "no species yet: a ball")
+local s = State.normalize(nil, t0)
+assert(State.stage(s).nameText == "ball", "no species yet: a ball")
 
-s.especie = 1
-local formas = Estado.formas(s)
-assert(#formas == 3 and formas[1].titulo == "Bulbasaur" and formas[3].titulo == "Venusaur")
-local ocorreu = Estado.comer(s, 160000, "x", t0 + 10)
-assert(ocorreu.evoluiu and ocorreu.evoluiu.titulo == "Ivysaur")
-Estado.comer(s, 700000, "x", t0 + 20)
-local pf = Estado.progressoFase(s)
-assert(not pf.proxima and pf.fracao == 1 and pf.paginas == 0, "final form has no next step")
-assert(Estado.fase(s).titulo == "Venusaur")
+s.species = 1
+local forms = State.forms(s)
+assert(#forms == 3 and forms[1].titleText == "Bulbasaur" and forms[3].titleText == "Venusaur")
+local occurred = State.eat(s, 160000, "x", t0 + 10)
+assert(occurred.evolved and occurred.evolved.titleText == "Ivysaur")
+State.eat(s, 700000, "x", t0 + 20)
+local pf = State.stageProgress(s)
+assert(not pf.nextForm and pf.fraction == 1 and pf.pages == 0, "final form has no next step")
+assert(State.stage(s).titleText == "Venusaur")
 
-s.especie = 54
-assert(#Estado.formas(s) == 2 and Estado.formas(s)[2].titulo == "Golduck")
+s.species = 54
+assert(#State.forms(s) == 2 and State.forms(s)[2].titleText == "Golduck")
 
-s.hibernando = true
-assert(Estado.sprite(s, t0 + 30):match("^bola_casulo"), "hibernating shows the ball")
+s.hibernating = true
+assert(State.sprite(s, t0 + 30):match("^ball_cocoon"), "hibernating shows the ball")
 
 local function quadrado(x, y)
     if x >= 8 and x < 24 and y >= 8 and y < 24 then return 0, 0, 0, 255 end
     return 0, 0, 0, 0
 end
-local linhas = assert(Sprite.converter(32, 32, quadrado))
-assert(#linhas == 64 and #linhas[1] == 64)
-assert(Sprite.ler(Sprite.guardar(linhas)), "round trip")
-assert(linhas[62]:find("#", 1, true), "sprite sits on the bottom margin")
-assert(not Sprite.converter(4, 4, function() return 0, 0, 0, 0 end), "empty image is rejected")
-assert(#Sprite.bola() == 64)
+local lines = assert(Sprite.convert(32, 32, quadrado))
+assert(#lines == 64 and #lines[1] == 64)
+assert(Sprite.readFile(Sprite.store(lines)), "round trip")
+assert(lines[62]:find("#", 1, true), "sprite sits on the bottom margin")
+assert(not Sprite.convert(4, 4, function() return 0, 0, 0, 0 end), "empty image is rejected")
+assert(#Sprite.ball() == 64)
 
-local t = Estado.normalizar(nil, t0)
-Estado.trocarEspecie(t, 1)
-Estado.comer(t, 200000, "x", t0 + 5)
-Estado.trocarEspecie(t, 54)
-assert(t.letras == 0 and t.colecao[1] >= 200000, "switching keeps the old progress")
-Estado.comer(t, 5000, "x", t0 + 10)
-Estado.trocarEspecie(t, 1)
-assert(t.letras >= 200000 and Estado.fase(t).titulo == "Ivysaur", "progress comes back")
-local c = Estado.colecao(t)
-assert(#c == 2 and c[1].atual and c[1].base == 1)
+local t = State.normalize(nil, t0)
+State.switchSpecies(t, 1)
+State.eat(t, 200000, "x", t0 + 5)
+State.switchSpecies(t, 54)
+assert(t.letters == 0 and t.collection[1] >= 200000, "switching keeps the old progress")
+State.eat(t, 5000, "x", t0 + 10)
+State.switchSpecies(t, 1)
+assert(t.letters >= 200000 and State.stage(t).titleText == "Ivysaur", "progress comes back")
+local c = State.collection(t)
+assert(#c == 2 and c[1].current and c[1].base == 1)
 
 print("ok")
 
 -- Languages: each locale loads, falls back to English and formats its own clock.
-local Lingua = require("yomimon_language")
-Lingua.force("en")
-assert(Lingua.t("BACK") == "BACK")
-assert(Lingua.format().clock({ hour = 14, min = 5 }) == "2:05 p.m.")
-assert(Lingua.content("state").FALAS)
-Lingua.force("pt")
-assert(Lingua.t("BACK") ~= "BACK")
-assert(Lingua.t("Untranslated text") == "Untranslated text")
-assert(Lingua.format().clock({ hour = 14, min = 0 }) == "14h")
-assert(Lingua.data("cards"))
-Lingua.force("xx")
-assert(Lingua.t("BACK") == "BACK", "unknown locale falls back to English")
-assert(Lingua.content("state") and Lingua.format().thousands == ",")
+local Language = require("yomimon_language")
+Language.force("en")
+assert(Language.t("BACK") == "BACK")
+assert(Language.format().clock({ hour = 14, min = 5 }) == "2:05 p.m.")
+assert(Language.content("state").SPEECHES)
+Language.force("pt")
+assert(Language.t("BACK") ~= "BACK")
+assert(Language.t("Untranslated text") == "Untranslated text")
+assert(Language.format().clock({ hour = 14, min = 0 }) == "14h")
+assert(Language.data("cards"))
+Language.force("xx")
+assert(Language.t("BACK") == "BACK", "unknown locale falls back to English")
+assert(Language.content("state") and Language.format().thousands == ",")
 print("ok languages")
 
 -- lfs.dir returns the iterator and the directory object it needs as state; the language scan must pass both.
@@ -80,7 +80,7 @@ do
         end,
         attributes = function(path) return not path:find("README") and "file" or nil end,
     }
-    local codes = Lingua.codes()
+    local codes = Language.codes()
     assert(#codes == 2 and codes[1] == "en" and codes[2] == "pt", table.concat(codes, ","))
     package.loaded["libs/libkoreader-lfs"] = real
 end
@@ -98,6 +98,6 @@ package.loaded["json"] = { decode = function()
         { language = { name = "fr" }, flavor_text = "Salut" },
     } }
 end }
-local Baixar = require("yomimon_download")
-assert(Baixar.extrairDescricao("{}") == "Spends 18 hours sleeping. The Pokemon-teleports.", Baixar.extrairDescricao("{}"))
+local Download = require("yomimon_download")
+assert(Download.extractDescription("{}") == "Spends 18 hours sleeping. The Pokemon-teleports.", Download.extractDescription("{}"))
 print("ok description")

@@ -1,11 +1,11 @@
 --[[--
-Palavras do nome composto dos livros (português), usadas por yomimon_vector.lua (PLANO-VOZ.md, Etapa 3).
-nomes[tema] = { texto, gênero do substantivo ("m"/"f") }: o começo do nome, pelo tema mais forte.
-Os adjetivos concordam com o gênero. Nunca falar do leitor com adjetivo de gênero (aqui é o livro).
+Words of the books' compound name (Portuguese), used by yomimon_vector.lua (PLANO-VOZ.md, step 3).
+names[theme] = { text, noun gender ("m"/"f") }: the start of the name, by the strongest theme.
+The adjectives agree with the gender. Never describe the reader with a gendered adjective (here it is the book).
 ]]
 
 return {
-    nomes = {
+    names = {
         amor = { "um romance", "m" },
         mar = { "uma história de mar", "f" },
         viagem = { "um livro de estrada", "m" },
@@ -31,26 +31,26 @@ return {
         saber = { "um livro de ideias", "m" },
         tempo = { "um livro sobre o tempo", "m" },
     },
-    -- teatro: "uma peça de política"
-    peca = { "uma peça de %s", "f" },
-    -- o tema sem artigo, para "com cheiro de …" e "uma peça de …"
-    tema_curto = {
+    -- theatre: "uma peça de política"
+    play = { "uma peça de %s", "f" },
+    -- the theme without an article, for "com cheiro de …" and "uma peça de …"
+    short_theme = {
         morte = "morte", amor = "amor", guerra = "guerra", mar = "mar", fe = "fé", dinheiro = "dinheiro",
         loucura = "loucura", tempo = "tempo", cidade = "cidade", natureza = "mato", comida = "comida",
         familia = "família", infancia = "infância", politica = "política", ciencia = "ciência", solidao = "solidão",
         arte = "arte", animais = "bichos", noite = "noite", viagem = "estrada", vinganca = "vingança",
         liberdade = "liberdade", saber = "saber", medo = "medo",
     },
-    adjetivos = {
-        sombrio = { m = "sombrio", f = "sombria" },
-        luminoso = { m = "luminoso", f = "luminosa" },
-        falante = { m = "falante", f = "falante" },
-        calado = { m = "calado", f = "calada" },
-        agitado = { m = "agitado", f = "agitada" },
-        parado = { m = "parado", f = "parada" },
+    adjectives = {
+        gloomy = { m = "gloomy", f = "sombria" },
+        bright = { m = "bright", f = "luminosa" },
+        speaker = { m = "speaker", f = "speaker" },
+        quiet = { m = "quiet", f = "calada" },
+        restless = { m = "restless", f = "agitada" },
+        still = { m = "still", f = "parada" },
     },
     e = " e ",
-    cheiro = "com cheiro de %s",
-    frases = { longas = "de frases longas", curtas = "de frases curtas" },
-    primeira = { m = "contado em primeira pessoa", f = "contada em primeira pessoa" },
+    smell = "com cheiro de %s",
+    sentences = { long_ones = "de frases longas", shorts = "de frases curtas" },
+    first = { m = "contado em primeira pessoa", f = "contada em primeira pessoa" },
 }

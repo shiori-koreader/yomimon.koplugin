@@ -1,8 +1,8 @@
--- Memory and notebook phrases. NOMES gives each theme with its article (English keeps prepositions in the
--- phrases); a language without NOMES uses the built-in grammar.
+-- Memory and notebook phrases. NAMES gives each theme with its article (English keeps prepositions in the
+-- phrases); a language without NAMES uses the built-in grammar.
 local M = {}
 
-M.NOMES = {
+M.NAMES = {
     morte = "death", amor = "love", guerra = "war", mar = "the sea", fe = "God", dinheiro = "money",
     loucura = "madness", tempo = "time", cidade = "the city", natureza = "nature", comida = "food",
     familia = "family", infancia = "childhood", politica = "politics", ciencia = "science", solidao = "solitude",
@@ -10,7 +10,7 @@ M.NOMES = {
     liberdade = "freedom", saber = "knowledge", medo = "fear",
 }
 
-M.FALAS_EVENTO = {
+M.SPEECHES_EVENT = {
     morte = { "There was a funeral in that chapter. I smelled the candles.", "Someone died back there. I told you it would happen.",
               "A whole chapter of mourning. My paper got damp." },
     casamento = { "A wedding in this chapter. I give it three chapters before it goes wrong.", "Bride, altar, vows. Noted, for later." },
@@ -23,40 +23,40 @@ M.FALAS_EVENTO = {
     fuga = { "Someone ran away. Cowardice or wisdom, I never know.", "An escape this chapter. I'd flee this book too, sometimes." },
     crime = { "A crime this chapter. I have an alibi: I was eating the previous page.", "Blood and police. Now the book's awake." },
 }
-M.FALAS_NOVO = { "Someone called %s showed up. I already don't like them.", "Who is %s? Nobody introduced us.", "%s has arrived. Trouble." }
-M.FALAS_SUMIU = { "A whole chapter without %s. Suspicious.", "Where's %s? Just vanished like that?", "No %s this chapter. Strange. Or a relief." }
-M.FALAS_AZEDOU = { "This chapter went sour.", "Everything got darker all of a sudden. I liked it. I mean, what a shame." }
-M.FALAS_ADOCOU = { "That chapter was light, actually. Suspicious.", "A sweet chapter. Someone will pay for it later.", "A little light. Don't get used to it." }
-M.FALAS_VIROU = { "The book was about %s and this chapter only talked about %s.", "Change of subject: out goes %s, in comes %s." }
+M.SPEECHES_NEW = { "Someone called %s showed up. I already don't like them.", "Who is %s? Nobody introduced us.", "%s has arrived. Trouble." }
+M.SPEECHES_VANISHED = { "A whole chapter without %s. Suspicious.", "Where's %s? Just vanished like that?", "No %s this chapter. Strange. Or a relief." }
+M.SPEECHES_SOURED = { "This chapter went sour.", "Everything got darker all of a sudden. I liked it. I mean, what a shame." }
+M.SPEECHES_SWEETENED = { "That chapter was light, actually. Suspicious.", "A sweet chapter. Someone will pay for it later.", "A little light. Don't get used to it." }
+M.SPEECHES_TURNED = { "The book was about %s and this chapter only talked about %s.", "Change of subject: out goes %s, in comes %s." }
 
-M.FALAS_REFERENCIA = {
-    jovem = {
-        "This book mentions {nome} {n} times. Who is {nome}? Should I worry?",
-        "{nome} again. Everyone knows {nome} except me.",
-        "The book quoted {nome} once more. I wrote it down, to look clever.",
+M.SPEECHES_REFERENCE = {
+    young = {
+        "This book mentions {nameText} {n} times. Who is {nameText}? Should I worry?",
+        "{nameText} again. Everyone knows {nameText} except me.",
+        "The book quoted {nameText} once more. I wrote it down, to look clever.",
     },
-    velha = {
-        "This book quotes {nome} {n} times. Show-off.",
-        "{nome} again. The author must have a poster on the wall.",
-        "Another mention of {nome}. I've read them too, you know. Eaten, actually.",
+    old = {
+        "This book quotes {nameText} {n} times. Show-off.",
+        "{nameText} again. The author must have a poster on the wall.",
+        "Another mention of {nameText}. I've read them too, you know. Eaten, actually.",
     },
 }
-M.FALAS_CITACAO = {
-    jovem = {
-        "{nome} said “{fala}”. I'd never be that brave.",
-        "“{fala}” — that's what {nome} said. I repeated it quietly.",
-        "I can't stop thinking about what {nome} said: “{fala}”.",
-        "{nome} said “{fala}”. I wrote it down to use one day.",
+M.SPEECHES_QUOTATION = {
+    young = {
+        "{nameText} said “{speech}”. I'd never be that brave.",
+        "“{speech}” — that's what {nameText} said. I repeated it quietly.",
+        "I can't stop thinking about what {nameText} said: “{speech}”.",
+        "{nameText} said “{speech}”. I wrote it down to use one day.",
     },
-    velha = {
-        "{nome} said “{fala}”. Noted, never to be forgiven.",
-        "“{fala}”, said {nome}. I'd have said it better.",
-        "{nome}: “{fala}”. Spoken like someone who never ate a dictionary.",
-        "Remember when {nome} said “{fala}”? I do. I remember everything.",
+    old = {
+        "{nameText} said “{speech}”. Noted, never to be forgiven.",
+        "“{speech}”, said {nameText}. I'd have said it better.",
+        "{nameText}: “{speech}”. Spoken like someone who never ate a dictionary.",
+        "Remember when {nameText} said “{speech}”? I do. I remember everything.",
     },
 }
 
-M.FALAS_NARRADOR = {
+M.SPEECHES_NARRATOR = {
     f = {
         "The woman telling this story talks a lot about herself. I like it. No, I don't.",
         "The narrator won't stop talking about herself. I relate.",
@@ -67,14 +67,14 @@ M.FALAS_NARRADOR = {
         "The narrator talks about himself like someone reading his own diary aloud.",
         "He narrates, he opines, he praises himself. Typical.",
     },
-    neutro = {
+    neutral = {
         "This book is told by someone who says \"I\" a lot. I distrust people who say \"I\" a lot.",
         "A first-person narrator. In other words: one side of the story.",
         "Whoever's telling this talks about themselves a lot. So would I, if anyone read me.",
     },
 }
 
-M.FALAS_TEMA = {
+M.SPEECHES_THEME = {
     morte = { "Every chapter is a small funeral.", "I've thought about my epitaph. It's short. Like me." },
     amor = { "Love. I've read so much about it I got heartburn.", "I've never loved anyone. Except a dictionary, once." },
     guerra = { "Every page turned is a trench.", "Peace is just the gap between two chapters." },
@@ -115,10 +115,10 @@ M.FALAS_TEMA = {
              "A shiver ran down my spine. Keep going. But slowly." },
 }
 
--- Caderno: comentários com contexto (mesmas chaves de C em yomimon_memory.lua)
+-- Notebook: comments with context (same keys as C in yomimon_memory.lua)
 M.C = {}
 local C = M.C
-C.personagem = {
+C.character = {
     "%s again? Are you in love or just suspicious?",
     "Everything revolves around %s. Even you.",
     "I wouldn't trust %s to hold a bookmark.",
@@ -128,11 +128,11 @@ C.personagem = {
     "%s deserved a better book. Or a crueller author.",
     "I've nibbled the page where %s appears. It tasted of drama.",
 }
-C.dois = {
+C.two = {
     "%s and %s. Someone's going to regret this.",
     "%s and %s in the same sentence. That never ends well.",
 }
-C.tema = {
+C.theme = {
     morte = { "Another funeral. I'm already in mourning in advance.", "Death again. This author has a type.",
               "You highlighted death. I highlight lunch.", "Every beautiful sentence smells of the grave." },
     amor = { "Love. Nobody learns, everybody highlights.", "Romantic. I'll pretend I didn't see.",
@@ -168,49 +168,49 @@ C.tema = {
     saber = { "You highlighted a book inside the book. I like it.", "Knowledge. The best thing there is to eat." },
     medo = { "You highlighted fear. Brave of you.", "This passage gives me shivers. Good taste." },
 }
-C.curto = {
+C.short_one = {
     "Three words and you're already moved. Easy.",
     "Short. Fits on a tombstone.",
     "Few words, lots of weight. Respect.",
     "That's almost a proverb. Or a threat.",
 }
-C.longo = {
+C.long = {
     "You highlighted half a page. Make up your mind.",
     "That's not a highlight, that's a change of address.",
     "If you're going to highlight everything, just give me the whole book.",
     "A whole paragraph. You weren't reading, you were agreeing.",
 }
-C.nota = {
+C.grade = {
     "You wrote “%s”. I'd write worse. Or better. Doesn't matter.",
     "Your note: “%s”. I kept it in my belly, with the rest.",
     "“%s”, you said. The sentence didn't ask for your opinion, but fine.",
 }
-C.madrugada = {
+C.small_hours = {
     "Highlighting in the small hours. Everything okay at home?",
     "The small hours. When every sentence sounds true.",
 }
-C.primeiro = {
+C.first_one = {
     "First highlight in “%s”. The romance begins.",
     "First mark in “%s”. There's still time to back out.",
 }
-C.muitos = {
+C.many = {
     "That's %s highlights in this book. Obsession noted.",
     "%s highlights. One more and you'll have to pay rent.",
 }
-C.capitulo = {
+C.chapter = {
     "Again in “%s”. That chapter got you.",
     "Another one in “%s”. I'll call that chapter yours.",
 }
-C.geral = {
-    ovo = { "…" },
-    jovem = {
+C.general = {
+    egg = { "…" },
+    young = {
         "You highlighted this. Should I be worried?",
         "I kept it. But I'm not sure I understood.",
         "This scared me. In a good way. I think.",
         "Pretty. I distrust pretty things.",
         "Is this true? Books lie sometimes, right?",
     },
-    velha = {
+    old = {
         "Highlighted. Classic move for someone who doesn't know what to do with their hands.",
         "I've read better. But fine, I'll keep it.",
         "This will seem deep until tomorrow morning.",

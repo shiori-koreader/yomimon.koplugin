@@ -20,30 +20,30 @@ local TextWidget = require("ui/widget/textwidget")
 local UIManager = require("ui/uimanager")
 local Screen = Device.screen
 
-local Desenho = require("yomimon_drawing")
+local Drawing = require("yomimon_drawing")
 local T = require("yomimon_language").t
-local Estado = require("yomimon_state")
-local Memoria = require("yomimon_memory")
-local Tracos = require("yomimon_traits")
+local State = require("yomimon_state")
+local Memory = require("yomimon_memory")
+local Traits = require("yomimon_traits")
 
-local QUADRO_SEGUNDOS = 1.2      -- time between animation frames
-local ANIMACAO_MINUTOS = 5       -- the normal animation stops by itself after this
+local FRAME_SECONDS = 1.2      -- time between animation frames
+local ANIMATION_MINUTES = 5       -- the normal animation stops by itself after this
 
-local LARG, ALT = 618, 824       -- size of the Figma frame
+local WIDE, ALT = 618, 824       -- size of the Figma frame
 
-local PRETO = Blitbuffer.COLOR_BLACK
-local BRANCO = Blitbuffer.COLOR_WHITE
-local CINZA_55 = Blitbuffer.Color8(0x55)
-local CINZA_BB = Blitbuffer.Color8(0xBB)
+local BLACK = Blitbuffer.COLOR_BLACK
+local WHITE = Blitbuffer.COLOR_WHITE
+local GREY_55 = Blitbuffer.Color8(0x55)
+local GREY_BB = Blitbuffer.Color8(0xBB)
 
 -- Icons of the status card, in Figma points (x, y, width, height), relative to the card.
-local ICONE_LIVRO = {
+local ICON_BOOK = {
     { 17, 17, 12, 3 }, { 35, 17, 12, 3 }, { 14, 20, 3, 3 }, { 29, 20, 6, 3 }, { 47, 20, 3, 3 },
     { 14, 23, 3, 3 }, { 29, 23, 6, 3 }, { 47, 23, 3, 3 }, { 14, 26, 3, 3 }, { 29, 26, 6, 3 },
     { 47, 26, 3, 3 }, { 14, 29, 3, 3 }, { 29, 29, 6, 3 }, { 47, 29, 3, 3 }, { 14, 32, 12, 3 },
     { 29, 32, 6, 3 }, { 38, 32, 12, 3 }, { 26, 35, 12, 3 },
 }
-local ICONE_CARA = {
+local ICON_FACE = {
     { 25, 62, 15, 3 }, { 22, 65, 3, 3 }, { 40, 65, 3, 3 }, { 19, 68, 3, 3 }, { 43, 68, 3, 3 },
     { 19, 71, 3, 3 }, { 25, 71, 6, 3 }, { 34, 71, 6, 3 }, { 43, 71, 3, 3 }, { 19, 74, 3, 3 },
     { 43, 74, 3, 3 }, { 19, 77, 3, 3 }, { 28, 77, 9, 3 }, { 43, 77, 3, 3 }, { 19, 80, 3, 3 },
@@ -52,15 +52,15 @@ local ICONE_CARA = {
 }
 
 -- Hourglass of the stage card (relative to the card).
-local ICONE_AMPULHETA = {
+local ICON_HOURGLASS = {
     { 14, 79, 10, 2 }, { 14, 81, 2, 2 }, { 22, 81, 2, 2 }, { 16, 83, 2, 2 }, { 20, 83, 2, 2 },
     { 18, 85, 2, 2 }, { 16, 87, 2, 2 }, { 20, 87, 2, 2 }, { 14, 89, 2, 2 }, { 18, 89, 2, 2 },
     { 22, 89, 2, 2 }, { 14, 91, 10, 2 },
 }
 
 local YomimonScreen = InputContainer:extend{
-    traca = nil,    -- plugin instance
-    mensagem = nil, -- special phrase (e.g. the answer to a pet)
+    plugin = nil,    -- plugin instance
+    message = nil, -- special phrase (e.g. the answer to a pet)
 }
 
 function YomimonScreen:init()
@@ -75,15 +75,15 @@ function YomimonScreen:init()
     local tam = Screen:getSize()
     self.dimen = Geom:new{ x = 0, y = 0, w = tam.w, h = tam.h }
     -- Figma-to-screen scale, and margin to centre when the proportion does not match
-    self.k = math.min(tam.w / LARG, tam.h / ALT)
-    self.ox = math.floor((tam.w - LARG * self.k) / 2)
+    self.k = math.min(tam.w / WIDE, tam.h / ALT)
+    self.ox = math.floor((tam.w - WIDE * self.k) / 2)
     self.oy = math.floor((tam.h - ALT * self.k) / 2)
     -- factor KOReader applies to font sizes; compensated in face()
-    self.fator_fonte = Screen:scaleBySize(1000) / 1000
+    self.font_factor = Screen:scaleBySize(1000) / 1000
     self.faces = {}
-    self.tick = function() self:proximoQuadro() end
-    self:prepararSprite()
-    self:iniciarAnimacao()
+    self.tick = function() self:nextFrame() end
+    self:prepareSprite()
+    self:startAnimation()
 end
 
 -- Drawing utilities ---------------------------------------------------------
@@ -94,15 +94,15 @@ end
 
 --- Silkscreen face with height `tam` in Figma points.
 function YomimonScreen:face(negrito, tam)
-    local chave = (negrito and "b" or "r") .. tam
-    if not self.faces[chave] then
-        local arquivo = negrito and "Silkscreen-Bold.ttf" or "Silkscreen-Regular.ttf"
-        local caminho = Desenho.caminhoFonte(arquivo)
-        local ok, f = pcall(Font.getFace, Font, caminho, tam * self.k / self.fator_fonte)
-        if not ok or not f then f = Font:getFace("cfont", tam * self.k / self.fator_fonte) end
-        self.faces[chave] = f
+    local lookupKey = (negrito and "b" or "r") .. tam
+    if not self.faces[lookupKey] then
+        local file_path = negrito and "Silkscreen-Bold.ttf" or "Silkscreen-Regular.ttf"
+        local path = Drawing.fontPath(file_path)
+        local ok, f = pcall(Font.getFace, Font, path, tam * self.k / self.font_factor)
+        if not ok or not f then f = Font:getFace("cfont", tam * self.k / self.font_factor) end
+        self.faces[lookupKey] = f
     end
-    return self.faces[chave]
+    return self.faces[lookupKey]
 end
 
 function YomimonScreen:ret(bb, x, y, w, h, cor)
@@ -111,72 +111,72 @@ function YomimonScreen:ret(bb, x, y, w, h, cor)
     if x1 > x0 and y1 > y0 then bb:paintRect(x0, y0, x1 - x0, y1 - y0, cor) end
 end
 
-function YomimonScreen:retangulos(bb, lista, dx, dy, cor)
-    for _, r in ipairs(lista) do self:ret(bb, dx + r[1], dy + r[2], r[3], r[4], cor) end
+function YomimonScreen:rectangles(bb, list, dx, dy, cor)
+    for _, r in ipairs(list) do self:ret(bb, dx + r[1], dy + r[2], r[3], r[4], cor) end
 end
 
 --- Text in the pixel font. Returns the width in Figma points.
-function YomimonScreen:texto(bb, str, x, y, negrito, tam, cor, centro_x)
-    local w = TextWidget:new{ text = str, face = self:face(negrito, tam), fgcolor = cor or PRETO, padding = 0 }
+function YomimonScreen:textValue(bb, str, x, y, negrito, tam, cor, center_x)
+    local w = TextWidget:new{ text = str, face = self:face(negrito, tam), fgcolor = cor or BLACK, padding = 0 }
     local tw = w:getSize().w
-    local px_x = centro_x and (self.ox + self:px(centro_x) - math.floor(tw / 2)) or (self.ox + self:px(x))
+    local px_x = center_x and (self.ox + self:px(center_x) - math.floor(tw / 2)) or (self.ox + self:px(x))
     w:paintTo(bb, px_x, self.oy + self:px(y))
     w:free()
     return tw / self.k
 end
 
 --- Width of a text in Figma points, without painting.
-function YomimonScreen:larguraTexto(str, negrito, tam)
+function YomimonScreen:textWidth(str, negrito, tam)
     local w = TextWidget:new{ text = str, face = self:face(negrito, tam), padding = 0 }
     local tw = w:getSize().w
     w:free()
     return tw / self.k
 end
 
---- Text with the letters closer together (kerning reduced by `aperto` points per letter).
+--- Text with the letters closer together (kerning reduced by `tightness` points per letter).
 -- Pairs that need extra adjustment, in Silkscreen pixels (1/8 of the font size).
 -- LV: the L is empty on the top right and the V thins at the bottom; without adjustment the gap is doubled.
 local KERNING = { LV = 1 }
 
-function YomimonScreen:textoApertado(bb, str, x, y, negrito, tam, aperto)
-    local cx, anterior = x, nil
-    for letra in str:gmatch("[%z\1-\127\194-\244][\128-\191]*") do
-        if anterior then cx = cx - (KERNING[anterior .. letra] or 0) * tam / 8 end
-        cx = cx + self:texto(bb, letra, cx, y, negrito, tam) - aperto
-        anterior = letra
+function YomimonScreen:tightText(bb, str, x, y, negrito, tam, tightness)
+    local cx, previous = x, nil
+    for letter in str:gmatch("[%z\1-\127\194-\244][\128-\191]*") do
+        if previous then cx = cx - (KERNING[previous .. letter] or 0) * tam / 8 end
+        cx = cx + self:textValue(bb, letter, cx, y, negrito, tam) - tightness
+        previous = letter
     end
 end
 
 --- Box with clipped corners (border of 3), white background and offset shadow (as in Figma).
-function YomimonScreen:cartao(bb, x, y, w, h, sombra)
-    if sombra then
-        self:ret(bb, x + 9, y + 6, w - 6, h, PRETO)
-        self:ret(bb, x + 6, y + 9, w, h - 6, PRETO)
+function YomimonScreen:card(bb, x, y, w, h, shadow)
+    if shadow then
+        self:ret(bb, x + 9, y + 6, w - 6, h, BLACK)
+        self:ret(bb, x + 6, y + 9, w, h - 6, BLACK)
     end
-    self:ret(bb, x + 3, y + 3, w - 6, h - 6, BRANCO)
-    self:ret(bb, x + 3, y, w - 6, 3, PRETO)
-    self:ret(bb, x + 3, y + h - 3, w - 6, 3, PRETO)
-    self:ret(bb, x, y + 3, 3, h - 6, PRETO)
-    self:ret(bb, x + w - 3, y + 3, 3, h - 6, PRETO)
+    self:ret(bb, x + 3, y + 3, w - 6, h - 6, WHITE)
+    self:ret(bb, x + 3, y, w - 6, 3, BLACK)
+    self:ret(bb, x + 3, y + h - 3, w - 6, 3, BLACK)
+    self:ret(bb, x, y + 3, 3, h - 6, BLACK)
+    self:ret(bb, x + w - 3, y + 3, 3, h - 6, BLACK)
 end
 
-function YomimonScreen:bolinhas(bb, x, y, cheias)
+function YomimonScreen:dots(bb, x, y, fulls)
     for i = 0, 3 do
         local bx = x + 32 * i
-        if i < cheias then
-            self:ret(bb, bx + 3, y, 20, 26, PRETO)
-            self:ret(bb, bx, y + 3, 26, 20, PRETO)
-            self:ret(bb, bx + 6, y + 6, 3, 3, BRANCO)
+        if i < fulls then
+            self:ret(bb, bx + 3, y, 20, 26, BLACK)
+            self:ret(bb, bx, y + 3, 26, 20, BLACK)
+            self:ret(bb, bx + 6, y + 6, 3, 3, WHITE)
         else
-            self:ret(bb, bx + 3, y, 20, 3, CINZA_BB)
-            self:ret(bb, bx + 3, y + 23, 20, 3, CINZA_BB)
-            self:ret(bb, bx, y + 3, 3, 20, CINZA_BB)
-            self:ret(bb, bx + 23, y + 3, 3, 20, CINZA_BB)
+            self:ret(bb, bx + 3, y, 20, 3, GREY_BB)
+            self:ret(bb, bx + 3, y + 23, 20, 3, GREY_BB)
+            self:ret(bb, bx, y + 3, 3, 20, GREY_BB)
+            self:ret(bb, bx + 23, y + 3, 3, 20, GREY_BB)
         end
     end
 end
 
-local function maiusculas(s)
+local function capitals(s)
     local ok, Utf8Proc = pcall(require, "ffi/utf8proc")
     if ok and Utf8Proc and Utf8Proc.uppercase then
         local ok2, r = pcall(Utf8Proc.uppercase, s)
@@ -191,265 +191,265 @@ end
 -- tail in the middle. Text in Silkscreen Regular with 16 of padding on top and bottom;
 -- the height grows with the number of lines.
 --- Measures the balloon: width W (454, or 560 for phrases of 3+ lines), height H and the text box.
-function YomimonScreen:medirBalao(fala)
-    local function caixaPara(W)
+function YomimonScreen:measureBalloon(speech)
+    local function boxFor(W)
         return TextBoxWidget:new{
-            text = maiusculas(fala), face = self:face(false, 20.88),
+            text = capitals(speech), face = self:face(false, 20.88),
             width = self:px(W - 47), alignment = "center",
         }
     end
-    local linha = TextWidget:new{ text = "A", face = self:face(false, 20.88) }
-    local lh = linha:getSize().h / self.k
-    linha:free()
+    local line = TextWidget:new{ text = "A", face = self:face(false, 20.88) }
+    local lh = line:getSize().h / self.k
+    line:free()
     local W = 454
-    local caixa = caixaPara(W)
-    if caixa:getSize().h / self.k > lh * 2.5 then  -- 3 lines or more: widen
-        caixa:free()
+    local box = boxFor(W)
+    if box:getSize().h / self.k > lh * 2.5 then  -- 3 lines or more: widen
+        box:free()
         W = 560
-        caixa = caixaPara(W)
+        box = boxFor(W)
     end
-    local th = caixa:getSize().h / self.k
-    return { W = W, H = th + 35, caixa = caixa }
+    local th = box:getSize().h / self.k
+    return { W = W, H = th + 35, box = box }
 end
 
 --- Main balloon (Figma 28:5911): border of 3, pixel shadow, tail in the middle at the bottom.
 -- topo: y of the balloon; without it, the tail tip is at y = 234. m: measure already done (optional).
-function YomimonScreen:balao(bb, fala, bx, topo, m)
-    m = m or self:medirBalao(fala)
+function YomimonScreen:balloon(bb, speech, bx, top, m)
+    m = m or self:measureBalloon(speech)
     local W, H = m.W, m.H
-    bx = bx or ((LARG - (W + 6)) / 2)        -- centred counting the shadow of 6
-    local by = topo or (234 - (H + 15))
+    bx = bx or ((WIDE - (W + 6)) / 2)        -- centred counting the shadow of 6
+    local by = top or (234 - (H + 15))
     local t = math.floor(W / 2) - 7          -- start of the tail
     local function r(x, y, w, h, cor) self:ret(bb, bx + x, by + y, w, h, cor) end
-    r(3, 3, W - 6, H - 3, BRANCO)            -- background
-    r(6, 0, W - 12, 3, PRETO)                -- top
-    r(3, 3, 3, 3, PRETO); r(W - 6, 3, 3, 3, PRETO)
-    r(0, 6, 3, H - 9, PRETO)                 -- left side
-    r(3, H - 3, 3, 3, PRETO)
-    r(W - 3, 6, 3, H - 3, PRETO)             -- right side
-    r(W - 6, H - 3, 3, 6, PRETO)
-    r(W, 9, 3, H - 3, PRETO)                 -- shadow on the right
-    r(W + 3, 12, 3, H - 6, PRETO)
-    r(6, H, W - 12, 3, PRETO)                -- base
-    r(9, H + 3, W - 9, 3, PRETO)             -- shadow below
-    r(12, H + 6, W - 9, 3, PRETO)
-    r(t, H + 6, 3, 3, PRETO)                 -- tail
-    r(t + 4, H + 9, 9, 3, PRETO); r(t + 7, H + 12, 3, 3, PRETO)
-    r(t + 1, H, 15, 3, BRANCO); r(t + 4, H + 3, 9, 3, BRANCO); r(t + 7, H + 6, 3, 3, BRANCO)
-    m.caixa:paintTo(bb, self.ox + self:px(bx + 28), self.oy + self:px(by + 19))
-    m.caixa:free()
+    r(3, 3, W - 6, H - 3, WHITE)            -- background
+    r(6, 0, W - 12, 3, BLACK)                -- top
+    r(3, 3, 3, 3, BLACK); r(W - 6, 3, 3, 3, BLACK)
+    r(0, 6, 3, H - 9, BLACK)                 -- left side
+    r(3, H - 3, 3, 3, BLACK)
+    r(W - 3, 6, 3, H - 3, BLACK)             -- right side
+    r(W - 6, H - 3, 3, 6, BLACK)
+    r(W, 9, 3, H - 3, BLACK)                 -- shadow on the right
+    r(W + 3, 12, 3, H - 6, BLACK)
+    r(6, H, W - 12, 3, BLACK)                -- base
+    r(9, H + 3, W - 9, 3, BLACK)             -- shadow below
+    r(12, H + 6, W - 9, 3, BLACK)
+    r(t, H + 6, 3, 3, BLACK)                 -- tail
+    r(t + 4, H + 9, 9, 3, BLACK); r(t + 7, H + 12, 3, 3, BLACK)
+    r(t + 1, H, 15, 3, WHITE); r(t + 4, H + 3, 9, 3, WHITE); r(t + 7, H + 6, 3, 3, WHITE)
+    m.box:paintTo(bb, self.ox + self:px(bx + 28), self.oy + self:px(by + 19))
+    m.box:free()
 end
 
-function YomimonScreen:prepararSprite()
+function YomimonScreen:prepareSprite()
     -- The sprite (64x64) takes ~295 points in Figma, centred at (309.5, 412.5);
     -- integer scale so the pixels stay sharp.
-    local escala = math.max(1, math.floor(295 * self.k / Desenho.LARGURA))
-    local lado = escala * Desenho.LARGURA
-    self.sprite_escala = escala
+    local scale = math.max(1, math.floor(295 * self.k / Drawing.WIDTH))
+    local side = scale * Drawing.WIDTH
+    self.sprite_scale = scale
     self.sprite_rect = Geom:new{
-        x = self.ox + self:px(309.5) - math.floor(lado / 2),
-        y = self.oy + self:px(412.5) - math.floor(lado / 2),
-        w = lado, h = lado,
+        x = self.ox + self:px(309.5) - math.floor(side / 2),
+        y = self.oy + self:px(412.5) - math.floor(side / 2),
+        w = side, h = side,
     }
-    self.fechar_rect = Geom:new{
+    self.close_rect = Geom:new{
         x = self.ox + self:px(545), y = self.oy + self:px(6), w = self:px(70), h = self:px(64),
     }
 end
 
 function YomimonScreen:paintTo(bb, x, y)
     self.dimen.x, self.dimen.y = x, y
-    local s, agora = self.traca.estado, os.time()
-    bb:paintRect(x, y, self.dimen.w, self.dimen.h, BRANCO)
-    self.alvos = {}
-    self:cabecalho(bb)
-    if self.modo == "caderno" then
-        self:pintarCaderno(bb, s)
-    elseif self.modo == "diario" then
-        self:pintarDiario(bb, s)
-    elseif self.modo == "conquistas" then
-        self:pintarConquistas(bb, s)
-    elseif self.modo == "pokedex" then
-        self:pintarPokedex(bb, s)
-    elseif self.modo == "percepcao" then
-        self:pintarPercepcao(bb, s)
+    local s, now = self.plugin.state, os.time()
+    bb:paintRect(x, y, self.dimen.w, self.dimen.h, WHITE)
+    self.targets = {}
+    self:header(bb)
+    if self.mode == "notebook" then
+        self:paintNotebook(bb, s)
+    elseif self.mode == "diary" then
+        self:paintDiary(bb, s)
+    elseif self.mode == "achievements" then
+        self:paintAchievements(bb, s)
+    elseif self.mode == "pokedex" then
+        self:paintPokedex(bb, s)
+    elseif self.mode == "perception" then
+        self:paintPerception(bb, s)
     else
-        self:pintarCasa(bb, s, agora)
+        self:paintHome(bb, s, now)
     end
-    if self.menu_aberto then self:pintarMenu(bb) end
+    if self.menu_open then self:paintMenu(bb) end
 end
 
 --- Tappable area, in Figma points.
-function YomimonScreen:alvo(x, y, w, h, acao)
-    table.insert(self.alvos, {
+function YomimonScreen:target(x, y, w, h, action)
+    table.insert(self.targets, {
         rect = Geom:new{ x = self.ox + self:px(x), y = self.oy + self:px(y), w = self:px(w), h = self:px(h) },
-        acao = acao,
-        camada = self.camada,
+        action = action,
+        layer = self.layer,
     })
 end
 
-local TITULOS = { caderno = T"NOTEBOOK", diario = T"DIARY", conquistas = T"ACHIEVEMENTS", pokedex = T"POKÉDEX",
-                  percepcao = T"PERCEPTION" }
+local TITLES = { notebook = T"NOTEBOOK", diary = T"DIARY", achievements = T"ACHIEVEMENTS", pokedex = T"POKÉDEX",
+                  perception = T"PERCEPTION" }
 
-function YomimonScreen:cabecalho(bb)
-    self.camada = "topo"
-    local titulo = TITULOS[self.modo]
-    if titulo then
-        self:texto(bb, titulo, 20, 18, true, 30)
+function YomimonScreen:header(bb)
+    self.layer = "top"
+    local titleText = TITLES[self.mode]
+    if titleText then
+        self:textValue(bb, titleText, 20, 18, true, 30)
     else
-        self:textoApertado(bb, T"YOMIMON", 20, 10, true, 44, 6)
+        self:tightText(bb, T"YOMIMON", 20, 10, true, 44, 6)
     end
-    if self.traca.estado.dev_simulacao and not self.exportando then self:texto(bb, T"SIMULATION", 20, 56, false, 10, CINZA_55) end
+    if self.plugin.state.dev_simulation and not self.exporting then self:textValue(bb, T"SIMULATION", 20, 56, false, 10, GREY_55) end
     -- ARCHIVE button with a pixel arrow
-    self:cartao(bb, 403, 16, 140, 39, true)
-    self:texto(bb, T"ARCHIVE", 417, 25, true, 14)
-    self:ret(bb, 517, 31, 12, 3, PRETO)
-    self:ret(bb, 520, 34, 6, 3, PRETO)
-    self:ret(bb, 522, 37, 2, 3, PRETO)
-    self:alvo(398, 6, 152, 60, function() self.menu_aberto = not self.menu_aberto end)
+    self:card(bb, 403, 16, 140, 39, true)
+    self:textValue(bb, T"ARCHIVE", 417, 25, true, 14)
+    self:ret(bb, 517, 31, 12, 3, BLACK)
+    self:ret(bb, 520, 34, 6, 3, BLACK)
+    self:ret(bb, 522, 37, 2, 3, BLACK)
+    self:target(398, 6, 152, 60, function() self.menu_open = not self.menu_open end)
     -- close
-    self:cartao(bb, 555, 16, 42, 39, true)
-    self:texto(bb, "X", 0, 12, true, 32, PRETO, 576)
-    self:alvo(550, 6, 64, 60, function() self:onClose(); return "fechou" end)
-    self.camada = "conteudo"
+    self:card(bb, 555, 16, 42, 39, true)
+    self:textValue(bb, "X", 0, 12, true, 32, BLACK, 576)
+    self:target(550, 6, 64, 60, function() self:onClose(); return "fechou" end)
+    self.layer = "conteudo"
 end
 
 -- ARCHIVE menu ------------------------------------------------------------------
 
-local ITENS_MENU = {
+local MENU_ITEMS = {
     { "casa", T"YOMIMON", T"YOUR CURRENT POKÉMON" },
-    { "caderno", T"NOTEBOOK", T"THE PASSAGES YOU MARKED" },
-    { "diario", T"DIARY", T"WHAT IT REMEMBERS OF YOUR READING" },
-    { "conquistas", T"ACHIEVEMENTS", T"MILESTONES AND BOOKS READ" },
+    { "notebook", T"NOTEBOOK", T"THE PASSAGES YOU MARKED" },
+    { "diary", T"DIARY", T"WHAT IT REMEMBERS OF YOUR READING" },
+    { "achievements", T"ACHIEVEMENTS", T"MILESTONES AND BOOKS READ" },
     { "pokedex", T"POKÉDEX", T"YOUR REGISTERED POKÉMON" },
-    { "idioma", T"LANGUAGE", T"CHANGE THE LANGUAGE" },
+    { "language", T"LANGUAGE", T"CHANGE THE LANGUAGE" },
 }
 
-function YomimonScreen:pintarMenu(bb)
-    self.camada = "menu"
+function YomimonScreen:paintMenu(bb)
+    self.layer = "menu"
     local x, y, w = 263, 66, 334
-    local h = 14 + #ITENS_MENU * 48 + 6
-    self:cartao(bb, x, y, w, h, true)
+    local h = 14 + #MENU_ITEMS * 48 + 6
+    self:card(bb, x, y, w, h, true)
     local iy = y + 12
-    for _, item in ipairs(ITENS_MENU) do
-        local atual = (self.modo or "casa") == item[1]
-        if atual then
-            self:ret(bb, x + 12, iy + 4, 6, 6, PRETO)
-            self:ret(bb, x + 12, iy + 10, 6, 6, PRETO)
-            self:ret(bb, x + 18, iy + 7, 6, 6, PRETO)
+    for _, item in ipairs(MENU_ITEMS) do
+        local current = (self.mode or "casa") == item[1]
+        if current then
+            self:ret(bb, x + 12, iy + 4, 6, 6, BLACK)
+            self:ret(bb, x + 12, iy + 10, 6, 6, BLACK)
+            self:ret(bb, x + 18, iy + 7, 6, 6, BLACK)
         end
-        self:texto(bb, item[2], x + 34, iy, true, 16)
-        self:texto(bb, item[3], x + 34, iy + 21, false, 10, CINZA_55)
-        local modo = item[1]
-        self:alvo(x, iy - 6, w, 48, function()
-            self.menu_aberto = false
-            if modo == "idioma" then return self:menuIdioma() end
-            self:entrar(modo)
+        self:textValue(bb, item[2], x + 34, iy, true, 16)
+        self:textValue(bb, item[3], x + 34, iy + 21, false, 10, GREY_55)
+        local mode = item[1]
+        self:target(x, iy - 6, w, 48, function()
+            self.menu_open = false
+            if mode == "language" then return self:languageMenu() end
+            self:enter(mode)
         end)
         iy = iy + 48
     end
 end
 
-function YomimonScreen:entrar(modo)
-    self.modo = modo ~= "casa" and modo or nil
-    self.pag = 1
-    self.mensagem = nil
-    if modo == "caderno" then
-        self:carregarSublinhados()
-    elseif modo == "conquistas" then
-        local s = self.traca.estado
-        self.terminados = s.dev_simulacao and s.sim_terminados or YomimonScreen.livrosTerminados()
+function YomimonScreen:enter(mode)
+    self.mode = mode ~= "casa" and mode or nil
+    self.pg = 1
+    self.message = nil
+    if mode == "notebook" then
+        self:loadHighlights()
+    elseif mode == "achievements" then
+        local s = self.plugin.state
+        self.finishedList = s.dev_simulation and s.sim_finished or YomimonScreen.finishedBooks()
         local n = 0
-        for _, L in ipairs(s.dev_simulacao and s.sim_sublinhados or YomimonScreen.lerSublinhados()) do n = n + #L.itens end
-        self.n_sublinhados = n
+        for _, L in ipairs(s.dev_simulation and s.sim_highlights or YomimonScreen.readHighlights()) do n = n + #L.items end
+        self.n_highlights = n
     end
-    self:atualizar()
+    self:refresh()
 end
 
 -- Home screen ------------------------------------------------------------------
 
-function YomimonScreen:pintarCasa(bb, s, agora)
+function YomimonScreen:paintHome(bb, s, now)
     -- balloon with the phrase (drawn once per opening, so it does not change on every redraw)
-    if not self.fala then self.fala = Estado.fala(s, agora, nil, nil, "traca") end
+    if not self.speech then self.speech = State.speech(s, now, nil, nil, "yomimon") end
     -- Yomimon always stays at Figma's spot; the balloon grows upwards (and widens for long
     -- phrases), never going past the header
     -- the tail sits right above the drawing's real head (small stages: the balloon comes down)
-    local m = self:medirBalao(self.mensagem or self.fala)
-    local nome = self.quadro_atual or Estado.sprite(s, agora)
-    local cabeca = (self.sprite_rect.y - self.oy) / self.k + Desenho.topoReal(nome) * self.sprite_escala / self.k
-    local ponta = cabeca - 30
-    local topo = math.max(70, ponta - (m.H + 15))
-    self:balao(bb, self.mensagem or self.fala, nil, topo, m)
+    local m = self:measureBalloon(self.message or self.speech)
+    local nameText = self.current_frame or State.sprite(s, now)
+    local head = (self.sprite_rect.y - self.oy) / self.k + Drawing.realTop(nameText) * self.sprite_scale / self.k
+    local tip = head - 30
+    local top = math.max(70, tip - (m.H + 15))
+    self:balloon(bb, self.message or self.speech, nil, top, m)
 
     -- Yomimon
     local r = self.sprite_rect
-    Desenho.pintarSprite(bb, self.quadro_atual or Estado.sprite(s, agora), r.x, r.y, self.sprite_escala)
+    Drawing.paintSprite(bb, self.current_frame or State.sprite(s, now), r.x, r.y, self.sprite_scale)
 
-    self:cartoesStatus(bb, s, agora)
+    self:statusCards(bb, s, now)
 end
 
 -- Page navigation (notebook and diary) -------------------------------------
 
-function YomimonScreen:navegacao(bb, total)
+function YomimonScreen:navigation(bb, total)
     if total <= 1 then return end
-    self.pag = math.max(1, math.min(self.pag or 1, total))
-    self:cartao(bb, 20, 744, 84, 50, true)
-    self:texto(bb, "<", 0, 750, true, 28, PRETO, 62)
-    self:cartao(bb, 514, 744, 84, 50, true)
-    self:texto(bb, ">", 0, 750, true, 28, PRETO, 556)
-    self:texto(bb, string.format("%d / %d", self.pag, total), 0, 760, false, 14, CINZA_55, 309)
-    self:alvo(14, 738, 100, 64, function() self.pag = math.max(1, self.pag - 1) end)
-    self:alvo(508, 738, 100, 64, function() self.pag = math.min(total, self.pag + 1) end)
+    self.pg = math.max(1, math.min(self.pg or 1, total))
+    self:card(bb, 20, 744, 84, 50, true)
+    self:textValue(bb, "<", 0, 750, true, 28, BLACK, 62)
+    self:card(bb, 514, 744, 84, 50, true)
+    self:textValue(bb, ">", 0, 750, true, 28, BLACK, 556)
+    self:textValue(bb, string.format("%d / %d", self.pg, total), 0, 760, false, 14, GREY_55, 309)
+    self:target(14, 738, 100, 64, function() self.pg = math.max(1, self.pg - 1) end)
+    self:target(508, 738, 100, 64, function() self.pg = math.min(total, self.pg + 1) end)
 end
 
 --- Balloon with the tail on the left (Figma 37:7072): same border and shadow as the
--- main balloon; the height grows with the text and the balloon is centred on `centro_y`.
-function YomimonScreen:balaoLateral(bb, texto, bx, W, centro_y, tam)
-    local caixa = TextBoxWidget:new{
-        text = maiusculas(texto), face = self:face(false, tam or 13), width = self:px(W - 56),
+-- main balloon; the height grows with the text and the balloon is centred on `center_y`.
+function YomimonScreen:sideBalloon(bb, textValue, bx, W, center_y, tam)
+    local box = TextBoxWidget:new{
+        text = capitals(textValue), face = self:face(false, tam or 13), width = self:px(W - 56),
     }
-    local th = caixa:getSize().h / self.k
+    local th = box:getSize().h / self.k
     local H = th + 35
-    local by = centro_y - H / 2
+    local by = center_y - H / 2
     local function r(x, y, w, h, cor) self:ret(bb, bx + x, by + y, w, h, cor) end
-    r(3, 3, W - 6, H - 3, BRANCO)                         -- background
-    r(6, 0, W - 12, 3, PRETO)                             -- top
-    r(3, 3, 3, 3, PRETO); r(W - 6, 3, 3, 3, PRETO)
-    r(0, 6, 3, H - 9, PRETO)                              -- left side
-    r(3, H - 3, 3, 3, PRETO)
-    r(W - 3, 6, 3, H - 3, PRETO)                          -- right side
-    r(W - 6, H - 3, 3, 6, PRETO)
-    r(W, 9, 3, H - 3, PRETO); r(W + 3, 12, 3, H - 6, PRETO)          -- shadow on the right
-    r(6, H, W - 12, 3, PRETO)                                         -- base
-    r(9, H + 3, W - 9, 3, PRETO); r(12, H + 6, W - 9, 3, PRETO)      -- shadow below
+    r(3, 3, W - 6, H - 3, WHITE)                         -- background
+    r(6, 0, W - 12, 3, BLACK)                             -- top
+    r(3, 3, 3, 3, BLACK); r(W - 6, 3, 3, 3, BLACK)
+    r(0, 6, 3, H - 9, BLACK)                              -- left side
+    r(3, H - 3, 3, 3, BLACK)
+    r(W - 3, 6, 3, H - 3, BLACK)                          -- right side
+    r(W - 6, H - 3, 3, 6, BLACK)
+    r(W, 9, 3, H - 3, BLACK); r(W + 3, 12, 3, H - 6, BLACK)          -- shadow on the right
+    r(6, H, W - 12, 3, BLACK)                                         -- base
+    r(9, H + 3, W - 9, 3, BLACK); r(12, H + 6, W - 9, 3, BLACK)      -- shadow below
     -- tail on the left, at mid height
     local ty = math.floor(H / 2) - 1
-    r(0, ty - 6, 3, 15, BRANCO)
-    r(-3, ty - 3, 3, 9, BRANCO); r(-6, ty, 3, 3, BRANCO)
-    r(-3, ty - 6, 3, 3, PRETO); r(-6, ty - 3, 3, 3, PRETO); r(-9, ty, 3, 3, PRETO)
-    r(-6, ty + 3, 3, 3, PRETO); r(-3, ty + 6, 3, 3, PRETO)
-    caixa:paintTo(bb, self.ox + self:px(bx + 28), self.oy + self:px(by + 19))
-    caixa:free()
+    r(0, ty - 6, 3, 15, WHITE)
+    r(-3, ty - 3, 3, 9, WHITE); r(-6, ty, 3, 3, WHITE)
+    r(-3, ty - 6, 3, 3, BLACK); r(-6, ty - 3, 3, 3, BLACK); r(-9, ty, 3, 3, BLACK)
+    r(-6, ty + 3, 3, 3, BLACK); r(-3, ty + 6, 3, 3, BLACK)
+    box:paintTo(bb, self.ox + self:px(bx + 28), self.oy + self:px(by + 19))
+    box:free()
 end
 
 --- Yomimon's little face with a balloon beside it (used in the archive screens).
-function YomimonScreen:rodapeFala(bb, s, texto, y)
-    local escala = math.max(1, math.floor(110 * self.k / Desenho.LARGURA))
-    Desenho.pintarSprite(bb, Estado.fase(s).nome, self.ox + self:px(14), self.oy + self:px(y), escala)
-    local lado = escala * Desenho.LARGURA / self.k
-    self:balaoLateral(bb, texto, 14 + lado + 16, LARG - (14 + lado + 16) - 20, y + lado / 2)
+function YomimonScreen:footerSpeech(bb, s, textValue, y)
+    local scale = math.max(1, math.floor(110 * self.k / Drawing.WIDTH))
+    Drawing.paintSprite(bb, State.stage(s).nameText, self.ox + self:px(14), self.oy + self:px(y), scale)
+    local side = scale * Drawing.WIDTH / self.k
+    self:sideBalloon(bb, textValue, 14 + side + 16, WIDE - (14 + side + 16) - 20, y + side / 2)
 end
 
 -- Notebook: KOReader's highlights and notes, organised by book ---------------
 
-function YomimonScreen:carregarSublinhados()
-    local s = self.traca.estado
-    self.caderno = s.dev_simulacao and s.sim_sublinhados or YomimonScreen.lerSublinhados()
-    self.livro_aberto = nil
+function YomimonScreen:loadHighlights()
+    local s = self.plugin.state
+    self.notebook = s.dev_simulation and s.sim_highlights or YomimonScreen.readHighlights()
+    self.open_book = nil
 end
 
 --- KOReader's highlights and notes, grouped by book (most recent first).
-function YomimonScreen.lerSublinhados()
-    local livros = {}
+function YomimonScreen.readHighlights()
+    local books = {}
     pcall(function()
         local ReadHistory = require("readhistory")
         local DocSettings = require("docsettings")
@@ -458,102 +458,102 @@ function YomimonScreen.lerSublinhados()
             if item.file and DocSettings:hasSidecarFile(item.file) then
                 local ds = DocSettings:open(item.file)
                 local props = ds:readSetting("doc_props") or {}
-                local titulo = props.display_title or props.title or item.text or "?"
-                local itens = {}
+                local titleText = props.display_title or props.title or item.text or "?"
+                local items = {}
                 for _, a in ipairs(ds:readSetting("annotations") or {}) do
                     if a.text and a.text ~= "" and (a.drawer or a.note) then
-                        itens[#itens + 1] = { texto = a.text, nota = a.note, capitulo = a.chapter, data = a.datetime or "" }
+                        items[#items + 1] = { textValue = a.text, grade = a.note, chapter = a.chapter, data = a.datetime or "" }
                     end
                 end
-                if #itens > 0 then
-                    table.sort(itens, function(a, b) return a.data < b.data end)
-                    livros[#livros + 1] = { livro = titulo, autor = props.authors, itens = itens, recente = itens[#itens].data }
+                if #items > 0 then
+                    table.sort(items, function(a, b) return a.data < b.data end)
+                    books[#books + 1] = { book = titleText, author = props.authors, items = items, recent = items[#items].data }
                 end
             end
         end
     end)
-    table.sort(livros, function(a, b) return a.recente > b.recente end)
-    return livros
+    table.sort(books, function(a, b) return a.recent > b.recent end)
+    return books
 end
 
-function YomimonScreen:pintarCaderno(bb, s)
-    local livros = self.caderno or {}
-    if #livros == 0 then
-        self:rodapeFala(bb, s, T"No highlights. Either you don't read or you don't feel. Hold your finger on a sentence and highlight it.", 380)
+function YomimonScreen:paintNotebook(bb, s)
+    local books = self.notebook or {}
+    if #books == 0 then
+        self:footerSpeech(bb, s, T"No highlights. Either you don't read or you don't feel. Hold your finger on a sentence and highlight it.", 380)
         return
     end
-    if self.livro_aberto then return self:pintarSublinhado(bb, s, livros[self.livro_aberto]) end
+    if self.open_book then return self:paintHighlight(bb, s, books[self.open_book]) end
 
     -- shelf: 2 columns x 3 rows of little boxes
-    local por_pag = 6
-    local total = math.ceil(#livros / por_pag)
-    self.pag = math.max(1, math.min(self.pag or 1, total))
-    for k = 0, por_pag - 1 do
-        local idx = (self.pag - 1) * por_pag + k + 1
-        local L = livros[idx]
+    local per_page = 6
+    local total = math.ceil(#books / per_page)
+    self.pg = math.max(1, math.min(self.pg or 1, total))
+    for k = 0, per_page - 1 do
+        local idx = (self.pg - 1) * per_page + k + 1
+        local L = books[idx]
         if not L then break end
         local x = 20 + (k % 2) * 299
         local y = 92 + math.floor(k / 2) * 208
-        self:cartao(bb, x, y, 279, 188, true)
-        self:ret(bb, x + 16, y + 16, 6, 30, PRETO)  -- spine in pixels
-        self:ret(bb, x + 22, y + 16, 3, 30, CINZA_BB)
-        local titulo = TextBoxWidget:new{
-            text = maiusculas(L.livro), face = self:face(true, 14), width = self:px(220),
+        self:card(bb, x, y, 279, 188, true)
+        self:ret(bb, x + 16, y + 16, 6, 30, BLACK)  -- spine in pixels
+        self:ret(bb, x + 22, y + 16, 3, 30, GREY_BB)
+        local titleText = TextBoxWidget:new{
+            text = capitals(L.book), face = self:face(true, 14), width = self:px(220),
             height = self:px(90), height_overflow_show_ellipsis = true,
         }
-        titulo:paintTo(bb, self.ox + self:px(x + 38), self.oy + self:px(y + 16))
-        titulo:free()
-        if L.autor then
-            local autor = TextBoxWidget:new{
-                text = maiusculas(L.autor:gsub("\n.*", "")), face = self:face(false, 10), fgcolor = CINZA_55,
+        titleText:paintTo(bb, self.ox + self:px(x + 38), self.oy + self:px(y + 16))
+        titleText:free()
+        if L.author then
+            local author = TextBoxWidget:new{
+                text = capitals(L.author:gsub("\n.*", "")), face = self:face(false, 10), fgcolor = GREY_55,
                 width = self:px(220), height = self:px(28), height_overflow_show_ellipsis = true,
             }
-            autor:paintTo(bb, self.ox + self:px(x + 38), self.oy + self:px(y + 112))
-            autor:free()
+            author:paintTo(bb, self.ox + self:px(x + 38), self.oy + self:px(y + 112))
+            author:free()
         end
-        local n = #L.itens
-        self:texto(bb, string.format("%d %s", n, n == 1 and T"HIGHLIGHT" or T"HIGHLIGHTS"), x + 16, y + 154, true, 11, CINZA_55)
-        self:alvo(x, y, 279, 188, function()
-            self.livro_aberto = idx
-            self.pag_estante = self.pag
-            self.pag = 1
+        local n = #L.items
+        self:textValue(bb, string.format("%d %s", n, n == 1 and T"HIGHLIGHT" or T"HIGHLIGHTS"), x + 16, y + 154, true, 11, GREY_55)
+        self:target(x, y, 279, 188, function()
+            self.open_book = idx
+            self.shelf_page = self.pg
+            self.pg = 1
         end)
     end
-    self:navegacao(bb, total)
+    self:navigation(bb, total)
 end
 
-function YomimonScreen:pintarSublinhado(bb, s, L)
+function YomimonScreen:paintHighlight(bb, s, L)
     -- back to the shelf
-    self:cartao(bb, 20, 82, 150, 38, true)
-    self:texto(bb, T"< BOOKS", 0, 92, true, 13, PRETO, 95)
-    self:alvo(14, 76, 162, 50, function()
-        self.livro_aberto = nil
-        self.pag = self.pag_estante or 1
+    self:card(bb, 20, 82, 150, 38, true)
+    self:textValue(bb, T"< BOOKS", 0, 92, true, 13, BLACK, 95)
+    self:target(14, 76, 162, 50, function()
+        self.open_book = nil
+        self.pg = self.shelf_page or 1
     end)
-    local livro = TextBoxWidget:new{
-        text = maiusculas(L.livro), face = self:face(true, 12), fgcolor = CINZA_55, width = self:px(410),
+    local book = TextBoxWidget:new{
+        text = capitals(L.book), face = self:face(true, 12), fgcolor = GREY_55, width = self:px(410),
         height = self:px(16), height_overflow_show_ellipsis = true,
     }
-    livro:paintTo(bb, self.ox + self:px(188), self.oy + self:px(94))
-    livro:free()
+    book:paintTo(bb, self.ox + self:px(188), self.oy + self:px(94))
+    book:free()
 
-    local total = #L.itens
-    self.pag = math.max(1, math.min(self.pag or 1, total))
-    local item = L.itens[self.pag]
-    self:cartao(bb, 20, 136, 578, 392, true)
-    self:ret(bb, 44, 154, 18, 6, PRETO)  -- quotation marks in pixels
-    self:ret(bb, 44, 160, 6, 12, PRETO)
-    self:ret(bb, 68, 154, 18, 6, PRETO)
-    self:ret(bb, 68, 160, 6, 12, PRETO)
-    local corpo = TextBoxWidget:new{
-        text = item.texto, face = self:face(false, 16), width = self:px(526),
+    local total = #L.items
+    self.pg = math.max(1, math.min(self.pg or 1, total))
+    local item = L.items[self.pg]
+    self:card(bb, 20, 136, 578, 392, true)
+    self:ret(bb, 44, 154, 18, 6, BLACK)  -- quotation marks in pixels
+    self:ret(bb, 44, 160, 6, 12, BLACK)
+    self:ret(bb, 68, 154, 18, 6, BLACK)
+    self:ret(bb, 68, 160, 6, 12, BLACK)
+    local body = TextBoxWidget:new{
+        text = item.textValue, face = self:face(false, 16), width = self:px(526),
         height = self:px(290), height_overflow_show_ellipsis = true,
     }
-    corpo:paintTo(bb, self.ox + self:px(44), self.oy + self:px(184))
-    corpo:free()
-    if item.capitulo then
+    body:paintTo(bb, self.ox + self:px(44), self.oy + self:px(184))
+    body:free()
+    if item.chapter then
         local cap = TextBoxWidget:new{
-            text = "— " .. maiusculas(item.capitulo), face = self:face(false, 11), fgcolor = CINZA_55,
+            text = "— " .. capitals(item.chapter), face = self:face(false, 11), fgcolor = GREY_55,
             width = self:px(526), height = self:px(16), height_overflow_show_ellipsis = true,
         }
         cap:paintTo(bb, self.ox + self:px(44), self.oy + self:px(494))
@@ -562,135 +562,135 @@ function YomimonScreen:pintarSublinhado(bb, s, L)
 
     -- comment with context
     local no_cap = 0
-    for _, it in ipairs(L.itens) do if it.capitulo and it.capitulo == item.capitulo then no_cap = no_cap + 1 end end
-    local pers = Memoria.personagens(s, L.livro, 10)
-    local comentario = Memoria.comentarioContexto(item, {
-        s = s, temperamento = Estado.fase(s).temperamento, livro = L.livro, personagens = pers,
-        ordem = self.pag, total = total, no_capitulo = no_cap,
+    for _, it in ipairs(L.items) do if it.chapter and it.chapter == item.chapter then no_cap = no_cap + 1 end end
+    local chars = Memory.characters(s, L.book, 10)
+    local comment = Memory.contextComment(item, {
+        s = s, temperament = State.stage(s).temperament, book = L.book, characters = chars,
+        order = self.pg, total = total, in_chapter = no_cap,
     })
-    self:rodapeFala(bb, s, comentario, 560)
-    self:navegacao(bb, total)
+    self:footerSpeech(bb, s, comment, 560)
+    self:navigation(bb, total)
 end
 
 -- Diary: memories and what the books did to it --------------------------------
 
-local MESES = {}
-for m in T"JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC":gmatch("%S+") do MESES[#MESES + 1] = m end
+local MONTHS = {}
+for m in T"JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC":gmatch("%S+") do MONTHS[#MONTHS + 1] = m end
 
-function YomimonScreen:pintarDiario(bb, s)
+function YomimonScreen:paintDiary(bb, s)
     local y = 88
     -- summarised "inner library": who it became
-    local a, b = Memoria.ambivalente(s)
-    local resumo
+    local a, b = Memory.ambivalent(s)
+    local summary
     if a then
-        resumo = string.format(T"TORN BETWEEN %s AND %s", maiusculas(Memoria.NOMES_TEMA[a]), maiusculas(Memoria.NOMES_TEMA[b]))
-    elseif s.tema_dominante then
-        resumo = string.format(T"OBSESSED WITH %s", maiusculas(Memoria.tema(s.tema_dominante, "por")))
+        summary = string.format(T"TORN BETWEEN %s AND %s", capitals(Memory.THEME_NAMES[a]), capitals(Memory.THEME_NAMES[b]))
+    elseif s.dominant_theme then
+        summary = string.format(T"OBSESSED WITH %s", capitals(Memory.theme(s.dominant_theme, "por")))
     end
     -- the way it ended up with your readings (up to 2 traits; 1 when it is already divided)
-    local jeito = Tracos.rotulos(s.tracos, a and 1 or 2)
-    if #jeito > 0 then resumo = (resumo and (resumo .. " · ") or "") .. table.concat(jeito, " · ") end
-    resumo = resumo or T"NO OPINIONS YET. READ MORE."
-    self:texto(bb, resumo, 20, y, true, 12, CINZA_55)
+    local manner = Traits.labels(s.traits, a and 1 or 2)
+    if #manner > 0 then summary = (summary and (summary .. " · ") or "") .. table.concat(manner, " · ") end
+    summary = summary or T"NO OPINIONS YET. READ MORE."
+    self:textValue(bb, summary, 20, y, true, 12, GREY_55)
     y = y + 26
 
-    local entradas = {}
-    for i = #(s.diario or {}), 1, -1 do entradas[#entradas + 1] = s.diario[i] end
-    if #entradas == 0 then
-        self:rodapeFala(bb, s, T"My diary is empty. Like your bookshelf.", 380)
+    local entries = {}
+    for i = #(s.diary or {}), 1, -1 do entries[#entries + 1] = s.diary[i] end
+    if #entries == 0 then
+        self:footerSpeech(bb, s, T"My diary is empty. Like your bookshelf.", 380)
         return
     end
-    local por_pag = 5
-    local total = math.ceil(#entradas / por_pag)
-    self.pag = math.max(1, math.min(self.pag or 1, total))
-    for i = (self.pag - 1) * por_pag + 1, math.min(#entradas, self.pag * por_pag) do
-        local e = entradas[i]
+    local per_page = 5
+    local total = math.ceil(#entries / per_page)
+    self.pg = math.max(1, math.min(self.pg or 1, total))
+    for i = (self.pg - 1) * per_page + 1, math.min(#entries, self.pg * per_page) do
+        local e = entries[i]
         local d = os.date("*t", e.t)
-        self:texto(bb, string.format("%02d %s", d.day, MESES[d.month]), 20, y, true, 12)
-        local caixa = TextBoxWidget:new{
-            text = maiusculas(e.texto), face = self:face(false, 13), width = self:px(500),
+        self:textValue(bb, string.format("%02d %s", d.day, MONTHS[d.month]), 20, y, true, 12)
+        local box = TextBoxWidget:new{
+            text = capitals(e.textValue), face = self:face(false, 13), width = self:px(500),
             height = self:px(72), height_overflow_show_ellipsis = true,
         }
-        local hh = caixa:getSize().h / self.k
-        caixa:paintTo(bb, self.ox + self:px(96), self.oy + self:px(y))
-        caixa:free()
+        local hh = box:getSize().h / self.k
+        box:paintTo(bb, self.ox + self:px(96), self.oy + self:px(y))
+        box:free()
         y = y + math.max(22, hh) + 14
-        self:ret(bb, 20, y - 8, 578, 3, CINZA_BB)
+        self:ret(bb, 20, y - 8, 578, 3, GREY_BB)
         y = y + 6
     end
-    self:navegacao(bb, total)
+    self:navigation(bb, total)
 end
 
 --- Belly/mood and stage cards (footer of the main screen).
-function YomimonScreen:cartoesStatus(bb, s, agora)
+function YomimonScreen:statusCards(bb, s, now)
     -- status card: belly and mood
     -- the two cards (380 + 20 of space + 174, plus 6 of shadow) centred on the screen
-    local cx, cy = (LARG - 580) / 2, 696
-    self:cartao(bb, cx, cy, 380, 104, true)
-    self:retangulos(bb, ICONE_LIVRO, cx, cy, PRETO)
-    self:retangulos(bb, ICONE_CARA, cx, cy, PRETO)
-    self:texto(bb, T"BELLY", cx + 62, cy + 12, true, 16)
-    local hoje = Estado.paginasHoje(s, agora)
-    self:texto(bb, string.format(T"%s · %d PG TODAY", Estado.rotuloBarriga(s), hoje), cx + 62, cy + 33, false, 10, CINZA_55)
-    self:texto(bb, T"MOOD", cx + 62, cy + 58, true, 16)
-    self:texto(bb, Estado.rotuloHumor(s), cx + 62, cy + 79, false, 10, CINZA_55)
-    self:bolinhas(bb, cx + 244, cy + 16, Estado.bolinhas(s.barriga))
-    self:bolinhas(bb, cx + 244, cy + 62, Estado.bolinhas(s.humor))
+    local cx, cy = (WIDE - 580) / 2, 696
+    self:card(bb, cx, cy, 380, 104, true)
+    self:rectangles(bb, ICON_BOOK, cx, cy, BLACK)
+    self:rectangles(bb, ICON_FACE, cx, cy, BLACK)
+    self:textValue(bb, T"BELLY", cx + 62, cy + 12, true, 16)
+    local today = State.pagesToday(s, now)
+    self:textValue(bb, string.format(T"%s · %d PG TODAY", State.bellyLabel(s), today), cx + 62, cy + 33, false, 10, GREY_55)
+    self:textValue(bb, T"MOOD", cx + 62, cy + 58, true, 16)
+    self:textValue(bb, State.moodLabel(s), cx + 62, cy + 79, false, 10, GREY_55)
+    self:dots(bb, cx + 244, cy + 16, State.dots(s.belly))
+    self:dots(bb, cx + 244, cy + 62, State.dots(s.mood))
 
     -- form card: name, pages left for the next form and the bar up to it
-    local ix, iy, larg = cx + 400, 696, 146
-    self:cartao(bb, ix, iy, 174, 104, true)
-    local pf = Estado.progressoFase(s)
-    self:texto(bb, maiusculas(pf.fase.titulo), ix + 14, iy + 8, true, 16)
-    local alvo = pf.proxima and maiusculas(pf.proxima.titulo) or T"FINAL FORM"
-    local linha1 = pf.proxima and (pf.paginas == 1 and T"PAGE TO" or T"PAGES TO") or T"REACHED"
-    local rotulo = math.max(self:larguraTexto(linha1, false, 10), self:larguraTexto(alvo, true, 10))
-    local num = pf.proxima and Desenho.milhar(pf.paginas) or "OK"
-    local tam_num = 28
-    while tam_num > 16 and self:larguraTexto(num, true, tam_num) + 6 + rotulo > larg do tam_num = tam_num - 4 end
-    local nw = self:texto(bb, num, ix + 14, iy + 26, true, tam_num)
-    self:texto(bb, linha1, ix + 14 + nw + 6, iy + 30, false, 10, CINZA_55)
-    self:texto(bb, alvo, ix + 14 + nw + 6, iy + 43, true, 10)
+    local ix, iy, wid = cx + 400, 696, 146
+    self:card(bb, ix, iy, 174, 104, true)
+    local pf = State.stageProgress(s)
+    self:textValue(bb, capitals(pf.stage.titleText), ix + 14, iy + 8, true, 16)
+    local target = pf.nextForm and capitals(pf.nextForm.titleText) or T"FINAL FORM"
+    local linha1 = pf.nextForm and (pf.pages == 1 and T"PAGE TO" or T"PAGES TO") or T"REACHED"
+    local label = math.max(self:textWidth(linha1, false, 10), self:textWidth(target, true, 10))
+    local num = pf.nextForm and Drawing.thousands(pf.pages) or "OK"
+    local size_num = 28
+    while size_num > 16 and self:textWidth(num, true, size_num) + 6 + label > wid do size_num = size_num - 4 end
+    local nw = self:textValue(bb, num, ix + 14, iy + 26, true, size_num)
+    self:textValue(bb, linha1, ix + 14 + nw + 6, iy + 30, false, 10, GREY_55)
+    self:textValue(bb, target, ix + 14 + nw + 6, iy + 43, true, 10)
     -- bar: grey track and the progress in black
-    self:ret(bb, ix + 14, iy + 64, larg, 6, CINZA_BB)
-    local cheio = math.floor(larg * pf.fracao + 0.5)
-    if cheio > 0 then self:ret(bb, ix + 14, iy + 64, cheio, 6, PRETO) end
-    self:retangulos(bb, ICONE_AMPULHETA, ix, iy, CINZA_55)
-    self:texto(bb, string.format(T"%s PAGES READ", Desenho.milhar(s.paginas)), ix + 30, iy + 77, false, 10, CINZA_55)
+    self:ret(bb, ix + 14, iy + 64, wid, 6, GREY_BB)
+    local full_one = math.floor(wid * pf.fraction + 0.5)
+    if full_one > 0 then self:ret(bb, ix + 14, iy + 64, full_one, 6, BLACK) end
+    self:rectangles(bb, ICON_HOURGLASS, ix, iy, GREY_55)
+    self:textValue(bb, string.format(T"%s PAGES READ", Drawing.thousands(s.pages)), ix + 30, iy + 77, false, 10, GREY_55)
 end
 
 --- Sleep screen: the balloon and Yomimon asleep, alone, in the middle of the screen (no cards since 29/10/2026:
 -- the image is drawn when the Kindle sleeps, and in the morning belly, mood and "pages today" would already be yesterday's).
 -- Paints on an image and saves it as PNG; KOReader shows it when the Kindle sleeps.
--- escolher = true only when the Kindle goes to sleep: the phrase is chosen now (Estado.falaDescanso); in the other
+-- escolher = true only when the Kindle goes to sleep: the phrase is chosen now (State.restSpeech); in the other
 -- redraws, it repeats the last one.
-function YomimonScreen.gerarTelaDescanso(s, caminho, agora, escolher)
+function YomimonScreen.generateSleepScreen(s, path, now, pick)
     local sw, sh = Screen:getWidth(), Screen:getHeight()
     local w, h = math.min(sw, sh), math.max(sw, sh)  -- always portrait
     local bb = Blitbuffer.new(w, h, Blitbuffer.TYPE_BB8)
-    bb:fill(BRANCO)
-    local k = math.min(w / LARG, h / ALT)
+    bb:fill(WHITE)
+    local k = math.min(w / WIDE, h / ALT)
     local p = setmetatable({
-        k = k, ox = math.floor((w - LARG * k) / 2), oy = math.floor((h - ALT * k) / 2),
-        fator_fonte = Screen:scaleBySize(1000) / 1000, faces = {},
+        k = k, ox = math.floor((w - WIDE * k) / 2), oy = math.floor((h - ALT * k) / 2),
+        font_factor = Screen:scaleBySize(1000) / 1000, faces = {},
     }, { __index = YomimonScreen })
     -- the sleeping creature: the sprite of the current form with the "z"s (or the ball, if the sprite was not downloaded).
     -- 64 high, at the Home's pixel size.
-    local nome = Estado.sprite(s, agora, true)
-    local escala = math.max(1, math.floor(295 * k / Desenho.LARGURA))
-    local L = Desenho.sprite(nome)
-    local larg = #L[1] * escala
-    local topo_real = Desenho.topoReal(nome) * escala           -- empty lines above the head
-    local alt_real = #L * escala - topo_real
+    local nameText = State.sprite(s, now, true)
+    local scale = math.max(1, math.floor(295 * k / Drawing.WIDTH))
+    local L = Drawing.sprite(nameText)
+    local wid = #L[1] * scale
+    local real_top = Drawing.realTop(nameText) * scale           -- empty lines above the head
+    local alt_real = #L * scale - real_top
     -- balloon and Yomimon as a group, like the Home (tail 30 above the head), in the middle of the screen
-    local fala = Estado.falaDescanso(s, agora, escolher)
-    local m = p:medirBalao(fala)
-    local grupo = m.H + 15 + 30 + alt_real / k
-    local topo = math.max(20, (ALT - grupo) / 2)
-    p:balao(bb, fala, nil, topo, m)
-    local cabeca = p.oy + p:px(topo + m.H + 15 + 30)
-    Desenho.pintarSprite(bb, nome, p.ox + p:px(LARG / 2) - math.floor(larg / 2), cabeca - topo_real, escala)
-    local ok, err = pcall(bb.writePNG, bb, caminho)
+    local speech = State.restSpeech(s, now, pick)
+    local m = p:measureBalloon(speech)
+    local group = m.H + 15 + 30 + alt_real / k
+    local top = math.max(20, (ALT - group) / 2)
+    p:balloon(bb, speech, nil, top, m)
+    local head = p.oy + p:px(top + m.H + 15 + 30)
+    Drawing.paintSprite(bb, nameText, p.ox + p:px(WIDE / 2) - math.floor(wid / 2), head - real_top, scale)
+    local ok, err = pcall(bb.writePNG, bb, path)
     bb:free()
     return ok, err
 end
@@ -698,577 +698,577 @@ end
 -- Achievements: summary, milestones and shelf by year --------------------------------------
 
 --- Books marked as finished in KOReader (or read to the end), with the date.
-function YomimonScreen.livrosTerminados()
-    local lista = {}
+function YomimonScreen.finishedBooks()
+    local list = {}
     pcall(function()
         local ReadHistory = require("readhistory")
         local DocSettings = require("docsettings")
         for _, item in ipairs(ReadHistory.hist or {}) do
             if item.file and DocSettings:hasSidecarFile(item.file) then
                 local ds = DocSettings:open(item.file)
-                local resumo = ds:readSetting("summary") or {}
+                local summary = ds:readSetting("summary") or {}
                 local pct = ds:readSetting("percent_finished") or 0
-                if resumo.status == "complete" or pct >= 0.995 then
+                if summary.status == "complete" or pct >= 0.995 then
                     local props = ds:readSetting("doc_props") or {}
-                    local data = resumo.modified or (item.time and os.date("%Y-%m-%d", item.time)) or ""
-                    lista[#lista + 1] = { titulo = props.display_title or props.title or item.text or "?", data = data }
+                    local data = summary.modified or (item.time and os.date("%Y-%m-%d", item.time)) or ""
+                    list[#list + 1] = { titleText = props.display_title or props.title or item.text or "?", data = data }
                 end
             end
         end
     end)
-    table.sort(lista, function(a, b) return a.data > b.data end)
-    return lista
+    table.sort(list, function(a, b) return a.data > b.data end)
+    return list
 end
 
-function YomimonScreen:pintarConquistas(bb, s)
-    local terminados = self.terminados or {}
+function YomimonScreen:paintAchievements(bb, s)
+    local finishedList = self.finishedList or {}
     -- page 1: summary + milestones; following pages: shelf by year
-    local anos, por_ano = {}, {}
-    for _, L in ipairs(terminados) do
-        local ano = L.data:sub(1, 4)
-        if ano == "" then ano = "????" end
-        if not por_ano[ano] then por_ano[ano] = {}; anos[#anos + 1] = ano end
-        table.insert(por_ano[ano], L)
+    local years, per_year = {}, {}
+    for _, L in ipairs(finishedList) do
+        local year = L.data:sub(1, 4)
+        if year == "" then year = "????" end
+        if not per_year[year] then per_year[year] = {}; years[#years + 1] = year end
+        table.insert(per_year[year], L)
     end
-    local paginas_estante = {}
-    for _, ano in ipairs(anos) do
-        local lista = por_ano[ano]
-        for i = 1, #lista, 9 do
-            paginas_estante[#paginas_estante + 1] = { ano = ano, total = #lista, de = i, lista = lista }
+    local shelf_pages = {}
+    for _, year in ipairs(years) do
+        local list = per_year[year]
+        for i = 1, #list, 9 do
+            shelf_pages[#shelf_pages + 1] = { year = year, total = #list, de = i, list = list }
         end
     end
-    local total = 2 + #paginas_estante  -- 2 pages of milestones
-    self.pag = math.max(1, math.min(self.pag or 1, total))
+    local total = 2 + #shelf_pages  -- 2 pages of milestones
+    self.pg = math.max(1, math.min(self.pg or 1, total))
 
-    if self.pag <= 2 then
-        if self.pag == 1 then
+    if self.pg <= 2 then
+        if self.pg == 1 then
             -- summary card
-            self:cartao(bb, 20, 86, 578, 96, true)
-            local function bloco(x, valor, rotulo)
-                self:texto(bb, valor, x, 100, true, 28)
-                self:texto(bb, rotulo, x, 140, false, 10, CINZA_55)
+            self:card(bb, 20, 86, 578, 96, true)
+            local function block(x, val, label)
+                self:textValue(bb, val, x, 100, true, 28)
+                self:textValue(bb, label, x, 140, false, 10, GREY_55)
             end
-            local paginas, dias = Estado.totais(s)
-            bloco(44, tostring(#terminados), T"BOOKS FINISHED")
-            bloco(240, Desenho.milhar(paginas), T"PAGES READ")
-            bloco(436, tostring(dias), T"DAYS READING")
+            local pages, days = State.totals(s)
+            block(44, tostring(#finishedList), T"BOOKS FINISHED")
+            block(240, Drawing.thousands(pages), T"PAGES READ")
+            block(436, tostring(days), T"DAYS READING")
         end
-        local marcos = Estado.marcos(s, {
-            livros_terminados = #terminados, sublinhados = self.n_sublinhados or 0,
-            ambivalente = Memoria.ambivalente(s) ~= nil,
+        local milestones = State.milestones(s, {
+            finished_books = #finishedList, highlights = self.n_highlights or 0,
+            ambivalent = Memory.ambivalent(s) ~= nil,
         })
-        local ini = self.pag == 1 and 1 or 11
-        local y0 = self.pag == 1 and 200 or 92
+        local ini = self.pg == 1 and 1 or 11
+        local y0 = self.pg == 1 and 200 or 92
         for k = 0, 9 do
-            local m = marcos[ini + k]
+            local m = milestones[ini + k]
             if not m then break end
             local x = 20 + (k % 2) * 299
             local y = y0 + math.floor(k / 2) * 104
-            self:cartao(bb, x, y, 279, 88, true)
+            self:card(bb, x, y, 279, 88, true)
             -- seal: filled square if achieved, empty (grey) if not
             local sx, sy = x + 16, y + 26
-            if m.feito then
-                self:ret(bb, sx + 3, sy, 20, 26, PRETO); self:ret(bb, sx, sy + 3, 26, 20, PRETO)
-                self:ret(bb, sx + 6, sy + 6, 3, 3, BRANCO)
+            if m.done then
+                self:ret(bb, sx + 3, sy, 20, 26, BLACK); self:ret(bb, sx, sy + 3, 26, 20, BLACK)
+                self:ret(bb, sx + 6, sy + 6, 3, 3, WHITE)
             else
-                self:ret(bb, sx + 3, sy, 20, 3, CINZA_BB); self:ret(bb, sx + 3, sy + 23, 20, 3, CINZA_BB)
-                self:ret(bb, sx, sy + 3, 3, 20, CINZA_BB); self:ret(bb, sx + 23, sy + 3, 3, 20, CINZA_BB)
+                self:ret(bb, sx + 3, sy, 20, 3, GREY_BB); self:ret(bb, sx + 3, sy + 23, 20, 3, GREY_BB)
+                self:ret(bb, sx, sy + 3, 3, 20, GREY_BB); self:ret(bb, sx + 23, sy + 3, 3, 20, GREY_BB)
             end
-            self:texto(bb, m.titulo, x + 56, y + 16, true, 13, m.feito and PRETO or CINZA_55)
-            local desc = m.feito and m.descricao
-                or (m.meta > 1 and string.format("%s / %s", Desenho.milhar(math.min(m.atual, m.meta)), Desenho.milhar(m.meta)) or m.descricao)
-            self:texto(bb, desc, x + 56, y + 42, false, 9, CINZA_55)
+            self:textValue(bb, m.titleText, x + 56, y + 16, true, 13, m.done and BLACK or GREY_55)
+            local desc = m.done and m.description
+                or (m.meta > 1 and string.format("%s / %s", Drawing.thousands(math.min(m.current, m.meta)), Drawing.thousands(m.meta)) or m.description)
+            self:textValue(bb, desc, x + 56, y + 42, false, 9, GREY_55)
         end
     else
-        local P = paginas_estante[self.pag - 2]
-        self:texto(bb, string.format("%s · %d %s", P.ano, P.total, P.total == 1 and T"BOOK" or T"BOOKS"), 20, 88, true, 18)
+        local P = shelf_pages[self.pg - 2]
+        self:textValue(bb, string.format("%s · %d %s", P.year, P.total, P.total == 1 and T"BOOK" or T"BOOKS"), 20, 88, true, 18)
         local y = 124
-        for i = P.de, math.min(P.de + 8, #P.lista) do
-            local L = P.lista[i]
-            self:cartao(bb, 20, y, 578, 62, true)
-            self:ret(bb, 36, y + 14, 6, 34, PRETO); self:ret(bb, 42, y + 14, 3, 34, CINZA_BB)  -- spine
+        for i = P.de, math.min(P.de + 8, #P.list) do
+            local L = P.list[i]
+            self:card(bb, 20, y, 578, 62, true)
+            self:ret(bb, 36, y + 14, 6, 34, BLACK); self:ret(bb, 42, y + 14, 3, 34, GREY_BB)  -- spine
             local t = TextBoxWidget:new{
-                text = maiusculas(L.titulo), face = self:face(true, 13), width = self:px(420),
+                text = capitals(L.titleText), face = self:face(true, 13), width = self:px(420),
                 height = self:px(18), height_overflow_show_ellipsis = true,
             }
             t:paintTo(bb, self.ox + self:px(60), self.oy + self:px(y + 14))
             t:free()
             local d = L.data
-            local dia, mes = d:sub(9, 10), tonumber(d:sub(6, 7))
-            self:texto(bb, mes and (dia .. " " .. MESES[mes]) or "", 60, y + 38, false, 10, CINZA_55)
+            local day, month = d:sub(9, 10), tonumber(d:sub(6, 7))
+            self:textValue(bb, month and (day .. " " .. MONTHS[month]) or "", 60, y + 38, false, 10, GREY_55)
             y = y + 70
         end
     end
-    self:navegacao(bb, total)
+    self:navigation(bb, total)
 end
 
 -- Pokédex: the Pokémon already chosen and the progress each one kept ---------------------------
 
 --- Pokédex: the Pokémon already chosen, each with the progress it kept; tapping one switches to it.
-function YomimonScreen:pintarPokedex(bb, s)
-    local lista = Estado.colecao(s)
-    local itens = {}
-    for _, e in ipairs(lista) do itens[#itens + 1] = e end
-    itens[#itens + 1] = { novo = true }
-    local por_pag = 5
-    local total = math.ceil(#itens / por_pag)
-    self.pag = math.max(1, math.min(self.pag or 1, total))
-    local escala = math.max(1, math.floor(80 * self.k / Desenho.LARGURA))
+function YomimonScreen:paintPokedex(bb, s)
+    local list = State.collection(s)
+    local items = {}
+    for _, e in ipairs(list) do items[#items + 1] = e end
+    items[#items + 1] = { new = true }
+    local per_page = 5
+    local total = math.ceil(#items / per_page)
+    self.pg = math.max(1, math.min(self.pg or 1, total))
+    local scale = math.max(1, math.floor(80 * self.k / Drawing.WIDTH))
     local y = 88
-    for i = (self.pag - 1) * por_pag + 1, math.min(#itens, self.pag * por_pag) do
-        local e = itens[i]
-        self:cartao(bb, 20, y, 578, 104, true)
-        if e.novo then
-            self:texto(bb, T"+ PICK ANOTHER POKÉMON", 0, y + 38, true, 18, PRETO, 309)
-            self:alvo(20, y, 578, 104, function() self.traca:mostrarBoasVindas(true) end)
+    for i = (self.pg - 1) * per_page + 1, math.min(#items, self.pg * per_page) do
+        local e = items[i]
+        self:card(bb, 20, y, 578, 104, true)
+        if e.new then
+            self:textValue(bb, T"+ PICK ANOTHER POKÉMON", 0, y + 38, true, 18, BLACK, 309)
+            self:target(20, y, 578, 104, function() self.plugin:showWelcome(true) end)
         else
-            Desenho.pintarSprite(bb, e.forma.nome, self.ox + self:px(30), self.oy + self:px(y + 12), escala)
-            self:texto(bb, maiusculas(e.forma.titulo), 130, y + 16, true, 15)
-            self:texto(bb, string.format(T"FORM %d OF %d", e.estagio, e.total), 130, y + 42, false, 10, CINZA_55)
-            local paginas = math.floor(e.letras / Estado.letrasPorPagina(s))
-            self:texto(bb, string.format(T"%s PAGES READ WITH YOU", Desenho.milhar(paginas)), 130, y + 62, false, 10, CINZA_55)
-            if e.atual then
-                self:texto(bb, T"WITH YOU NOW", 130, y + 80, true, 10)
+            Drawing.paintSprite(bb, e.form.nameText, self.ox + self:px(30), self.oy + self:px(y + 12), scale)
+            self:textValue(bb, capitals(e.form.titleText), 130, y + 16, true, 15)
+            self:textValue(bb, string.format(T"FORM %d OF %d", e.formIndex, e.total), 130, y + 42, false, 10, GREY_55)
+            local pages = math.floor(e.letters / State.lettersPerPage(s))
+            self:textValue(bb, string.format(T"%s PAGES READ WITH YOU", Drawing.thousands(pages)), 130, y + 62, false, 10, GREY_55)
+            if e.current then
+                self:textValue(bb, T"WITH YOU NOW", 130, y + 80, true, 10)
             else
-                self:texto(bb, ">", 0, y + 36, true, 24, PRETO, 570)
-                self:alvo(20, y, 578, 104, function()
-                    Estado.trocarEspecie(s, e.base)
-                    pcall(function() require("yomimon_simpleui").sincronizarCritter(self.traca) end)
-                    self.fala = nil
-                    self.traca:salvar(true)
-                    self.pag = 1
+                self:textValue(bb, ">", 0, y + 36, true, 24, BLACK, 570)
+                self:target(20, y, 578, 104, function()
+                    State.switchSpecies(s, e.base)
+                    pcall(function() require("yomimon_simpleui").syncCritter(self.plugin) end)
+                    self.speech = nil
+                    self.plugin:save(true)
+                    self.pg = 1
                 end)
             end
         end
         y = y + 120
     end
-    self:navegacao(bb, total)
+    self:navigation(bb, total)
 end
 
 -- Text cards ---------------------------------------------------------------------
 
 --- Height (in Figma points) a text takes at a width, with the pixel font.
-function YomimonScreen:alturaTexto(texto, negrito, tam, largura)
-    local t = TextBoxWidget:new{ text = texto, face = self:face(negrito, tam), width = self:px(largura) }
+function YomimonScreen:textHeight(textValue, negrito, tam, widthPx)
+    local t = TextBoxWidget:new{ text = textValue, face = self:face(negrito, tam), width = self:px(widthPx) }
     local h = t:getSize().h / self.k
     t:free()
     return h
 end
 
---- Card with a label and text, as tall as the text (up to altura_max). Returns the y right below.
-function YomimonScreen:caixaTexto(bb, y, rotulo, texto, altura_max)
-    texto = maiusculas(texto)
-    local altura = math.min(altura_max, math.ceil(self:alturaTexto(texto, false, 13, 530)) + 52)
-    self:cartao(bb, 20, y, 578, altura, true)
-    self:texto(bb, rotulo, 40, y + 14, true, 11, CINZA_55)
+--- Card with a label and text, as tall as the text (up to max_heightPx). Returns the y right below.
+function YomimonScreen:textBox(bb, y, label, textValue, max_heightPx)
+    textValue = capitals(textValue)
+    local heightPx = math.min(max_heightPx, math.ceil(self:textHeight(textValue, false, 13, 530)) + 52)
+    self:card(bb, 20, y, 578, heightPx, true)
+    self:textValue(bb, label, 40, y + 14, true, 11, GREY_55)
     local t = TextBoxWidget:new{
-        text = texto, face = self:face(false, 13), width = self:px(530),
-        height = self:px(altura - 46), height_overflow_show_ellipsis = true,
+        text = textValue, face = self:face(false, 13), width = self:px(530),
+        height = self:px(heightPx - 46), height_overflow_show_ellipsis = true,
     }
     t:paintTo(bb, self.ox + self:px(40), self.oy + self:px(y + 36))
     t:free()
-    return y + altura + 18
+    return y + heightPx + 18
 end
 
 --- Dev mode: saves each screen as PNG (koreader/yomimon/demo), at the device's resolution.
-function YomimonScreen:exportarTelas(pasta)
+function YomimonScreen:exportScreens(folder)
     local lfs = require("libs/libkoreader-lfs")
     local DataStorage = require("datastorage")
-    pasta = pasta or DataStorage:getDataDir() .. "/yomimon/demo"
-    local mae = pasta:match("^(.*)/[^/]+$")
-    if mae and lfs.attributes(mae, "mode") ~= "directory" then lfs.mkdir(mae) end
-    if lfs.attributes(pasta, "mode") ~= "directory" then lfs.mkdir(pasta) end
+    folder = folder or DataStorage:getDataDir() .. "/yomimon/demo"
+    local mother = folder:match("^(.*)/[^/]+$")
+    if mother and lfs.attributes(mother, "mode") ~= "directory" then lfs.mkdir(mother) end
+    if lfs.attributes(folder, "mode") ~= "directory" then lfs.mkdir(folder) end
     local bb = Blitbuffer.new(Screen:getWidth(), Screen:getHeight(), Blitbuffer.TYPE_BB8)
-    local s = self.traca.estado
-    local n, falhas = 0, 0
-    self.exportando = true  -- without the SIMULATION seal on the images
-    local function foto(nome, preparar)
+    local s = self.plugin.state
+    local n, failures = 0, 0
+    self.exporting = true  -- without the SIMULATION seal on the images
+    local function photo(nameText, prepare)
         local ok = pcall(function()
-            self.menu_aberto = false
-            preparar()
-            bb:fill(BRANCO)
+            self.menu_open = false
+            prepare()
+            bb:fill(WHITE)
             self:paintTo(bb, 0, 0)
-            bb:writePNG(string.format("%s/%02d-%s.png", pasta, n + 1, nome))
+            bb:writePNG(string.format("%s/%02d-%s.png", folder, n + 1, nameText))
         end)
-        if ok then n = n + 1 else falhas = falhas + 1 end
+        if ok then n = n + 1 else failures = failures + 1 end
     end
-    foto("casa", function() self.modo = nil; self.mensagem = nil end)
-    foto("menu", function() self.modo = nil; self.menu_aberto = true end)
-    foto("diario", function() self:entrar("diario") end)
-    foto("diario-2", function() self.pag = 2 end)
-    foto("caderno", function() self:entrar("caderno") end)
-    foto("caderno-trecho", function() self.livro_aberto = 1; self.pag = 1 end)
-    foto("conquistas", function() self:entrar("conquistas") end)
-    foto("conquistas-2", function() self.pag = 2 end)
-    foto("estante", function() self.pag = 3 end)
-    foto("percepcao", function() self:entrar("percepcao") end)
-    -- demo: phrases and dreams chosen (dev_falas and dev_sonhos, put in the simulated state), one screen
+    photo("casa", function() self.mode = nil; self.message = nil end)
+    photo("menu", function() self.mode = nil; self.menu_open = true end)
+    photo("diary", function() self:enter("diary") end)
+    photo("diario-2", function() self.pg = 2 end)
+    photo("notebook", function() self:enter("notebook") end)
+    photo("caderno-trecho", function() self.open_book = 1; self.pg = 1 end)
+    photo("achievements", function() self:enter("achievements") end)
+    photo("conquistas-2", function() self.pg = 2 end)
+    photo("shelf", function() self.pg = 3 end)
+    photo("perception", function() self:enter("perception") end)
+    -- demo: phrases and dreams chosen (dev_speeches and dev_dreams, put in the simulated state), one screen
     -- for each, in place of the drawn ones
-    for i, f in ipairs(s.dev_falas or {}) do
-        foto("casa-" .. i, function() self:entrar("casa"); self.mensagem = nil; self.fala = f end)
+    for i, f in ipairs(s.dev_speeches or {}) do
+        photo("casa-" .. i, function() self:enter("casa"); self.message = nil; self.speech = f end)
     end
     bb:free()
-    if pcall(YomimonScreen.gerarTelaDescanso, s, string.format("%s/%02d-descanso.png", pasta, n + 1), os.time()) then n = n + 1 end
-    for i, f in ipairs(s.dev_sonhos or {}) do
-        s.fala_descanso = f
-        if pcall(YomimonScreen.gerarTelaDescanso, s, string.format("%s/%02d-descanso-%d.png", pasta, n + 1, i), os.time(), false) then
+    if pcall(YomimonScreen.generateSleepScreen, s, string.format("%s/%02d-descanso.png", folder, n + 1), os.time()) then n = n + 1 end
+    for i, f in ipairs(s.dev_dreams or {}) do
+        s.rest_speech = f
+        if pcall(YomimonScreen.generateSleepScreen, s, string.format("%s/%02d-descanso-%d.png", folder, n + 1, i), os.time(), false) then
             n = n + 1
         end
     end
-    self.exportando = false
-    self:entrar("casa")
-    return n, pasta, falhas
+    self.exporting = false
+    self:enter("casa")
+    return n, folder, failures
 end
 
---- Dev mode: exports the screens of each simulation in koreader/yomimon/simulacoes/*.lua, each in its own folder in
+--- Dev mode: exports the screens of each simulation in koreader/yomimon/simulations/*.lua, each in its own folder in
 -- koreader/yomimon/demo/<file name>/. Saves nothing: at the end the state that was open comes back.
-function YomimonScreen:exportarSimulacoes()
+function YomimonScreen:exportSimulations()
     local lfs = require("libs/libkoreader-lfs")
     local DataStorage = require("datastorage")
     local LuaSettings = require("luasettings")
     local base = DataStorage:getDataDir() .. "/yomimon"
-    local arquivos = {}
-    if lfs.attributes(base .. "/simulacoes", "mode") == "directory" then
-        for f in lfs.dir(base .. "/simulacoes") do
-            if f:match("%.lua$") then arquivos[#arquivos + 1] = f end
+    local files = {}
+    if lfs.attributes(base .. "/simulations", "mode") == "directory" then
+        for f in lfs.dir(base .. "/simulations") do
+            if f:match("%.lua$") then files[#files + 1] = f end
         end
     end
-    table.sort(arquivos)
-    local traca, antes = self.traca, self.traca.estado
-    self:pararAnimacao()
-    local sims, telas, falhas = 0, 0, 0
-    for _, f in ipairs(arquivos) do
-        local ok, sim = pcall(function() return LuaSettings:open(base .. "/simulacoes/" .. f):readSetting("estado") end)
+    table.sort(files)
+    local plugin, before = self.plugin, self.plugin.state
+    self:stopAnimation()
+    local sims, screens, failures = 0, 0, 0
+    for _, f in ipairs(files) do
+        local ok, sim = pcall(function() return LuaSettings:open(base .. "/simulations/" .. f):readSetting("state") end)
         if ok and type(sim) == "table" then
-            traca.estado = Estado.normalizar(sim, os.time())
-            traca.estado.dev_simulacao = true
-            Estado.passarTempo(traca.estado, os.time())
-            self.fala, self.quadro_atual = nil, nil  -- nothing from the previous simulation
-            local n, _, x = self:exportarTelas(base .. "/demo/" .. (f:gsub("%.lua$", "")))
-            sims, telas, falhas = sims + 1, telas + n, falhas + x
+            plugin.state = State.normalize(sim, os.time())
+            plugin.state.dev_simulation = true
+            State.passTime(plugin.state, os.time())
+            self.speech, self.current_frame = nil, nil  -- nothing from the previous simulation
+            local n, _, x = self:exportScreens(base .. "/demo/" .. (f:gsub("%.lua$", "")))
+            sims, screens, failures = sims + 1, screens + n, failures + x
         else
-            falhas = falhas + 1
+            failures = failures + 1
         end
     end
-    traca.estado = antes
-    self.fala, self.quadro_atual = nil, nil
-    return sims, telas, falhas
+    plugin.state = before
+    self.speech, self.current_frame = nil, nil
+    return sims, screens, failures
 end
 
 -- Dev panel: what it noticed about the current book ----------------------------------------
 
-local NOMES_EVENTO = { morte = T"DEATH", casamento = T"WEDDING", viagem = T"JOURNEY", carta = T"LETTER",
+local EVENT_NAMES = { morte = T"DEATH", casamento = T"WEDDING", viagem = T"JOURNEY", carta = T"LETTER",
     tempestade = T"STORM", doenca = T"ILLNESS", festa = T"PARTY", briga = T"FIGHT", fuga = T"ESCAPE", crime = T"CRIME" }
 
-function YomimonScreen:pintarPercepcao(bb, s)
-    local livro = s.ultimo_livro
-    local P = livro and Memoria.percepcao(s, livro)
+function YomimonScreen:paintPerception(bb, s)
+    local book = s.last_book
+    local P = book and Memory.perception(s, book)
     if not P then
-        self:rodapeFala(bb, s, T"I haven't noticed anything yet. Read a few pages with this version.", 380)
+        self:footerSpeech(bb, s, T"I haven't noticed anything yet. Read a few pages with this version.", 380)
         return
     end
-    local linhas = { T"BOOK: " .. maiusculas(livro), "" , T"CHARACTERS (MENTIONS · LINES · CHAPTERS)" }
-    for i, p in ipairs(P.personagens) do
+    local lines = { T"BOOK: " .. capitals(book), "" , T"CHARACTERS (MENTIONS · LINES · CHAPTERS)" }
+    for i, p in ipairs(P.characters) do
         if i > 8 then break end
-        linhas[#linhas + 1] = string.format("  %s%s  %d · %d · %d", p.protagonista and "★ " or "", maiusculas(p.nome), p.vezes, p.falas, p.capitulos)
+        lines[#lines + 1] = string.format("  %s%s  %d · %d · %d", p.protagonist and "★ " or "", capitals(p.nameText), p.times, p.speeches, p.chapters)
     end
     local lug = {}
-    for i, l in ipairs(P.lugares) do if i <= 6 then lug[#lug + 1] = maiusculas(l[1]) end end
-    linhas[#linhas + 1] = ""
-    linhas[#linhas + 1] = T"PLACES: " .. (#lug > 0 and table.concat(lug, ", ") or "—")
-    local tem = {}
-    for i, t in ipairs(P.temas) do if i <= 4 then tem[#tem + 1] = string.format("%s %d", maiusculas(Memoria.tema(t[1])), math.floor(t[2] + 0.5)) end end
-    linhas[#linhas + 1] = T"THEMES: " .. (#tem > 0 and table.concat(tem, " · ") or "—")
+    for i, l in ipairs(P.places) do if i <= 6 then lug[#lug + 1] = capitals(l[1]) end end
+    lines[#lines + 1] = ""
+    lines[#lines + 1] = T"PLACES: " .. (#lug > 0 and table.concat(lug, ", ") or "—")
+    local has = {}
+    for i, t in ipairs(P.themes) do if i <= 4 then has[#has + 1] = string.format("%s %d", capitals(Memory.theme(t[1])), math.floor(t[2] + 0.5)) end end
+    lines[#lines + 1] = T"THEMES: " .. (#has > 0 and table.concat(has, " · ") or "—")
     local refs = {}
-    for i, r in ipairs(P.referencias or {}) do if i <= 4 then refs[#refs + 1] = string.format("%s %d", maiusculas(r[1]), r[2]) end end
-    linhas[#linhas + 1] = T"QUOTED: " .. (#refs > 0 and table.concat(refs, " · ") or "—")
-    local narr = P.narrador
-    linhas[#linhas + 1] = T"NARRATOR: " .. (not narr and "?" or not narr.primeira and T"THIRD PERSON"
-        or (T"FIRST PERSON" .. (narr.genero == "f" and (" · " .. T"WOMAN") or narr.genero == "m" and (" · " .. T"MAN") or "")))
+    for i, r in ipairs(P.references or {}) do if i <= 4 then refs[#refs + 1] = string.format("%s %d", capitals(r[1]), r[2]) end end
+    lines[#lines + 1] = T"QUOTED: " .. (#refs > 0 and table.concat(refs, " · ") or "—")
+    local narr = P.narrator
+    lines[#lines + 1] = T"NARRATOR: " .. (not narr and "?" or not narr.first and T"THIRD PERSON"
+        or (T"FIRST PERSON" .. (narr.gender == "f" and (" · " .. T"WOMAN") or narr.gender == "m" and (" · " .. T"MAN") or "")))
     local tr = {}
-    for _, t in ipairs(Tracos.LISTA) do
-        local v = (s.tracos or {})[t.id] or 0
-        tr[#tr + 1] = string.format("%s %+d", Tracos.rotulo(v >= 0 and t.pos or t.neg), math.floor(v + 0.5))
+    for _, t in ipairs(Traits.LIST) do
+        local v = (s.traits or {})[t.id] or 0
+        tr[#tr + 1] = string.format("%s %+d", Traits.label(v >= 0 and t.pos or t.neg), math.floor(v + 0.5))
     end
-    linhas[#linhas + 1] = T"TRAITS: " .. table.concat(tr, " · ")
-    linhas[#linhas + 1] = ""
-    linhas[#linhas + 1] = T"LATEST CHAPTERS (PG · MOOD · EVENTS)"
-    for i, c in ipairs(P.capitulos) do
+    lines[#lines + 1] = T"TRAITS: " .. table.concat(tr, " · ")
+    lines[#lines + 1] = ""
+    lines[#lines + 1] = T"LATEST CHAPTERS (PG · MOOD · EVENTS)"
+    for i, c in ipairs(P.chapters) do
         if i > 6 then break end
         local evs = {}
-        for ev in pairs(c.C.eventos or {}) do evs[#evs + 1] = NOMES_EVENTO[ev] or ev end
-        local clima = c.C.paginas > 0 and c.C.clima / c.C.paginas or 0
-        linhas[#linhas + 1] = string.format("  %s · %d · %+.1f · %s", maiusculas(c.nome):sub(1, 22), c.C.paginas, clima,
+        for ev in pairs(c.C.events or {}) do evs[#evs + 1] = EVENT_NAMES[ev] or ev end
+        local weather = c.C.pages > 0 and c.C.weather / c.C.pages or 0
+        lines[#lines + 1] = string.format("  %s · %d · %+.1f · %s", capitals(c.nameText):sub(1, 22), c.C.pages, weather,
             #evs > 0 and table.concat(evs, ", ") or "—")
     end
-    local p = s.comentario_pendente
-    linhas[#linhas + 1] = ""
-    linhas[#linhas + 1] = T"LAST CHAPTER COMMENT: " .. (p and (maiusculas(p.texto) .. (p.usado and T" (ALREADY SAID)" or "")) or "—")
-    local caixa = TextBoxWidget:new{
-        text = table.concat(linhas, "\n"), face = self:face(false, 11), width = self:px(578),
+    local p = s.pending_comment
+    lines[#lines + 1] = ""
+    lines[#lines + 1] = T"LAST CHAPTER COMMENT: " .. (p and (capitals(p.textValue) .. (p.used and T" (ALREADY SAID)" or "")) or "—")
+    local box = TextBoxWidget:new{
+        text = table.concat(lines, "\n"), face = self:face(false, 11), width = self:px(578),
         height = self:px(700), height_overflow_show_ellipsis = true,
     }
-    caixa:paintTo(bb, self.ox + self:px(20), self.oy + self:px(90))
-    caixa:free()
+    box:paintTo(bb, self.ox + self:px(20), self.oy + self:px(90))
+    box:free()
 end
 
-function YomimonScreen:atualizar()
+function YomimonScreen:refresh()
     UIManager:setDirty(self, "ui")
 end
 
 -- Animation ------------------------------------------------------------------------
 
-function YomimonScreen:iniciarAnimacao()
-    self.quadros = Desenho.quadros(Estado.quadros(self.traca.estado, os.time()))
-    self.quadro_atual = nil
-    if not self.quadros then return end
-    if not self.anim_ate then
-        self.anim_ate = os.time() + 60 * ANIMACAO_MINUTOS
+function YomimonScreen:startAnimation()
+    self.frames = Drawing.frames(State.frames(self.plugin.state, os.time()))
+    self.current_frame = nil
+    if not self.frames then return end
+    if not self.anim_until then
+        self.anim_until = os.time() + 60 * ANIMATION_MINUTES
     end
-    self.quadro = 0
-    UIManager:scheduleIn(QUADRO_SEGUNDOS, self.tick)
+    self.frame = 0
+    UIManager:scheduleIn(FRAME_SECONDS, self.tick)
 end
 
-function YomimonScreen:pararAnimacao()
+function YomimonScreen:stopAnimation()
     UIManager:unschedule(self.tick)
 end
 
-function YomimonScreen:proximoQuadro()
-    local agora = os.time()
-    if agora >= (self.anim_ate or 0) then
-        self.anim_ate = nil
+function YomimonScreen:nextFrame()
+    local now = os.time()
+    if now >= (self.anim_until or 0) then
+        self.anim_until = nil
         return
     end
-    self.quadro = self.quadro % #self.quadros + 1
-    self.quadro_atual = self.quadros[self.quadro]
+    self.frame = self.frame % #self.frames + 1
+    self.current_frame = self.frames[self.frame]
     UIManager:setDirty(self, function() return "ui", self.sprite_rect end)
-    UIManager:scheduleIn(QUADRO_SEGUNDOS, self.tick)
+    UIManager:scheduleIn(FRAME_SECONDS, self.tick)
 end
 
-function YomimonScreen:reiniciar()
-    self:pararAnimacao()
-    self.fala = nil
-    self:iniciarAnimacao()
-    self:atualizar()
+function YomimonScreen:restart()
+    self:stopAnimation()
+    self.speech = nil
+    self:startAnimation()
+    self:refresh()
 end
 
 -- Taps ----------------------------------------------------------------------------
 
-function YomimonScreen:carinho()
-    if self.traca:carinho() then
-        self.mensagem = T"Hm. Fine. You may continue."
-    elseif self.traca.estado.hibernando then
-        self.mensagem = T"(back in its ball; read a page to call it out)"
+function YomimonScreen:pet()
+    if self.plugin:pet() then
+        self.message = T"Hm. Fine. You may continue."
+    elseif self.plugin.state.hibernating then
+        self.message = T"(back in its ball; read a page to call it out)"
     else
-        self.mensagem = T"That's enough affection for now."
+        self.message = T"That's enough affection for now."
     end
-    self:atualizar()
+    self:refresh()
 end
 
 function YomimonScreen:onTap(_, ges)
     local pos = ges and ges.pos
     if not pos then return end
-    local alvos = self.alvos or {}
-    for i = #alvos, 1, -1 do  -- the ones drawn last (menu) take priority
-        local a = alvos[i]
-        if (not self.menu_aberto or a.camada ~= "conteudo") and pos:intersectWith(a.rect) then
-            if a.acao() ~= "fechou" then self:atualizar() end
+    local targets = self.targets or {}
+    for i = #targets, 1, -1 do  -- the ones drawn last (menu) take priority
+        local a = targets[i]
+        if (not self.menu_open or a.layer ~= "conteudo") and pos:intersectWith(a.rect) then
+            if a.action() ~= "fechou" then self:refresh() end
             return true
         end
     end
-    if self.menu_aberto then
-        self.menu_aberto = false
-        self:atualizar()
+    if self.menu_open then
+        self.menu_open = false
+        self:refresh()
         return true
     end
-    if not self.modo and pos:intersectWith(self.sprite_rect) then
-        self:carinho()
+    if not self.mode and pos:intersectWith(self.sprite_rect) then
+        self:pet()
         return true
     end
 end
 
 function YomimonScreen:onHold(_, ges)
     local pos = ges and ges.pos
-    if self.modo or not (pos and pos:intersectWith(self.sprite_rect)) then return end
-    local dialogo
-    local botoes = {
+    if self.mode or not (pos and pos:intersectWith(self.sprite_rect)) then return end
+    local dialogue
+    local buttonRows = {
             {{
-                text = self.traca:telaDescansoAtiva() and T"Sleep screen: on" or T"Sleep screen: off",
+                text = self.plugin:sleepScreenActive() and T"Sleep screen: on" or T"Sleep screen: off",
                 callback = function()
-                    UIManager:close(dialogo)
-                    self.traca:alternarTelaDescanso()
+                    UIManager:close(dialogue)
+                    self.plugin:toggleSleepScreen()
                 end,
             }},
     }
-    table.insert(botoes, {{ text = T"Language…", callback = function()
-        UIManager:close(dialogo)
-        self:menuIdioma()
+    table.insert(buttonRows, {{ text = T"Language…", callback = function()
+        UIManager:close(dialogue)
+        self:languageMenu()
     end }})
-    if YomimonScreen.devLigado() then
-        table.insert(botoes, {{ text = T"Dev mode…", callback = function()
-            UIManager:close(dialogo)
+    if YomimonScreen.devOn() then
+        table.insert(buttonRows, {{ text = T"Dev mode…", callback = function()
+            UIManager:close(dialogue)
             self:menuDev()
         end }})
     end
-    dialogo = ButtonDialog:new{ buttons = botoes }
+    dialogue = ButtonDialog:new{ buttons = buttonRows }
 
-    UIManager:show(dialogo)
+    UIManager:show(dialogue)
     return true
 end
 
 --- Language menu: automatic (follows KOReader) plus every folder found in yomimon_locales/. Applies after a restart.
-function YomimonScreen:menuIdioma()
-    local Lingua = require("yomimon_language")
-    local atual = Lingua.choice()
-    local dialogo
-    local function opcao(texto, valor)
-        return {{ text = (atual == valor and "▸ " or "") .. texto, callback = function()
-            UIManager:close(dialogo)
-            if valor == atual then return end
-            Lingua.saveChoice(valor)
+function YomimonScreen:languageMenu()
+    local Language = require("yomimon_language")
+    local current = Language.choice()
+    local dialogue
+    local function option(textValue, val)
+        return {{ text = (current == val and "▸ " or "") .. textValue, callback = function()
+            UIManager:close(dialogue)
+            if val == current then return end
+            Language.saveChoice(val)
             UIManager:show(require("ui/widget/infomessage"):new{ text = T"Restart KOReader to change the language." })
         end }}
     end
-    local botoes = { opcao(T"Automatic (KOReader language)", "auto") }
-    for _, idioma in ipairs(Lingua.available()) do botoes[#botoes + 1] = opcao(idioma.name, idioma.code) end
-    dialogo = ButtonDialog:new{ title = T"Yomimon language", buttons = botoes }
-    UIManager:show(dialogo)
+    local buttonRows = { option(T"Automatic (KOReader language)", "auto") }
+    for _, language in ipairs(Language.available()) do buttonRows[#buttonRows + 1] = option(language.name, language.code) end
+    dialogue = ButtonDialog:new{ title = T"Yomimon language", buttons = buttonRows }
+    UIManager:show(dialogue)
 end
 
 --- Dev mode: only exists if the file koreader/yomimon/dev exists. Changes stage and mood for testing.
-function YomimonScreen:menuDev(fechar_anterior)
-    local s = self.traca.estado
-    local dialogo
-    local function acao(fn)
+function YomimonScreen:menuDev(close_previous)
+    local s = self.plugin.state
+    local dialogue
+    local function action(fn)
         return function()
-            UIManager:close(dialogo)
+            UIManager:close(dialogue)
             fn()
-            self.traca:salvar(true)
-            self.mensagem = nil
-            self:reiniciar()
+            self.plugin:save(true)
+            self.message = nil
+            self:restart()
         end
     end
-    local fases = {}
-    for _, f in ipairs(Estado.formas(s)) do
-        fases[#fases + 1] = { text = (s.dev_fase == f.nome and "▸ " or "") .. f.titulo, callback = acao(function() s.dev_fase = f.nome end) }
+    local stages = {}
+    for _, f in ipairs(State.forms(s)) do
+        stages[#stages + 1] = { text = (s.dev_stage == f.nameText and "▸ " or "") .. f.titleText, callback = action(function() s.dev_stage = f.nameText end) }
     end
-    dialogo = ButtonDialog:new{
+    dialogue = ButtonDialog:new{
         title = T"YOMIMON · DEV MODE",
         buttons = {
-            fases,
+            stages,
             {
-                { text = T"Starving", callback = acao(function() s.barriga, s.humor = 5, 40 end) },
-                { text = T"Grumpy", callback = acao(function() s.barriga, s.humor = 60, 10 end) },
-                { text = T"Happy", callback = acao(function() s.barriga, s.humor = 90, 90 end) },
+                { text = T"Starving", callback = action(function() s.belly, s.mood = 5, 40 end) },
+                { text = T"Grumpy", callback = action(function() s.belly, s.mood = 60, 10 end) },
+                { text = T"Happy", callback = action(function() s.belly, s.mood = 90, 90 end) },
             },
             {
-                { text = s.dev_noite and T"Night: on" or T"Night: off", callback = acao(function() s.dev_noite = not s.dev_noite or nil end) },
-                { text = s.hibernando and T"Leave the ball" or T"Back to the ball", callback = acao(function() s.hibernando = not s.hibernando end) },
+                { text = s.dev_night and T"Night: on" or T"Night: off", callback = action(function() s.dev_night = not s.dev_night or nil end) },
+                { text = s.hibernating and T"Leave the ball" or T"Back to the ball", callback = action(function() s.hibernating = not s.hibernating end) },
             },
             {
                 { text = T"What it noticed", callback = function()
-                    UIManager:close(dialogo)
-                    self:entrar("percepcao")
+                    UIManager:close(dialogue)
+                    self:enter("perception")
                 end },
             },
             {
                 { text = T"End of cycle (test)", callback = function()
-                    UIManager:close(dialogo)
-                    s.dev_fase = nil
+                    UIManager:close(dialogue)
+                    s.dev_stage = nil
                     self:onClose()
-                    self.traca:fimDoCiclo()
+                    self.plugin:cycleEnd()
                 end },
             },
             (function()
                 -- loading always reads the file again (the real state is stored the first time)
-                local linha = {
+                local line = {
                     { text = T"Endgame simulation", callback = function()
-                        UIManager:close(dialogo)
-                        if not self.traca:carregarSimulacao() then
-                            UIManager:show(require("ui/widget/infomessage"):new{ text = T"No simulation at koreader/yomimon/simulacao.lua." })
+                        UIManager:close(dialogue)
+                        if not self.plugin:loadSimulation() then
+                            UIManager:show(require("ui/widget/infomessage"):new{ text = T"No simulation at koreader/yomimon/simulation.lua." })
                         end
-                        self.mensagem = nil
-                        self:reiniciar()
+                        self.message = nil
+                        self:restart()
                     end },
                 }
-                if self.traca:emSimulacao() then
-                    linha[2] = { text = T"Back to the real state", callback = function()
-                        UIManager:close(dialogo)
-                        self.traca:voltarEstadoReal()
-                        self.mensagem = nil
-                        self:reiniciar()
+                if self.plugin:inSimulation() then
+                    line[2] = { text = T"Back to the real state", callback = function()
+                        UIManager:close(dialogue)
+                        self.plugin:restoreRealState()
+                        self.message = nil
+                        self:restart()
                     end }
                 end
-                return linha
+                return line
             end)(),
             {
                 { text = T"Export screens (PNG)", callback = function()
-                    UIManager:close(dialogo)
-                    local n, pasta, falhas = self:exportarTelas()
+                    UIManager:close(dialogue)
+                    local n, folder, failures = self:exportScreens()
                     UIManager:show(require("ui/widget/infomessage"):new{
-                        text = string.format(T"%d screens saved to %s", n, pasta) .. (falhas > 0 and string.format(" (%d ✗)", falhas) or ""),
+                        text = string.format(T"%d screens saved to %s", n, folder) .. (failures > 0 and string.format(" (%d ✗)", failures) or ""),
                     })
                 end },
             },
             {
                 { text = T"Export all simulations", callback = function()
-                    UIManager:close(dialogo)
+                    UIManager:close(dialogue)
                     local InfoMessage = require("ui/widget/infomessage")
-                    local aviso = InfoMessage:new{ text = T"Exporting the simulations in koreader/yomimon/simulacoes…" }
-                    UIManager:show(aviso)
+                    local notice = InfoMessage:new{ text = T"Exporting the simulations in koreader/yomimon/simulations…" }
+                    UIManager:show(notice)
                     UIManager:forceRePaint()
-                    local sims, n, falhas = self:exportarSimulacoes()
-                    UIManager:close(aviso)
-                    self:reiniciar()
+                    local sims, n, failures = self:exportSimulations()
+                    UIManager:close(notice)
+                    self:restart()
                     UIManager:show(InfoMessage:new{
                         text = string.format(T"%d simulations, %d screens saved to koreader/yomimon/demo", sims, n)
-                            .. (falhas > 0 and string.format(" (%d ✗)", falhas) or ""),
+                            .. (failures > 0 and string.format(" (%d ✗)", failures) or ""),
                     })
                 end },
             },
             {
-                { text = self.traca.falha_teste and T"Test failure: on" or T"Test failure: off", callback = function()
-                    UIManager:close(dialogo)
-                    self.traca:alternarFalhaTeste()
+                { text = self.plugin.test_failure and T"Test failure: on" or T"Test failure: off", callback = function()
+                    UIManager:close(dialogue)
+                    self.plugin:toggleTestFailure()
                 end },
             },
             {
                 { text = T"Show welcome", callback = function()
-                    UIManager:close(dialogo)
+                    UIManager:close(dialogue)
                     self:onClose()
-                    self.traca:mostrarBoasVindas()
+                    self.plugin:showWelcome()
                 end },
             },
             {
-                { text = T"Leave test (back to normal)", callback = acao(function()
-                    s.dev_fase, s.dev_noite, s.hibernando = nil, nil, false
-                    s.barriga, s.humor = math.max(s.barriga, 60), math.max(s.humor, 60)
+                { text = T"Leave test (back to normal)", callback = action(function()
+                    s.dev_stage, s.dev_night, s.hibernating = nil, nil, false
+                    s.belly, s.mood = math.max(s.belly, 60), math.max(s.mood, 60)
                 end) },
             },
         },
     }
-    UIManager:show(dialogo)
+    UIManager:show(dialogue)
 end
 
-function YomimonScreen.devLigado()
-    local okV, Versao = pcall(require, "yomimon_version")
-    if okV and type(Versao) == "table" and Versao.publica then return false end  -- community version: never
+function YomimonScreen.devOn()
+    local okV, Version = pcall(require, "yomimon_version")
+    if okV and type(Version) == "table" and Version.public then return false end  -- community version: never
     local lfs = require("libs/libkoreader-lfs")
     local DataStorage = require("datastorage")
     return lfs.attributes(DataStorage:getDataDir() .. "/yomimon/dev", "mode") == "file"
 end
 
 function YomimonScreen:onSuspend()
-    self:pararAnimacao()
+    self:stopAnimation()
 end
 
 function YomimonScreen:onResume()
-    self.anim_ate = nil
-    self:reiniciar()
+    self.anim_until = nil
+    self:restart()
 end
 
 function YomimonScreen:onCloseWidget()
-    self:pararAnimacao()
+    self:stopAnimation()
 end
 
 function YomimonScreen:onClose()
@@ -1278,16 +1278,16 @@ end
 
 -- Protection: an error when drawing, tapping or animating cannot freeze KOReader. If it fails, the screen
 -- shows a simple notice and any tap closes it (so the reader is never stuck on a broken screen).
-local Guarda = require("yomimon_guard")
-Guarda.padrao:envolver(YomimonScreen, { "paintTo", "onTap", "onHold", "proximoQuadro" }, function(nome, self, bb, x, y)
-    if nome == "paintTo" then
-        bb:paintRect(x, y, self.dimen.w, self.dimen.h, BRANCO)
-        local aviso = TextBoxWidget:new{
+local Guard = require("yomimon_guard")
+Guard.default:wrap(YomimonScreen, { "paintTo", "onTap", "onHold", "nextFrame" }, function(nameText, self, bb, x, y)
+    if nameText == "paintTo" then
+        bb:paintRect(x, y, self.dimen.w, self.dimen.h, WHITE)
+        local notice = TextBoxWidget:new{
             text = T"Yomimon tripped. Tap to close.", face = Font:getFace("cfont", 22), width = self.dimen.w - 80,
         }
-        aviso:paintTo(bb, x + 40, y + math.floor(self.dimen.h / 3))
-        aviso:free()
-    elseif nome == "onTap" or nome == "onHold" then
+        notice:paintTo(bb, x + 40, y + math.floor(self.dimen.h / 3))
+        notice:free()
+    elseif nameText == "onTap" or nameText == "onHold" then
         UIManager:close(self)
         return true
     end

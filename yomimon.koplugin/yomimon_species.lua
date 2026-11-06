@@ -1,6 +1,6 @@
 -- Species lines (base form to final form) from the PokeAPI CSV data; ids are national dex numbers (1-649).
 return {
-    nomes = {
+    names = {
         [1] = "Bulbasaur",
         [2] = "Ivysaur",
         [3] = "Venusaur",
@@ -651,7 +651,7 @@ return {
         [648] = "Meloetta",
         [649] = "Genesect",
     },
-    linhas = {
+    lines = {
         {1, 2, 3},
         {4, 5, 6},
         {7, 8, 9},

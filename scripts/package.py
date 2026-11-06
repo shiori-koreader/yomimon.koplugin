@@ -10,7 +10,7 @@ from pathlib import Path
 
 root = Path(__file__).resolve().parent.parent
 plugin = root / "yomimon.koplugin"
-version = re.search(r'numero = "([^"]+)"', (plugin / "yomimon_version.lua").read_text(encoding="utf-8")).group(1)
+version = re.search(r'number = "([^"]+)"', (plugin / "yomimon_version.lua").read_text(encoding="utf-8")).group(1)
 meta = re.search(r'version = "([^"]+)"', (plugin / "_meta.lua").read_text(encoding="utf-8")).group(1)
 
 if meta != version:

@@ -1,175 +1,175 @@
 --[[--
-Banco de frases do diário (português). Brechas: {n} páginas, {livro}, {livro2}, {nome}, {nome2},
-{fala}, {tema} ("o mar"), {de_tema} ("do mar"), {autor}, {anterior}, {outro}, {ordinal}.
-Nunca falar do leitor com adjetivo de gênero.
+Diary phrase bank (Portuguese). Gaps: {n} pages, {book}, {book2}, {nameText}, {name2},
+{fala}, {tema} ("o mar"), {of_theme} ("do mar"), {autor}, {anterior}, {outro}, {ordinal}.
+Never describe the reader with a gendered adjective.
 ]]
 
-local B = { dia = {}, inicio = {}, fim = {}, obsessao = {}, lembranca = {} }
+local B = { day = {}, beginning = {}, ending = {}, obsession = {}, recollection = {} }
 
--- Dia de leitura ------------------------------------------------------------------------
-B.dia.magro = {
-    "Dia magro: {n} páginas de “{livro}”.",
-    "Só {n} páginas hoje. Belisquei “{livro}”.",
-    "{n} páginas de “{livro}”. Um aperitivo.",
-    "Hoje foi pouco: {n} páginas de “{livro}”. Lambi os dedos.",
-    "Umas migalhas de “{livro}”: {n} páginas.",
-    "{n} páginas. “{livro}” mal encostou na minha boca.",
+-- Reading day ------------------------------------------------------------------------
+B.day.thin = {
+    "Dia magro: {n} páginas de “{book}”.",
+    "Só {n} páginas hoje. Belisquei “{book}”.",
+    "{n} páginas de “{book}”. Um aperitivo.",
+    "Hoje foi pouco: {n} páginas de “{book}”. Lambi os dedos.",
+    "Umas migalhas de “{book}”: {n} páginas.",
+    "{n} páginas. “{book}” mal encostou na minha boca.",
 }
-B.dia.normal = {
-    "{n} páginas de “{livro}”.",
-    "Comi {n} páginas de “{livro}”.",
-    "Mais {n} páginas de “{livro}” na barriga.",
-    "Hoje: “{livro}”, {n} páginas.",
-    "Avancei {n} páginas em “{livro}”.",
-    "“{livro}” rendeu {n} páginas hoje.",
-    "{n} páginas. “{livro}” continua no meu prato.",
+B.day.normal = {
+    "{n} páginas de “{book}”.",
+    "Comi {n} páginas de “{book}”.",
+    "Mais {n} páginas de “{book}” na barriga.",
+    "Hoje: “{book}”, {n} páginas.",
+    "Avancei {n} páginas em “{book}”.",
+    "“{book}” rendeu {n} páginas hoje.",
+    "{n} páginas. “{book}” continua no meu prato.",
 }
-B.dia.banquete = {
-    "{n} páginas de “{livro}”. Banquete.",
-    "Hoje teve festa: {n} páginas de “{livro}”.",
-    "{n} páginas de “{livro}” de uma vez. Tô de barriga cheia.",
-    "Comi {n} páginas de “{livro}”. Nem lembro de respirar.",
-    "Um dia gordo: {n} páginas de “{livro}”.",
-    "{n} páginas de “{livro}”. Minha barriga pediu arrego.",
+B.day.banquete = {
+    "{n} páginas de “{book}”. Banquete.",
+    "Hoje teve festa: {n} páginas de “{book}”.",
+    "{n} páginas de “{book}” de uma vez. Tô de barriga cheia.",
+    "Comi {n} páginas de “{book}”. Nem lembro de respirar.",
+    "Um dia gordo: {n} páginas de “{book}”.",
+    "{n} páginas de “{book}”. Minha barriga pediu arrego.",
 }
-B.dia.enorme = {
-    "{n} páginas de “{livro}” num dia só. Estou redonda.",
-    "{n} páginas. Você não leu “{livro}”, você atravessou.",
-    "Maratona: {n} páginas de “{livro}”. Preciso me deitar.",
+B.day.huge_one = {
+    "{n} páginas de “{book}” num dia só. Estou redonda.",
+    "{n} páginas. Você não leu “{book}”, você atravessou.",
+    "Maratona: {n} páginas de “{book}”. Preciso me deitar.",
 }
-B.dia.dois_livros = {
-    "{n} páginas, divididas entre “{livro}” e “{livro2}”.",
-    "Dia de dois pratos: “{livro}” e um pouco de “{livro2}”. {n} páginas.",
-    "{n} páginas. Fiquei entre “{livro}” e “{livro2}”, como quem não decide a sobremesa.",
-    "Traí “{livro2}” com “{livro}”. {n} páginas no total.",
+B.day.two_books = {
+    "{n} páginas, divididas entre “{book}” e “{book2}”.",
+    "Dia de dois pratos: “{book}” e um pouco de “{book2}”. {n} páginas.",
+    "{n} páginas. Fiquei entre “{book}” e “{book2}”, como quem não decide a sobremesa.",
+    "Traí “{book2}” com “{book}”. {n} páginas no total.",
 }
-B.dia.horario = {
-    madrugada = { "Quase tudo de madrugada.", "Lido depois da meia-noite, como os segredos.", "Mais uma madrugada em claro.<noturna: Adoro.|medrosa: Com a luz acesa.|>",
-                  "Lemos enquanto a casa dormia.<medrosa: Ouvi cada estalo.|>" },
-    manha = { "Tudo antes do almoço.", "Lido de manhã, com cheiro de café.<diurna: Meu horário.|>", "Começamos cedo." },
-    noite = { "Lido tarde da noite.", "Quase tudo depois das dez.", "Noite adentro.<noturna: Do jeito que eu gosto.|>" },
+B.day.time_of_day = {
+    small_hours = { "Quase tudo de madrugada.", "Lido depois da meia-noite, como os segredos.", "Mais uma madrugada em claro.<nocturnal: Adoro.|fearful: Com a luz acesa.|>",
+                  "Lemos enquanto a casa dormia.<fearful: Ouvi cada estalo.|>" },
+    morning = { "Tudo antes do almoço.", "Lido de manhã, com cheiro de café.<diurnal: Meu horário.|>", "Começamos cedo." },
+    noite = { "Lido tarde da noite.", "Quase tudo depois das dez.", "Noite adentro.<nocturnal: Do jeito que eu gosto.|>" },
 }
-B.dia.fala = {
-    jovem = { "{nome} disse “{fala}”. Repeti baixinho.", "{nome} falou “{fala}”. Fiquei pensando nisso.",
-              "Guardei uma fala de {nome}: “{fala}”.", "“{fala}”, disse {nome}. Eu nunca teria coragem." },
-    velha = { "{nome} disse “{fala}”. Anotei para nunca perdoar.", "“{fala}”, disse {nome}. Eu teria dito melhor.",
-              "Frase do dia, de {nome}: “{fala}”. Merecia um cigarro.", "{nome}: “{fala}”. Guardei. <romantica:Vou usar numa carta.|Vou usar contra alguém.>" },
+B.day.speech = {
+    young = { "{nameText} disse “{speech}”. Repeti baixinho.", "{nameText} falou “{speech}”. Fiquei pensando nisso.",
+              "Guardei uma fala de {nameText}: “{speech}”.", "“{speech}”, disse {nameText}. Eu nunca teria coragem." },
+    old = { "{nameText} disse “{speech}”. Anotei para nunca perdoar.", "“{speech}”, disse {nameText}. Eu teria dito melhor.",
+              "Frase do dia, de {nameText}: “{speech}”. Merecia um cigarro.", "{nameText}: “{speech}”. Guardei. <romantic:Vou usar numa carta.|Vou usar contra alguém.>" },
 }
-B.dia.novo = {
-    "Conheci {nome}.", "Apareceu {nome}. Ainda não sei o que acho.", "Entrou em cena {nome}.",
-    "Me apresentaram {nome}. Sem muito entusiasmo.", "Um tal de {nome} chegou. <romantica:Gostei logo.|medrosa:Me escondi.|Vou ficar de olho.>",
-    "{nome} apareceu. Vai dar trabalho.",
+B.day.new = {
+    "Conheci {nameText}.", "Apareceu {nameText}. Ainda não sei o que acho.", "Entrou em cena {nameText}.",
+    "Me apresentaram {nameText}. Sem muito entusiasmo.", "Um tal de {nameText} chegou. <romantic:Gostei logo.|fearful:Me escondi.|Vou ficar de olho.>",
+    "{nameText} apareceu. Vai dar trabalho.",
 }
-B.dia.novos2 = {
-    "Conheci {nome} e {nome2}.", "Apareceram {nome} e {nome2}. Gente demais.",
-    "{nome} e {nome2} entraram em cena. Um dos dois vai me irritar.", "Me apresentaram {nome} e {nome2}. Anotei os dois.",
+B.day.newOnes2 = {
+    "Conheci {nameText} e {name2}.", "Apareceram {nameText} e {name2}. Gente demais.",
+    "{nameText} e {name2} entraram em cena. Um dos dois vai me irritar.", "Me apresentaram {nameText} e {name2}. Anotei os dois.",
 }
-B.dia.evento = {
-    morte = { "Alguém morreu.", "Teve morte. <romantica:Chorei de verdade.|medrosa:Dormi de luz acesa.|Fiquei de luto por educação.>", "Enterraram alguém. Cheiro de vela." },
-    casamento = { "Teve casamento.", "Alguém casou. <romantica:Chorei no altar.|otimista:Desta vez vai durar.|Dou três capítulos.>", "Noiva, altar, promessa. Anotei pra cobrar." },
-    viagem = { "Alguém pegou a estrada.", "Teve viagem. <corajosa:Fui junto, de carona na mala.|Eu fiquei.>", "Gente partindo e chegando o dia todo." },
-    carta = { "Chegou uma carta.", "Teve carta. <romantica:Li duas vezes.|otimista:Era boa notícia, pra variar.|Nunca é boa notícia.>", "Alguém escreveu o que não devia." },
+B.day.event = {
+    morte = { "Alguém morreu.", "Teve morte. <romantic:Chorei de verdade.|fearful:Dormi de luz acesa.|Fiquei de luto por educação.>", "Enterraram alguém. Cheiro de vela." },
+    casamento = { "Teve casamento.", "Alguém casou. <romantic:Chorei no altar.|hopeful:Desta vez vai durar.|Dou três capítulos.>", "Noiva, altar, promessa. Anotei pra cobrar." },
+    viagem = { "Alguém pegou a estrada.", "Teve viagem. <brave:Fui junto, de carona na mala.|Eu fiquei.>", "Gente partindo e chegando o dia todo." },
+    carta = { "Chegou uma carta.", "Teve carta. <romantic:Li duas vezes.|hopeful:Era boa notícia, pra variar.|Nunca é boa notícia.>", "Alguém escreveu o que não devia." },
     tempestade = { "Choveu no livro.", "Teve tempestade." },
     doenca = { "Alguém adoeceu.", "Teve febre e médico.", "Gente de cama. Mau sinal." },
-    festa = { "Teve festa.", "Teve baile. <romantica:Dancei na margem, sem par.|Ninguém me chamou.>", "Música e vinho. Para eles." },
+    festa = { "Teve festa.", "Teve baile. <romantic:Dancei na margem, sem par.|Ninguém me chamou.>", "Música e vinho. Para eles." },
     briga = { "Teve briga.", "Alguém finalmente disse o que pensava." },
     fuga = { "Alguém fugiu.", "Teve fuga.", "Gente correndo do próprio destino." },
     crime = { "Teve crime.", "Sangue e polícia." },
 }
-B.dia.tema = {
-    "O assunto foi {tema}.", "Só se falou {de_tema}.", "Muito {de_tema} hoje. Demais.",
-    "O dia teve gosto {de_tema}.", "Tudo girou em torno {de_tema}.",
+B.day.theme = {
+    "O assunto foi {theme}.", "Só se falou {of_theme}.", "Muito {of_theme} hoje. Demais.",
+    "O dia teve gosto {of_theme}.", "Tudo girou em torno {of_theme}.",
 }
-B.dia.pesado = { "Páginas pesadas.", "Dia escuro de papel.", "Muita sombra, pouca luz.", "Leitura que deixa marca." }
-B.dia.leve = { "Páginas leves, para variar.", "Um dia doce de papel.", "Leitura que não machuca. Rara." }
-B.dia.fecho = {
-    jovem = { "Amanhã tem mais.", "Ainda digerindo.", "Tô gostando.", "Dormi pensando nisso.", "Quero mais.", "" },
-    velha = { "Anotado.", "Que cansaço.", "Acendi um cigarro imaginário.", "Sigamos.", "Nada de novo. Ou quase.", "" },
+B.day.heavy = { "Páginas pesadas.", "Dia escuro de papel.", "Muita sombra, pouca luz.", "Leitura que deixa marca." }
+B.day.light = { "Páginas leves, para variar.", "Um dia doce de papel.", "Leitura que não machuca. Rara." }
+B.day.closing = {
+    young = { "Amanhã tem mais.", "Ainda digerindo.", "Tô gostando.", "Dormi pensando nisso.", "Quero mais.", "" },
+    old = { "Anotado.", "Que cansaço.", "Acendi um cigarro imaginário.", "Sigamos.", "Nada de novo. Ou quase.", "" },
 }
-B.dia.fecho_escuro = {
-    jovem = { "Dormi mal.", "Fiquei com medo do escuro.", "Deixei a luz acesa." },
-    velha = { "Dormi mal. Como sempre.", "Mais um peso na estante.", "Precisei de dois cigarros imaginários.", "Previsível. Doeu mesmo assim." },
+B.day.closing_dark = {
+    young = { "Dormi mal.", "Fiquei com medo do escuro.", "Deixei a luz acesa." },
+    old = { "Dormi mal. Como sempre.", "Mais um peso na estante.", "Precisei de dois cigarros imaginários.", "Previsível. Doeu mesmo assim." },
 }
-B.dia.fecho_leve = {
-    jovem = { "Sonhei bonito.", "Fiquei feliz à toa.", "Dormi sorrindo." },
-    velha = { "Quase sorri.", "Desconfio de tanta leveza.", "Não se acostume." },
-}
-
--- Começo de livro ------------------------------------------------------------------------
-B.inicio.generico = {
-    "Comecei a roer “{livro}”. A capa prometia muito. Capas sempre prometem.",
-    "Livro novo: “{livro}”. Cheiro de papel que ainda não sabe o que o espera.",
-    "“{livro}” chegou ao meu prato. Vamos ver se aguenta.",
-    "Abri “{livro}”. A primeira página sempre jura que vai valer a pena.",
-    "Começamos “{livro}”. Eu com fome, você com esperança.",
-    "Outro livro: “{livro}”. Minha barriga agradece, meu humor aguarda.",
-    "“{livro}”. Novo endereço. Ainda estou desfazendo as malas.",
-}
-B.inicio.autor = {
-    "“{livro}”, de {autor}. Vamos ver se {autor} merece a minha fome.",
-    "Comecei “{livro}”. Nunca comi nada de {autor}. Primeira vez é sempre estranha.",
-    "{autor}, prazer. Vim comer o seu “{livro}”.",
-}
-B.inicio.mesmo_autor = {
-    "Mais um de {autor}: “{livro}”. Fidelidade ou preguiça?",
-    "{autor} de novo. “{livro}” agora. Estamos namorando?",
-    "Voltamos a {autor}. “{livro}” é o próximo prato.",
-    "Outro {autor}. Você não larga esse autor, hein.",
-}
-B.inicio.largou = {
-    "Larguei “{anterior}” no meio do caminho. Agora é “{livro}”. Não comento. Comento: covardia.",
-    "“{anterior}” ficou para trás, sem fim. Trocamos por “{livro}”. Eu vi.",
-    "Abandonamos “{anterior}”. Que descanse em paz. Agora: “{livro}”.",
-    "Pulamos para “{livro}”. “{anterior}” vai ficar me olhando da estante.",
-}
-B.inicio.relendo = {
-    "Relendo “{livro}”. Já sei o fim. Como devagar.",
-    "“{livro}” outra vez. Ou você esqueceu, ou se apaixonou.",
-    "Releitura de “{livro}”. Agora eu presto atenção nos detalhes. E nas vírgulas.",
+B.day.closing_light = {
+    young = { "Sonhei bonito.", "Fiquei feliz à toa.", "Dormi sorrindo." },
+    old = { "Quase sorri.", "Desconfio de tanta leveza.", "Não se acostume." },
 }
 
--- Fim de livro -------------------------------------------------------------------------
-B.fim.abertura = {
-    "Terminei “{livro}”.", "Fim de “{livro}”.", "Acabou “{livro}”.", "Última página de “{livro}”.",
-    "“{livro}”: digerido.", "Comi a última linha de “{livro}”.",
+-- Start of a book ------------------------------------------------------------------------
+B.beginning.generic_one = {
+    "Comecei a roer “{book}”. A capa prometia muito. Capas sempre prometem.",
+    "Livro novo: “{book}”. Cheiro de papel que ainda não sabe o que o espera.",
+    "“{book}” chegou ao meu prato. Vamos ver se aguenta.",
+    "Abri “{book}”. A primeira página sempre jura que vai valer a pena.",
+    "Começamos “{book}”. Eu com fome, você com esperança.",
+    "Outro livro: “{book}”. Minha barriga agradece, meu humor aguarda.",
+    "“{book}”. Novo endereço. Ainda estou desfazendo as malas.",
 }
--- {nome}: o nome composto do livro (yomimon_vector.lua), ex.: "uma história de mar, agitada"
-B.fim.nome = { "Foi {nome}.", "No fundo, {nome}.", "Resumindo: {nome}.", "Se me perguntarem: {nome}." }
-B.fim.protagonista = {
-    jovem = { "Vou sentir falta de {nome}.", "Fiquei com {nome} na cabeça.", "{nome} vai morar no meu coração. Pequeno, mas cabe." },
-    velha = { "Fiquei com {nome} na cabeça. Contra a minha vontade.", "{nome} vai me assombrar por uns dias.",
-              "Sobrevivi a {nome}. Por pouco." },
+B.beginning.author = {
+    "“{book}”, de {author}. Vamos ver se {author} merece a minha fome.",
+    "Comecei “{book}”. Nunca comi nada de {author}. Primeira vez é sempre estranha.",
+    "{author}, prazer. Vim comer o seu “{book}”.",
 }
-B.fim.mais_escuro = { "Mais sombrio que “{outro}”.", "Pesou mais que “{outro}”.", "Deixou “{outro}” parecendo comédia." }
-B.fim.mais_leve = { "Mais leve que “{outro}”.", "Depois de “{outro}”, um respiro.", "Doeu menos que “{outro}”." }
-B.fim.serie = {
-    "{ordinal} livro seguido sobre {tema}. Você está fugindo de alguma coisa?",
-    "{ordinal} livro {de_tema} em sequência. Estou vendo um padrão.",
-    "{ordinal} vez que um livro seu me fala {de_tema}. Anotado.",
+B.beginning.same_author = {
+    "Mais um de {author}: “{book}”. Fidelidade ou preguiça?",
+    "{author} de novo. “{book}” agora. Estamos namorando?",
+    "Voltamos a {author}. “{book}” é o próximo prato.",
+    "Outro {author}. Você não larga esse autor, hein.",
 }
-B.fim.traco = {
-    amarga = { "Saí com mais amargura do que entrei.", "Esse livro me tirou um pouco de esperança." },
-    otimista = { "Saí mais leve do que entrei.", "Esse livro me devolveu um pouco de fé." },
-    medrosa = { "Saí com mais medo do que entrei.", "Esse livro me ensinou a olhar debaixo das páginas." },
-    corajosa = { "Saí com mais coragem do que entrei." },
-    cinica = { "Saí com mais desconfiança do que entrei.", "Esse livro me ensinou a seguir o dinheiro." },
-    romantica = { "Saí com mais romantismo do que entrei.", "Esse livro me amoleceu. Que vergonha." },
+B.beginning.dropped = {
+    "Larguei “{previous}” no meio do caminho. Agora é “{book}”. Não comento. Comento: covardia.",
+    "“{previous}” ficou para trás, sem fim. Trocamos por “{book}”. Eu vi.",
+    "Abandonamos “{previous}”. Que descanse em paz. Agora: “{book}”.",
+    "Pulamos para “{book}”. “{previous}” vai ficar me olhando da estante.",
+}
+B.beginning.rereading = {
+    "Relendo “{book}”. Já sei o fim. Como devagar.",
+    "“{book}” outra vez. Ou você esqueceu, ou se apaixonou.",
+    "Releitura de “{book}”. Agora eu presto atenção nos detalhes. E nas vírgulas.",
+}
+
+-- End of a book -------------------------------------------------------------------------
+B.ending.opening = {
+    "Terminei “{book}”.", "Fim de “{book}”.", "Acabou “{book}”.", "Última página de “{book}”.",
+    "“{book}”: digerido.", "Comi a última linha de “{book}”.",
+}
+-- {nameText}: the book's compound name (yomimon_vector.lua), e.g. "uma história de mar, agitada"
+B.ending.nameText = { "Foi {nameText}.", "No fundo, {nameText}.", "Resumindo: {nameText}.", "Se me perguntarem: {nameText}." }
+B.ending.protagonist = {
+    young = { "Vou sentir falta de {nameText}.", "Fiquei com {nameText} na cabeça.", "{nameText} vai morar no meu coração. Pequeno, mas cabe." },
+    old = { "Fiquei com {nameText} na cabeça. Contra a minha vontade.", "{nameText} vai me assombrar por uns dias.",
+              "Sobrevivi a {nameText}. Por pouco." },
+}
+B.ending.darker = { "Mais sombrio que “{other}”.", "Pesou mais que “{other}”.", "Deixou “{other}” parecendo comédia." }
+B.ending.lighter = { "Mais leve que “{other}”.", "Depois de “{other}”, um respiro.", "Doeu menos que “{other}”." }
+B.ending.series = {
+    "{ordinal} livro seguido sobre {theme}. Você está fugindo de alguma coisa?",
+    "{ordinal} livro {of_theme} em sequência. Estou vendo um padrão.",
+    "{ordinal} vez que um livro seu me fala {of_theme}. Anotado.",
+}
+B.ending.trait = {
+    bitter = { "Saí com mais amargura do que entrei.", "Esse livro me tirou um pouco de esperança." },
+    hopeful = { "Saí mais leve do que entrei.", "Esse livro me devolveu um pouco de fé." },
+    fearful = { "Saí com mais medo do que entrei.", "Esse livro me ensinou a olhar debaixo das páginas." },
+    brave = { "Saí com mais coragem do que entrei." },
+    cynical = { "Saí com mais desconfiança do que entrei.", "Esse livro me ensinou a seguir o dinheiro." },
+    romantic = { "Saí com mais romantismo do que entrei.", "Esse livro me amoleceu. Que vergonha." },
     popular = { "Saí com pressa de ler. Mau sinal.", "Esse livro me acostumou mal com o ritmo." },
-    erudita = { "Saí mais culta do que entrei. Insuportável.", "Esse livro me deixou citando autores." },
+    erudite = { "Saí mais culta do que entrei. Insuportável.", "Esse livro me deixou citando autores." },
 }
-B.fim.nota = {
-    jovem = { "Nota: {n} estrelinhas.", "Dou {n} estrelinhas.", "{n} estrelinhas de 5." },
-    velha = { "Nota: {n} cigarros imaginários.", "{n} cigarros imaginários de 5.", "Vale {n} cigarros imaginários." },
+B.ending.grade = {
+    young = { "Nota: {n} estrelinhas.", "Dou {n} estrelinhas.", "{n} estrelinhas de 5." },
+    old = { "Nota: {n} cigarros imaginários.", "{n} cigarros imaginários de 5.", "Vale {n} cigarros imaginários." },
 }
-B.fim.veredito = {
-    jovem = {
+B.ending.verdict = {
+    young = {
         { "Comi por educação. Desculpa, autor.", "Não era pra mim. Acho." },
         { "Tinha coisa boa, mas demorou a aparecer.", "Meio morno. Igual papel esquecido no sol." },
         { "Gostei! Não muito. Mas gostei." },
         { "Que livro! Vou sonhar com ele.", "Fiquei triste quando acabou. Isso é bom, né?" },
         { "O melhor que eu já comi. Até agora. Acho. Sim.", "Quero ler de novo. Agora. Já." },
     },
-    velha = {
+    old = {
         { "Um livro que existe. Só isso." },
         { "Teve seus momentos. Poucos.", "Morno. Como chá esquecido." },
         { "Decente. Raro, hoje em dia.", "Não mudou minha vida. Mas também não a piorou." },
@@ -178,66 +178,66 @@ B.fim.veredito = {
     },
 }
 
--- Obsessões (tema dominante) ---------------------------------------------------------------
-B.obsessao.nova = {
-    "Percebi que penso muito {tema}. Não pedi por isso.",
-    "Ando pensando {tema}. Culpa dos seus livros.",
-    "Não consigo parar de pensar {tema}. Vou precisar de outro livro. Ou de terapia.",
+-- Obsessions (dominant theme) ---------------------------------------------------------------
+B.obsession.new = {
+    "Percebi que penso muito {theme}. Não pedi por isso.",
+    "Ando pensando {theme}. Culpa dos seus livros.",
+    "Não consigo parar de pensar {theme}. Vou precisar de outro livro. Ou de terapia.",
 }
-B.obsessao.troca = {
-    "Antes eu pensava {antes}. Agora só penso {agora}. Culpa sua e dos seus livros.",
-    "Troquei de obsessão: saiu {antes_s}, entrou {agora_s}.",
-    "{agora_s} tomou o lugar de {antes_s} na minha cabeça.",
-    "Já não penso tanto {antes}. Agora é {agora_s}, o tempo todo.",
+B.obsession.swap = {
+    "Antes eu pensava {before}. Agora só penso {now}. Culpa sua e dos seus livros.",
+    "Troquei de obsessão: saiu {before_s}, entrou {now_s}.",
+    "{now_s} tomou o lugar de {before_s} na minha cabeça.",
+    "Já não penso tanto {before}. Agora é {now_s}, o tempo todo.",
 }
 
--- Lembranças (yomimon_memories.lua): {autor} {n} {livro} {mes} {nome} {tema} {de_tema} --------------
-B.lembranca.autor = {
-    "{autor} de novo. É o {n}º livro de {autor} que a gente lê. Isso já é um relacionamento.",
-    "Voltamos a {autor}: {n}º livro. Eu já reconheço o tempero.",
-    "{n}º de {autor}. Tem gente que coleciona selos.",
-    "Mais {autor}. O {n}º. Você não cansa, e eu confesso que também não.",
-    "{autor} outra vez, pela {n}ª vez. Já sei onde ficam os ossos.",
+-- Memories (yomimon_memories.lua): {author} {n} {book} {monthName} {nameText} {theme} {of_theme} --------------
+B.recollection.author = {
+    "{author} de novo. É o {n}º livro de {author} que a gente lê. Isso já é um relacionamento.",
+    "Voltamos a {author}: {n}º livro. Eu já reconheço o tempero.",
+    "{n}º de {author}. Tem gente que coleciona selos.",
+    "Mais {author}. O {n}º. Você não cansa, e eu confesso que também não.",
+    "{author} outra vez, pela {n}ª vez. Já sei onde ficam os ossos.",
 }
-B.lembranca.aniversario = {
-    "Faz um ano que a gente terminou “{livro}”. Ainda sinto o gosto.",
-    "Um ano hoje desde o fim de “{livro}”. Você lembra? Eu lembro de tudo.",
-    "Aniversário: há exatamente um ano, a última página de “{livro}”.",
+B.recollection.anniversary = {
+    "Faz um ano que a gente terminou “{book}”. Ainda sinto o gosto.",
+    "Um ano hoje desde o fim de “{book}”. Você lembra? Eu lembro de tudo.",
+    "Aniversário: há exatamente um ano, a última página de “{book}”.",
 }
-B.lembranca.personagem = {
-    "{nome} de novo… a gente se conhece de “{livro}”.",
-    "Olha quem voltou: {nome}. Desde “{livro}” eu não via essa figura.",
-    "{nome}! Achei que tinha ficado em “{livro}”.",
-    "{nome} outra vez. “{livro}” não foi suficiente, pelo visto.",
+B.recollection.character = {
+    "{nameText} de novo… a gente se conhece de “{book}”.",
+    "Olha quem voltou: {nameText}. Desde “{book}” eu não via essa figura.",
+    "{nameText}! Achei que tinha ficado em “{book}”.",
+    "{nameText} outra vez. “{book}” não foi suficiente, pelo visto.",
 }
-B.lembranca.recorde_longo = {
-    "“{livro}”: {n} páginas. O mais longo que você já leu comigo. Tô de barriga estufada.",
-    "Recorde: “{livro}” foi o livro mais comprido que a gente comeu junto.",
-    "Nunca comemos nada tão grande quanto “{livro}”. Preciso deitar.",
+B.recollection.longest_record = {
+    "“{book}”: {n} páginas. O mais longo que você já leu comigo. Tô de barriga estufada.",
+    "Recorde: “{book}” foi o livro mais comprido que a gente comeu junto.",
+    "Nunca comemos nada tão grande quanto “{book}”. Preciso deitar.",
 }
-B.lembranca.recorde_rapido = {
-    "Nenhum livro desceu tão rápido quanto “{livro}”. Ou era bom, ou era fome.",
-    "Recorde de velocidade: “{livro}”. Me deu soluço.",
+B.recollection.fastest_record = {
+    "Nenhum livro desceu tão rápido quanto “{book}”. Ou era bom, ou era fome.",
+    "Recorde de velocidade: “{book}”. Me deu soluço.",
 }
-B.lembranca.serie_tema = {
-    "{n}º livro seguido sobre {tema}. Estou vendo um padrão. E você?",
-    "Mais um livro {de_tema}. É o {n}º seguido. Você está procurando alguma coisa?",
-    "{n} livros seguidos em que {tema} manda. Anotado no meu caderninho.",
+B.recollection.theme_series = {
+    "{n}º livro seguido sobre {theme}. Estou vendo um padrão. E você?",
+    "Mais um livro {of_theme}. É o {n}º seguido. Você está procurando alguma coisa?",
+    "{n} livros seguidos em que {theme} manda. Anotado no meu caderninho.",
 }
-B.lembranca.sombrio_desde = {
-    "Você não lia nada tão sombrio desde “{livro}”, em {mes}.",
-    "Desde “{livro}”, lá em {mes}, eu não comia páginas tão escuras.",
-    "Isso aqui está tão pesado quanto “{livro}”. E isso foi em {mes}.",
+B.recollection.gloomy_since = {
+    "Você não lia nada tão sombrio desde “{book}”, em {month}.",
+    "Desde “{book}”, lá em {month}, eu não comia páginas tão escuras.",
+    "Isso aqui está tão pesado quanto “{book}”. E isso foi em {month}.",
 }
-B.lembranca.mais_sombrio = {
+B.recollection.gloomiest = {
     "Este é o livro mais sombrio que a gente já leu junto. Estou de luto e nem sei por quê.",
     "Nunca comi páginas tão escuras com você. Recorde que ninguém queria.",
 }
-B.lembranca.leve_desde = {
-    "Nada tão leve desde “{livro}”, em {mes}. Que alívio.",
-    "Desde “{livro}”, em {mes}, eu não comia páginas tão doces.",
+B.recollection.light_since = {
+    "Nada tão leve desde “{book}”, em {month}. Que alívio.",
+    "Desde “{book}”, em {month}, eu não comia páginas tão doces.",
 }
-B.lembranca.mais_leve = {
+B.recollection.lighter = {
     "O livro mais leve que a gente já leu junto. Desconfio.",
     "Nunca comi páginas tão doces com você. Vou ter cárie.",
 }

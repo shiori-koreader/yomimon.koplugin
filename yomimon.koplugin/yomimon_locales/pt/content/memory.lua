@@ -1,7 +1,7 @@
--- Frases da memória e do caderno. Sem NOMES, o módulo usa a gramática própria (artigo + preposição).
+-- Memory and notebook phrases. Without NAMES, the module uses its own grammar (article + preposition).
 local T = {}
 
-T.FALAS_EVENTO = {
+T.SPEECHES_EVENT = {
     morte = { "Teve enterro nesse capítulo. Senti o cheiro de vela.", "Alguém morreu ali atrás. Eu avisei que ia acontecer.",
               "Um capítulo inteiro de luto. Fiquei com o papel úmido." },
     casamento = { "Casamento no capítulo. Dou três capítulos para dar errado.", "Noiva, altar, promessas. Anotei pra cobrar depois." },
@@ -15,17 +15,17 @@ T.FALAS_EVENTO = {
     crime = { "Crime no capítulo. Eu tenho álibi: estava comendo a página anterior.", "Sangue e polícia. Agora sim o livro acordou." },
 }
 
-T.FALAS_NOVO = { "Apareceu um tal de %s. Já não gosto.", "Quem é %s? Ninguém me apresentou.", "%s chegou. Vai dar trabalho." }
+T.SPEECHES_NEW = { "Apareceu um tal de %s. Já não gosto.", "Quem é %s? Ninguém me apresentou.", "%s chegou. Vai dar trabalho." }
 
-T.FALAS_SUMIU = { "Um capítulo inteiro sem %s. Suspeito.", "Cadê %s? Some assim do nada?", "Sem %s nesse capítulo. Estranho. Ou alívio." }
+T.SPEECHES_VANISHED = { "Um capítulo inteiro sem %s. Suspeito.", "Cadê %s? Some assim do nada?", "Sem %s nesse capítulo. Estranho. Ou alívio." }
 
-T.FALAS_AZEDOU = { "Esse capítulo azedou.", "Ficou tudo mais escuro de repente. Gostei. Quer dizer, que pena." }
+T.SPEECHES_SOURED = { "Esse capítulo azedou.", "Ficou tudo mais escuro de repente. Gostei. Quer dizer, que pena." }
 
-T.FALAS_ADOCOU = { "Até que esse capítulo foi leve. Desconfio.", "Capítulo doce. Alguém vai pagar por isso depois.", "Um pouco de luz. Não se acostume." }
+T.SPEECHES_SWEETENED = { "Até que esse capítulo foi leve. Desconfio.", "Capítulo doce. Alguém vai pagar por isso depois.", "Um pouco de luz. Não se acostume." }
 
-T.FALAS_VIROU = { "O livro era %s e esse capítulo só falou %s.", "Mudou de assunto: saiu %s e entrou %s." }
+T.SPEECHES_TURNED = { "O livro era %s e esse capítulo só falou %s.", "Mudou de assunto: saiu %s e entrou %s." }
 
-T.FALAS_TEMA = {
+T.SPEECHES_THEME = {
     morte = { "Todo capítulo é um pequeno enterro.", "Já pensei no meu epitáfio. É curto. Como eu." },
     amor = { "Amor. Li tanto sobre isso que fiquei com azia.", "Nunca amei ninguém. Exceto um dicionário, uma vez." },
     guerra = { "Cada página virada é uma trincheira.", "A paz é só o intervalo entre dois capítulos." },
@@ -66,35 +66,35 @@ T.FALAS_TEMA = {
              "Senti um arrepio na lombada. Continue. Mas devagar." },
 }
 
-T.FALAS_REFERENCIA = {
-    jovem = {
-        "Esse livro fala de {nome} {n} vezes. Quem é {nome}? Devo me preocupar?",
-        "{nome} de novo. Todo mundo conhece {nome}, menos eu.",
-        "O livro citou {nome} mais uma vez. Anotei, pra parecer culta.",
+T.SPEECHES_REFERENCE = {
+    young = {
+        "Esse livro fala de {nameText} {n} vezes. Quem é {nameText}? Devo me preocupar?",
+        "{nameText} de novo. Todo mundo conhece {nameText}, menos eu.",
+        "O livro citou {nameText} mais uma vez. Anotei, pra parecer culta.",
     },
-    velha = {
-        "Esse livro cita {nome} {n} vezes. Exibido.",
-        "{nome} de novo. O autor deve ter um pôster na parede.",
-        "Mais uma menção a {nome}. Eu também li, tá? Comi, na verdade.",
-    },
-}
-
-T.FALAS_CITACAO = {
-    jovem = {
-        "{nome} disse “{fala}”. Eu nunca teria coragem.",
-        "“{fala}” — foi o que {nome} disse. Repeti baixinho.",
-        "Não paro de pensar no que {nome} disse: “{fala}”.",
-        "{nome} falou “{fala}”. Anotei pra usar um dia.",
-    },
-    velha = {
-        "{nome} disse “{fala}”. Anotei para nunca perdoar.",
-        "“{fala}”, disse {nome}. Eu teria dito melhor.",
-        "{nome}: “{fala}”. Frase de quem nunca comeu um dicionário.",
-        "Lembra quando {nome} disse “{fala}”? Eu lembro. Eu lembro de tudo.",
+    old = {
+        "Esse livro cita {nameText} {n} vezes. Exibido.",
+        "{nameText} de novo. O autor deve ter um pôster na parede.",
+        "Mais uma menção a {nameText}. Eu também li, tá? Comi, na verdade.",
     },
 }
 
-T.FALAS_NARRADOR = {
+T.SPEECHES_QUOTATION = {
+    young = {
+        "{nameText} disse “{speech}”. Eu nunca teria coragem.",
+        "“{speech}” — foi o que {nameText} disse. Repeti baixinho.",
+        "Não paro de pensar no que {nameText} disse: “{speech}”.",
+        "{nameText} falou “{speech}”. Anotei pra usar um dia.",
+    },
+    old = {
+        "{nameText} disse “{speech}”. Anotei para nunca perdoar.",
+        "“{speech}”, disse {nameText}. Eu teria dito melhor.",
+        "{nameText}: “{speech}”. Frase de quem nunca comeu um dicionário.",
+        "Lembra quando {nameText} disse “{speech}”? Eu lembro. Eu lembro de tudo.",
+    },
+}
+
+T.SPEECHES_NARRATOR = {
     f = {
         "Quem conta essa história é uma mulher que fala muito de si. Gosto. Não, mentira.",
         "A narradora não para de falar dela mesma. Me identifico.",
@@ -105,7 +105,7 @@ T.FALAS_NARRADOR = {
         "O narrador fala de si como quem lê o próprio diário em voz alta.",
         "Ele narra, ele opina, ele se elogia. Típico.",
     },
-    neutro = {
+    neutral = {
         "Esse livro é contado por alguém que diz muito \"eu\". Desconfio de quem diz muito \"eu\".",
         "Narrador em primeira pessoa. Ou seja: um lado só da história.",
         "Quem conta fala muito de si. Eu também falaria, se alguém me lesse.",
@@ -113,8 +113,8 @@ T.FALAS_NARRADOR = {
 }
 
 T.C = {}
-local C = T.C  -- bancos de frases por pista; %s = personagem, livro ou capítulo
-C.personagem = {
+local C = T.C  -- phrase banks by clue; %s = character, book or chapter
+C.character = {
     "%s de novo? Você está apaixonado ou só desconfiado?",
     "Tudo gira em torno de %s. Até você.",
     "Eu não confiaria em %s nem para guardar um marcador.",
@@ -124,12 +124,12 @@ C.personagem = {
     "%s merecia um livro melhor. Ou um autor mais cruel.",
 }
 
-C.dois = {
+C.two = {
     "%s e %s. Alguém aí vai se arrepender.",
     "%s e %s na mesma frase. Isso nunca termina bem.",
 }
 
-C.tema = {
+C.theme = {
     morte = { "Mais um enterro. Já estou de luto adiantado.", "A morte de novo. Esse autor tem um tipo.",
               "Sublinhou a morte. Eu sublinho o almoço.", "Toda frase bonita tem cheiro de cova." },
     amor = { "Amor. Ninguém aprende, todo mundo sublinha.", "Romântico. Vou fingir que não vi.",
@@ -166,56 +166,56 @@ C.tema = {
     medo = { "Sublinhou o medo. Coragem sua.", "Esse trecho dá arrepio. Bom gosto." },
 }
 
-C.curto = {
+C.short_one = {
     "Três palavras e você já se emocionou. Fácil.",
     "Curtinho. Cabe num epitáfio.",
     "Pouca coisa, muito peso. Respeito.",
     "Isso aí é quase um provérbio. Ou uma ameaça.",
 }
 
-C.longo = {
+C.long = {
     "Sublinhou meia página. Decida-se.",
     "Isso não é um destaque, é uma mudança de endereço.",
     "Se for para sublinhar tudo, me dê o livro inteiro de uma vez.",
     "Parágrafo inteiro. Você não estava lendo, estava concordando.",
 }
 
-C.nota = {
+C.grade = {
     "Você escreveu “%s”. Eu escreveria pior. Ou melhor. Não importa.",
     "Sua nota: “%s”. Guardei na barriga, junto com o resto.",
     "“%s”, você disse. A frase não pediu sua opinião, mas tudo bem.",
 }
 
-C.madrugada = {
+C.small_hours = {
     "Sublinhando de madrugada. Está tudo bem em casa?",
     "Madrugada. Hora em que toda frase parece verdade.",
 }
 
-C.primeiro = {
+C.first_one = {
     "Primeiro sublinhado em “%s”. Começou o namoro.",
     "Primeira marca em “%s”. Ainda dá tempo de desistir.",
 }
 
-C.muitos = {
+C.many = {
     "Já são %s sublinhados neste livro. Obsessão notada.",
     "%s sublinhados. Mais um e você vai ter que pagar aluguel.",
 }
 
-C.capitulo = {
+C.chapter = {
     "De novo em “%s”. Esse capítulo te pegou.",
     "Mais um em “%s”. Vou chamar esse capítulo de seu.",
 }
 
-C.geral = {
-    ovo = { "…" },
-    jovem = {
+C.general = {
+    egg = { "…" },
+    young = {
         "Você sublinhou isso. Devo me preocupar?",
         "Guardei. Mas não sei se entendi.",
         "Isso me deu medo. No bom sentido. Acho.",
         "Bonito. Desconfio de coisas bonitas.",
         "Isso é verdade? Livros mentem às vezes, né?",
     },
-    velha = {
+    old = {
         "Sublinhado. Clássico de quem não sabe o que fazer com as mãos.",
         "Já li coisa melhor. Mas tudo bem, guardo.",
         "Isso vai parecer profundo até amanhã de manhã.",

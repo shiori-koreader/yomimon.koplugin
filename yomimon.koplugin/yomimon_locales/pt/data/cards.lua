@@ -1,50 +1,50 @@
 --[[--
-Caixa de cartões (português). Falas escritas por você; nada entra aqui sem aprovação.
-Fonte: o documento "Yomimon — Lote 1" (28/10/2026).
+Card box (Portuguese). Phrases written by you; nothing enters here without approval.
+Source: the document "Yomimon — Batch 1" (2026-10-28).
 
-Cada cartão:
-  id      nome curto e fixo (o estado guarda os cartões já ditos por ele)
-  fala    o texto; {personagem} é quem mais aparece no capítulo
-  quando  tela: "home" (aparece na Home se couber em 2 linhas; senão, na tela da Yomimon)
-          assunto: o capítulo fala disso (yomimon_data/topics.lua)
-          fase: só nessa fase ("jovem", "adulta", "ancia")
-          gravado: só depois que ela já disse um cartão que grava isso
-  grava   o que fica guardado quando ela diz a fala
-  uma_vez true: uma vez só na vida dela
-  desligado true: o cartão não sai (guardado para voltar depois)
-A ordem conta: no mesmo capítulo, vale o primeiro cartão que serve.
+Each card:
+  id      short, fixed name (the state stores the cards already said by it)
+  speech  the text; {character} is who appears most in the chapter
+  when    screen: "home" (shows on the Home if it fits in 2 lines; otherwise on the Yomimon screen)
+          subject: the chapter talks about it (yomimon_data/topics.lua)
+          stage: only in that stage ("young", "adult", "elder")
+          stored: only after it has already said a card that records this
+  records what is stored when it says the phrase
+  once true: only once in its life
+  turned_off true: the card does not come out (kept to come back later)
+Order matters: in the same chapter, the first card that fits wins.
 
-Desligados para o beta (29/10/2026): presságio e pai. As listas de palavras deles acendem em capítulos
-errados ("deck" é convés, "fortune" é dinheiro, "cartas" às vezes é correio, "filho" acende o pai) e a fala
-afirma o que o capítulo não tem. Voltam quando as listas tiverem palavras fortes e de apoio.
+Turned off for the beta (2026-10-29): omen and father. Their word lists light up in chapters
+wrong ("deck" is a ship deck, "fortune" is money, "cartas" is sometimes mail, "filho" lights up the father) and the phrase
+states what the chapter does not have. They come back when the lists have strong and supporting words.
 ]]
 
 return {
     {
         id = "pressagio",
-        fala = "Cartas na mesa, sorte de {personagem}. A minha? Ninguém lê e todo mundo sabe.",
-        quando = { tela = "home", assunto = "pressagio" },
-        desligado = true,
+        speech = "Cartas na mesa, sorte de {character}. A minha? Ninguém lê e todo mundo sabe.",
+        when = { screen = "home", subject = "pressagio" },
+        turned_off = true,
     },
     {
         id = "alexandria_ancia",
-        fala = "Já te contei de Alexandria? A família inteira. Num dia só.",
-        quando = { tela = "home", assunto = "antepassados", gravado = "contou de Alexandria", fase = "ancia" },
+        speech = "Já te contei de Alexandria? A família inteira. Num dia só.",
+        when = { screen = "home", subject = "antepassados", stored = "contou de Alexandria", stage = "elder" },
     },
     {
         id = "alexandria",
-        fala = "Falaram de antepassados. Os meus morreram no incêndio em Alexandria. Minha avó contou.",
-        quando = { tela = "home", assunto = "antepassados" },
-        grava = "contou de Alexandria",
-        uma_vez = true,
+        speech = "Falaram de antepassados. Os meus morreram no incêndio em Alexandria. Minha avó contou.",
+        when = { screen = "home", subject = "antepassados" },
+        records = "contou de Alexandria",
+        once = true,
     },
     {
         id = "pai",
-        fala = "Pai dando conselho. Meu pai? Não conheci. Morreu atropelado por uma enciclopédia Barsa. "
+        speech = "Pai dando conselho. Meu pai? Não conheci. Morreu atropelado por uma enciclopédia Barsa. "
             .. "Morreu fazendo o que amava: tentando chegar à letra M.",
-        quando = { tela = "home", assunto = "pai" },
-        grava = "contou do pai",
-        uma_vez = true,
-        desligado = true,
+        when = { screen = "home", subject = "pai" },
+        records = "contou do pai",
+        once = true,
+        turned_off = true,
     },
 }

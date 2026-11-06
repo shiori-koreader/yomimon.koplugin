@@ -1,12 +1,12 @@
 --[[--
-Banco de frases dos traços (inglês). Mesma estrutura de tracos_pt.lua; adaptado, não traduzido
+Trait phrase bank (English). Same structure as the Portuguese one; adapted, not translated
 palavra por palavra.
 ]]
 
-local B = { falas = {}, diario = {} }
+local B = { speeches = {}, diary = {} }
 
-B.falas.amarga = {
-    jovem = {
+B.speeches.bitter = {
+    young = {
         "I've been sad and I don't even know why. I suspect your books.",
         "I used to think everything ended well. You gave me too many books.",
         "I woke up today with tragedy in my mouth.",
@@ -22,7 +22,7 @@ B.falas.amarga = {
         "My heart is the size of a full stop.",
         "When I grow up I want to be less sad. Or grumpier. Either way.",
     },
-    velha = {
+    old = {
         "Bitter? Me? I only eat what you give me. Draw your own conclusions.",
         "I don't expect happy endings anymore. I just expect endings.",
         "Every page has a corpse hidden in it. I find them all.",
@@ -41,8 +41,8 @@ B.falas.amarga = {
     },
 }
 
-B.falas.otimista = {
-    jovem = {
+B.speeches.hopeful = {
+    young = {
         "Everything feels like a good chapter today. Even the cover!",
         "I think the world is prettier than the villains say.",
         "I ate a happy page and now I'm skipping between the lines.",
@@ -58,7 +58,7 @@ B.falas.otimista = {
         "I like it when the book ends and nobody died. I like it a lot.",
         "The letters are dancing. Or maybe I am.",
     },
-    velha = {
+    old = {
         "I'm in a good mood. Don't spread it around, I have a reputation.",
         "Your books have been kind. I'm softening. How embarrassing.",
         "Today I believe in humanity. Lightly, but I do.",
@@ -75,8 +75,8 @@ B.falas.otimista = {
     },
 }
 
-B.falas.medrosa = {
-    jovem = {
+B.speeches.fearful = {
+    young = {
         "Did you hear that? Did the page turn by itself?",
         "Please don't read in the dark. I'm in here too.",
         "There's something under the dust jacket. I can feel it.",
@@ -92,7 +92,7 @@ B.falas.medrosa = {
         "Why does every good book have a basement?",
         "I swear the cover winked at me.",
     },
-    velha = {
+    old = {
         "I'm not scared. I take precautions. Many.",
         "Since that book, I check under every page before bed.",
         "Old and frightened. A fine result of your literary taste.",
@@ -109,8 +109,8 @@ B.falas.medrosa = {
     },
 }
 
-B.falas.corajosa = {
-    jovem = {
+B.speeches.brave = {
+    young = {
         "I want to go to sea! I can't swim, but I want to.",
         "Today I'd fight a dragon. A small one. Made of paper.",
         "Your books make me brave. Or silly. Brave-silly.",
@@ -126,7 +126,7 @@ B.falas.corajosa = {
         "I want to see the horizon. Any horizon. Even the margin's.",
         "Courage tastes like salty paper.",
     },
-    velha = {
+    old = {
         "I've crossed oceans of paper. A chapter doesn't scare me.",
         "Your books gave me courage. And rheumatism, from all the travelling.",
         "Let the monster come. I've eaten worse: prefaces.",
@@ -144,8 +144,8 @@ B.falas.corajosa = {
     },
 }
 
-B.falas.cinica = {
-    jovem = {
+B.speeches.cynical = {
+    young = {
         "Everyone in your books wants something. Even the nice ones.",
         "I've started distrusting people who smile a lot in books.",
         "Nobody does anything for free, right? I learned that from you.",
@@ -162,7 +162,7 @@ B.falas.cinica = {
         "I'm learning to read intentions. They're ugly.",
         "Yesterday I trusted a character. Today he betrayed me. Noted.",
     },
-    velha = {
+    old = {
         "Love? A contract with flowers.",
         "Every hero has a lawyer and a debt.",
         "Kindness is just a slower strategy.",
@@ -181,8 +181,8 @@ B.falas.cinica = {
     },
 }
 
-B.falas.romantica = {
-    jovem = {
+B.speeches.romantic = {
+    young = {
         "I think I'm in love. With whom, I don't know. A paragraph.",
         "Will someone ever read me tenderly?",
         "I kept that love letter from the chapter in my belly.",
@@ -195,7 +195,7 @@ B.falas.romantica = {
         "A silly heart beats in rhyme.",
         "I want a happy ending. With a wedding and everything.",
     },
-    velha = {
+    old = {
         "I've gone soft. It was your romances. Tell no one.",
         "I used to be cynical. Then you fed me love letters. Low blow.",
         "I sighed. It was age. Or that chapter.",
@@ -213,8 +213,8 @@ B.falas.romantica = {
     },
 }
 
-B.falas.popular = {
-    jovem = {
+B.speeches.popular = {
+    young = {
         "I like it when the book goes fast! No fancy words.",
         "Short chapters are like sweets: one after another.",
         "I read so much dialogue today I've turned chatty.",
@@ -229,7 +229,7 @@ B.falas.popular = {
         "I read nonstop today. Do I have a problem?",
         "If there's a plot twist, I want it. Two, ideally.",
     },
-    velha = {
+    old = {
         "I confess I'm enjoying these quick reads. Don't get used to it.",
         "No Latin today. Just gunshots, kisses and twists.",
         "I've gone lowbrow. My younger self would be horrified.",
@@ -247,8 +247,8 @@ B.falas.popular = {
     },
 }
 
-B.falas.erudita = {
-    jovem = {
+B.speeches.erudite = {
+    young = {
         "Today I learned three words with more than four syllables. I feel tall.",
         "I think I'm getting cultured. I ate a whole metaphor.",
         "I want to read a philosophy book. Just to say I did.",
@@ -264,7 +264,7 @@ B.falas.erudita = {
         "Today I understood some irony. All by myself!",
         "Now I read prefaces. Is that what being grown-up is?",
     },
-    velha = {
+    old = {
         "My diet is classics now. Everything else gives me heartburn.",
         "I no longer accept a sentence without a subordinate clause.",
         "I've turned highbrow. Nobody understands me. Exactly as planned.",
@@ -282,8 +282,8 @@ B.falas.erudita = {
     },
 }
 
-B.falas.diurna = {
-    jovem = {
+B.speeches.diurnal = {
+    young = {
         "Good morning! Reading in the morning tastes like warm bread.",
         "I woke up early to wait for you. You came!",
         "Letters are brighter in the morning.",
@@ -298,7 +298,7 @@ B.falas.diurna = {
         "Book ghosts don't come out in the morning. Great.",
         "Good morning, book. Good morning, you. Good morning, me.",
     },
-    velha = {
+    old = {
         "Morning reading. Civilised. As it should be.",
         "Books are more honest in the morning. They haven't been drinking yet.",
         "Coffee, paper and silence. The holy trinity.",
@@ -314,8 +314,8 @@ B.falas.diurna = {
     },
 }
 
-B.falas.noturna = {
-    jovem = {
+B.speeches.nocturnal = {
+    young = {
         "We've become creatures of the night, haven't we? I like it.",
         "Letters glow brighter in the small hours. Or it's the screen.",
         "I sleep during the day now. Like a bat. A paper bat.",
@@ -330,7 +330,7 @@ B.falas.noturna = {
         "My clock now is the end of the chapter.",
         "Night tastes like fresh ink.",
     },
-    velha = {
+    old = {
         "The small hours are when literature takes its make-up off.",
         "You made me nocturnal. I already was. You made it worse.",
         "Insomnia and books: an old marriage, happy and destructive.",
@@ -347,57 +347,57 @@ B.falas.noturna = {
     },
 }
 
-B.diario.amarga = {
-    [1] = { "I've been bitter lately. I think it was “{livro}”. Or life. But it was “{livro}”.",
+B.diary.bitter = {
+    [1] = { "I've been bitter lately. I think it was “{book}”. Or life. But it was “{book}”.",
             "I noticed I no longer expect happy endings. Blame the books you give me." },
     [2] = { "I'm as bitter as burnt paper. No book consoles me.",
             "Today I realised I've become a full-time pessimist. Your books did a fine job." },
-    volta = { "I think the sadness has passed. For now.", "I'm not bitter today. Strange. Writing it down so I remember." },
+    fadeBack = { "I think the sadness has passed. For now.", "I'm not bitter today. Strange. Writing it down so I remember." },
 }
-B.diario.otimista = {
-    [1] = { "I've been in a good mood for days. I suspect “{livro}”.", "I've started believing in happy endings. Dangerous." },
+B.diary.hopeful = {
+    [1] = { "I've been in a good mood for days. I suspect “{book}”.", "I've started believing in happy endings. Dangerous." },
     [2] = { "I've become an optimist. If you hear me whistling, pretend you didn't.", "I feel too light. Your books have been too sweet." },
-    volta = { "The good mood is gone. Back to normal: suspicious.", "I'm not so optimistic anymore. The bookshelf feels heavy again." },
+    fadeBack = { "The good mood is gone. Back to normal: suspicious.", "I'm not so optimistic anymore. The bookshelf feels heavy again." },
 }
-B.diario.medrosa = {
-    [1] = { "I think I'm getting jumpy. Blame “{livro}”.", "Today a comma made me jump. That's new." },
+B.diary.fearful = {
+    [1] = { "I think I'm getting jumpy. Blame “{book}”.", "Today a comma made me jump. That's new." },
     [2] = { "I'm scared of everything. Even the cover. Thanks for your taste in books." },
-    volta = { "The fear has passed. I only check under the pages once a night now.", "I'm not scared anymore. Almost." },
+    fadeBack = { "The fear has passed. I only check under the pages once a night now.", "I'm not scared anymore. Almost." },
 }
-B.diario.corajosa = {
-    [1] = { "I'm getting brave. Must have been “{livro}”.", "Today I faced a stormy chapter without blinking." },
+B.diary.brave = {
+    [1] = { "I'm getting brave. Must have been “{book}”.", "Today I faced a stormy chapter without blinking." },
     [2] = { "I've become an adventurer. Give me a map and a book and I'm gone." },
-    volta = { "My courage has taken a day off." },
+    fadeBack = { "My courage has taken a day off." },
 }
-B.diario.cinica = {
-    [1] = { "I've started distrusting everyone. Thank you, “{livro}”.", "Now I look for the motive behind every kindness." },
+B.diary.cynical = {
+    [1] = { "I've started distrusting everyone. Thank you, “{book}”.", "Now I look for the motive behind every kindness." },
     [2] = { "I'm a card-carrying cynic now. Your books taught me to follow the money.", "I don't believe anyone anymore. Not even the narrator." },
-    volta = { "I believed in someone again. A little, but I did.", "The cynicism has called a truce." },
+    fadeBack = { "I believed in someone again. A little, but I did.", "The cynicism has called a truce." },
 }
-B.diario.romantica = {
-    [1] = { "I think I'm turning romantic. Blame “{livro}”.", "I sighed today. For no reason. For a reason: a chapter." },
+B.diary.romantic = {
+    [1] = { "I think I'm turning romantic. Blame “{book}”.", "I sighed today. For no reason. For a reason: a chapter." },
     [2] = { "I'm a hopeless romantic now. Give me a sonnet and a handkerchief." },
-    volta = { "The romance has passed. Thankfully. Or sadly.", "I don't sigh for no reason anymore. Only sometimes." },
+    fadeBack = { "The romance has passed. Thankfully. Or sadly.", "I don't sigh for no reason anymore. Only sometimes." },
 }
-B.diario.popular = {
-    [1] = { "I've been enjoying quick reads. Blame “{livro}”.", "I noticed I skip long descriptions now. I never used to." },
+B.diary.popular = {
+    [1] = { "I've been enjoying quick reads. Blame “{book}”.", "I noticed I skip long descriptions now. I never used to." },
     [2] = { "I've become a bestseller reader. My erudition handed in its notice.", "Now I only want pace. Hard words make me lazy." },
-    volta = { "I have patience for long sentences again.", "I'm not in such a hurry to read anymore." },
+    fadeBack = { "I have patience for long sentences again.", "I'm not in such a hurry to read anymore." },
 }
-B.diario.erudita = {
-    [1] = { "I'm getting cultured. Must have been “{livro}”.", "I noticed I quote authors now. How awful. How delicious." },
+B.diary.erudite = {
+    [1] = { "I'm getting cultured. Must have been “{book}”.", "I noticed I quote authors now. How awful. How delicious." },
     [2] = { "I've turned highbrow. Nobody understands me, as it should be." },
-    volta = { "My erudition is taking a rest.", "I like short sentences again." },
+    fadeBack = { "My erudition is taking a rest.", "I like short sentences again." },
 }
-B.diario.diurna = {
+B.diary.diurnal = {
     [1] = { "I noticed I wake up with the sun, like you." },
     [2] = { "I read with breakfast now. It's a ritual." },
-    volta = { "I'm not such a morning creature anymore.", "My schedule's a mess again." },
+    fadeBack = { "I'm not such a morning creature anymore.", "My schedule's a mess again." },
 }
-B.diario.noturna = {
+B.diary.nocturnal = {
     [1] = { "I've become a creature of the night. Blame you and your late nights.", "I noticed I only really wake up after ten at night." },
     [2] = { "I'm nocturnal for good. The sun offends me.", "The small hours are my home now. Yours too, apparently." },
-    volta = { "I'm sleeping at night again. How dull.", "I'm not so nocturnal anymore." },
+    fadeBack = { "I'm sleeping at night again. How dull.", "I'm not so nocturnal anymore." },
 }
 
 return B

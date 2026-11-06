@@ -2,6 +2,6 @@
 -- Corpus: the 30 public-domain books of the simulation (7064 pages in English, 1024 in Portuguese).
 -- The traits move by the difference between the page and this average.
 return {
-    en = { humor = -0.079, coragem = 0.037, coracao = 0.148, gosto = 0.167 },
-    pt = { humor = 0.040, coragem = 0.127, coracao = 0.391, gosto = 0.336 },
+    en = { mood = -0.079, courage = 0.037, heart = 0.148, taste = 0.167 },
+    pt = { mood = 0.040, courage = 0.127, heart = 0.391, taste = 0.336 },
 }
