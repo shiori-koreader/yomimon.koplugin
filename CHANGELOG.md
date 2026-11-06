@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0 (unreleased)
+## 1.0.0 (2026-11-06)
 
 - Languages are extensible: one folder per language in `yomimon_locales/<code>/` (UI texts, phrase banks, data banks and
   formats), found by scanning the folder and listed in the language menu, with English as the fallback. The English
