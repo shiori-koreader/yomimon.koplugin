@@ -1114,7 +1114,7 @@ function YomimonScreen:onHold(_, ges)
     return true
 end
 
---- Language menu: automatic (follows KOReader) plus every folder found in locales/. Applies after a restart.
+--- Language menu: automatic (follows KOReader) plus every folder found in yomimon_locales/. Applies after a restart.
 function YomimonScreen:menuIdioma()
     local Lingua = require("yomimon_language")
     local atual = Lingua.choice()

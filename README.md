@@ -25,9 +25,9 @@ leaves the device. The only network use is a one-time download of the sprite of 
 ## Languages
 
 The interface and the phrases come in English and Brazilian Portuguese. *Yomimon > Language* lets you pick one, or
-follow the KOReader language. Each language is a folder in `yomimon.koplugin/locales/`, and anything a folder does not
+follow the KOReader language. Each language is a folder in `yomimon.koplugin/yomimon_locales/`, and anything a folder does not
 provide falls back to English, so adding a language means adding a folder: see
-[locales/README.md](yomimon.koplugin/locales/README.md).
+[yomimon_locales/README.md](yomimon.koplugin/yomimon_locales/README.md).
 
 ## Install
 

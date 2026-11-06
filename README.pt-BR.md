@@ -23,8 +23,8 @@ terminados, hábitos de leitura, o horário em que você lê. Roda no seu leitor
 ## Idiomas
 
 A interface e as frases existem em inglês e em português do Brasil. Em *Yomimon > Idioma* você escolhe um ou segue o
-idioma do KOReader. Cada idioma é uma pasta em `yomimon.koplugin/locales/`, e o que a pasta não tiver cai para o
-inglês: acrescentar um idioma é acrescentar uma pasta (veja [locales/README.md](yomimon.koplugin/locales/README.md)).
+idioma do KOReader. Cada idioma é uma pasta em `yomimon.koplugin/yomimon_locales/`, e o que a pasta não tiver cai para o
+inglês: acrescentar um idioma é acrescentar uma pasta (veja [yomimon_locales/README.md](yomimon.koplugin/yomimon_locales/README.md)).
 
 ## Instalação
 

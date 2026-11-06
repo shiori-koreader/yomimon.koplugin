@@ -8,7 +8,7 @@ https://creativecommons.org/licenses/by-nc-sa/4.0/
 
 This covers, inside `yomimon.koplugin/`:
 
-- the phrase banks in `locales/` and `yomimon_data/` (adapted for Yomimon: lines about the original creature were removed, and
+- the phrase banks in `yomimon_locales/` and `yomimon_data/` (adapted for Yomimon: lines about the original creature were removed, and
   new lines in the same format were added).
 
 The sprite files and icons of the original were removed. Yomimon stores no creature artwork: the sprite of the
@@ -30,7 +30,7 @@ https://creativecommons.org/licenses/by-nc-sa/4.0/deed.pt-br
 
 Isso vale, dentro de `yomimon.koplugin/`, para:
 
-- os bancos de frases em `locales/` e `yomimon_data/` (adaptados para o Yomimon: as falas sobre a criatura original foram
+- os bancos de frases em `yomimon_locales/` e `yomimon_data/` (adaptados para o Yomimon: as falas sobre a criatura original foram
   removidas e novas falas, no mesmo formato, foram acrescentadas).
 
 Os sprites e ícones do original foram removidos. O Yomimon não guarda arte de criaturas: o sprite do bichinho

@@ -1,7 +1,7 @@
 --[[--
-Language support. Every language is a folder, locales/<code>/, found by scanning that folder, so adding a
-language is adding a folder (see locales/README.md). The code is the English UI text itself: Lingua.t"Back"
-returns the translation of "Back" from locales/<code>/ui.lua, or the English text when there is none.
+Language support. Every language is a folder, yomimon_locales/<code>/, found by scanning that folder, so adding a
+language is adding a folder (see yomimon_locales/README.md). The code is the English UI text itself: Lingua.t"Back"
+returns the translation of "Back" from yomimon_locales/<code>/ui.lua, or the English text when there is none.
 
 A locale folder holds:
   locale.lua        name and formats (clock, months, ordinals, thousands separator)
@@ -35,20 +35,20 @@ end
 
 local function manifest(code)
     if manifests[code] == nil then
-        manifests[code] = load("locales." .. code .. ".locale") or false
+        manifests[code] = load("yomimon_locales." .. code .. ".locale") or false
     end
     return manifests[code] or nil
 end
 
---- The locale codes found in locales/, sorted. Without lfs (unit tests) only English and Portuguese are known.
+--- The locale codes found in yomimon_locales/, sorted. Without lfs (unit tests) only English and Portuguese are known.
 function Lingua.codes()
     local ok, lfs = pcall(require, "libs/libkoreader-lfs")
     if not ok then return { "en", "pt" } end
     local codes = {}
-    local listing, dir = pcall(lfs.dir, PLUGIN_DIR .. "/locales")
+    local listing, dir = pcall(lfs.dir, PLUGIN_DIR .. "/yomimon_locales")
     if not listing then return { FALLBACK } end
     for entry in dir do
-        if entry:sub(1, 1) ~= "." and lfs.attributes(string.format("%s/locales/%s/locale.lua", PLUGIN_DIR, entry), "mode") == "file" then
+        if entry:sub(1, 1) ~= "." and lfs.attributes(string.format("%s/yomimon_locales/%s/locale.lua", PLUGIN_DIR, entry), "mode") == "file" then
             codes[#codes + 1] = entry
         end
     end
@@ -111,12 +111,12 @@ end
 --- Translated UI text, or the English text itself.
 function Lingua.t(text)
     if Lingua.code() == FALLBACK then return text end
-    translations = translations or load("locales." .. Lingua.code() .. ".ui") or {}
+    translations = translations or load("yomimon_locales." .. Lingua.code() .. ".ui") or {}
     return translations[text] or text
 end
 
 local function pick(code, name)
-    return load(string.format("locales.%s.%s", code, name))
+    return load(string.format("yomimon_locales.%s.%s", code, name))
 end
 
 --- The phrase banks of a module ("state", "context", "speech", "memory") in the current language, falling back
@@ -137,7 +137,7 @@ function Lingua.format()
     return setmetatable(own and own.format or {}, { __index = base and base.format })
 end
 
---- Appends the extra phrases of a module (locales/<code>/data/extra.lua) to its lists: where `extra` has a list it
+--- Appends the extra phrases of a module (yomimon_locales/<code>/data/extra.lua) to its lists: where `extra` has a list it
 -- is added to the list of the same name in `base`, and nested tables are followed.
 function Lingua.append(base, extra)
     if type(base) ~= "table" or type(extra) ~= "table" then return end

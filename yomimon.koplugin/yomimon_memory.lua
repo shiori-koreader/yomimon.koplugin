@@ -1847,7 +1847,7 @@ if Content.NOMES then
     for t in pairs(M.NOMES_TEMA) do M.NOMES_TEMA[t] = M.tema(t) end
 end
 
--- Lotes novos de frases (locales/<code>/data/extra.lua) somam às listas acima.
+-- Lotes novos de frases (yomimon_locales/<code>/data/extra.lua) somam às listas acima.
 Lingua.append({ FALAS_EVENTO = FALAS_EVENTO, FALAS_NOVO = FALAS_NOVO, FALAS_SUMIU = FALAS_SUMIU,
     FALAS_AZEDOU = FALAS_AZEDOU, FALAS_ADOCOU = FALAS_ADOCOU, FALAS_VIROU = FALAS_VIROU, FALAS_TEMA = FALAS_TEMA,
     C = C, FALAS_CITACAO = FALAS_CITACAO, FALAS_REFERENCIA = FALAS_REFERENCIA }, Lingua.extra("memoria"))

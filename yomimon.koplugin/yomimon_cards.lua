@@ -1,5 +1,5 @@
 --[[--
-Caixa de cartões: falas escritas por você para momentos certos (locales/<code>/data/cards.lua).
+Caixa de cartões: falas escritas por você para momentos certos (yomimon_locales/<code>/data/cards.lua).
 
 Quando um capítulo fala de um assunto (yomimon_memory.lua, M.cartaoDoCapitulo), o primeiro cartão que serve
 fica guardado em s.cartao_pendente. Ele vira a próxima fala da Home por até 24 horas (Estado.fala). Se não

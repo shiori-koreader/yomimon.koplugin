@@ -7,7 +7,7 @@ Diário da Yomimon: o que ela escreve sobre a sua leitura, com coisas concretas.
 - Ao terminar um livro: resenha curta (protagonista, comparação com outros livros, série de
   temas, o traço que o livro mexeu, nota) — e a resenha completa vai para s.resenhas.
 
-As frases ficam em locales/<code>/data/diary.lua. Lógica pura, testável fora do KOReader.
+As frases ficam em yomimon_locales/<code>/data/diary.lua. Lógica pura, testável fora do KOReader.
 ]]
 
 local Lingua = require("yomimon_language")

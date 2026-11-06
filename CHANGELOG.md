@@ -2,10 +2,10 @@
 
 ## 1.0.0 (unreleased)
 
-- Languages are extensible: one folder per language in `locales/<code>/` (UI texts, phrase banks, data banks and
+- Languages are extensible: one folder per language in `yomimon_locales/<code>/` (UI texts, phrase banks, data banks and
   formats), found by scanning the folder and listed in the language menu, with English as the fallback. The English
   UI text is now the translation key in the code. `scripts/check_locales.lua` reports untranslated texts, and the
-  README in `locales/` explains how to add a language.
+  README in `yomimon_locales/` explains how to add a language.
 - The sprite cache moved to `koreader/yomimon/sprites/`, so a plugin update no longer wipes it; sprites cached
   inside the plugin folder by earlier versions are moved there on first use.
 - About and disclaimer: a menu item under *Tools > Yomimon*, shown once after the first welcome.

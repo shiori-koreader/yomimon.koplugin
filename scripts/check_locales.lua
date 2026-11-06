@@ -37,9 +37,9 @@ end
 
 for key in all_text:gmatch('[^%w_]T%s*%(?%s*"([^"]*)"') do used[unescape(key)] = true end
 
-local codes = listing("ls " .. PLUGIN .. "/locales")
+local codes = listing("ls " .. PLUGIN .. "/yomimon_locales")
 for _, code in ipairs(codes) do
-    local base = PLUGIN .. "/locales/" .. code
+    local base = PLUGIN .. "/yomimon_locales/" .. code
     local ok, locale = pcall(dofile, base .. "/locale.lua")
     if not ok or type(locale) ~= "table" or type(locale.name) ~= "string" or type(locale.format) ~= "table" then
         print("ERROR " .. code .. ": locale.lua must return { name = ..., format = {...} }")

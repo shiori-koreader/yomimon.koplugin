@@ -42,7 +42,7 @@ Infl.POR_ID = {}
 for _, I in ipairs(Infl.LISTA) do Infl.POR_ID[I.id] = I end
 
 local bancos = {}
---- Frases no idioma atual (locales/<code>/data/influences.lua), ou nil.
+--- Frases no idioma atual (yomimon_locales/<code>/data/influences.lua), ou nil.
 function Infl.banco()
     local c = Lingua.code()
     if bancos[c] == nil then

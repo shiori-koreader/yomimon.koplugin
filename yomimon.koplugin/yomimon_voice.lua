@@ -18,7 +18,7 @@ Etapa 2, vocabulário do que ela comeu (os domínios de Caves of Qud):
     "Lambi a capa. Só tinha {gosto|poeira}."         → "Só tinha sal." (quem anda lendo sobre o mar)
     "Ainda mastigando “%s”.<dominio: Tem gosto de {gosto}.|>"
 
-- Cada tema tem um vocabulário (locales/<code>/data/domains.lua) com seis tipos de palavra:
+- Cada tema tem um vocabulário (yomimon_locales/<code>/data/domains.lua) com seis tipos de palavra:
   gosto, cheiro, comparacao, exclamacao, lugar e coisa.
 - O domínio de uma fala é o do livro atual ou o da vida, a obsessão dela (s.tema_dominante); quando os dois
   existem e são diferentes, o do livro vale 6 em cada 10 vezes. O do livro, depois de algumas páginas, é o

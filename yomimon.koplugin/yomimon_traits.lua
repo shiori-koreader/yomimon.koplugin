@@ -15,7 +15,7 @@ livro tem acima (ou abaixo) do normal molda ela. O que você NÃO lê só desfaz
 nada para um traço puxa para o neutro, nunca para o polo oposto (não ler romance não deixa cínica).
 Cada página empurra um pouco e tudo volta devagar para o meio: o que você leu por último
 pesa mais. Quando um traço fica marcante, ela escreve no diário e ganha falas próprias
-(em locales/<code>/data/traits.lua).
+(em yomimon_locales/<code>/data/traits.lua).
 
 Lógica pura (sem KOReader), testável fora dele.
 ]]

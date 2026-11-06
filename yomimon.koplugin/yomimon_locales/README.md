@@ -5,14 +5,14 @@ The plugin finds it by itself and lists it in *Yomimon > Language*. Whatever the
 to English, so a language can ship incomplete and grow.
 
 ```
-locales/<code>/
+yomimon_locales/<code>/
   locale.lua        required: name and formats
   ui.lua            menu and screen texts
   content/          phrase banks of the modules: state.lua, context.lua, speech.lua, memory.lua
   data/             cards.lua, diary.lua, domains.lua, extra.lua, influences.lua, traits.lua, vector.lua
 ```
 
-Start by copying `locales/en/` to `locales/<code>/` and translating in place.
+Start by copying `locales/en/` to `yomimon_locales/<code>/` and translating in place.
 
 - **locale.lua** returns `{ name = "Español", format = { clock, months, ordinals, thousands } }`.
 - **ui.lua** returns `{ ["English text"] = "translation" }`. The keys are the English texts used by the code

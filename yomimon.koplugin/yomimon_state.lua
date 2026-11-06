@@ -345,7 +345,7 @@ local FALAS_MUDA_PERTO, FALAS_MUDA_IMINENTE = Content.FALAS_MUDA_PERTO, Content.
 
 -- Close to the next form (growing a stage). %d = pages left.
 
--- New batches of phrases (locales/<code>/data/extra.lua) add to the lists above.
+-- New batches of phrases (yomimon_locales/<code>/data/extra.lua) add to the lists above.
 Lingua.append({ FALAS = FALAS, FALAS_LIVRO = FALAS_LIVRO, FALAS_PERSONAGEM = FALAS_PERSONAGEM,
     FALAS_MUDA_PERTO = FALAS_MUDA_PERTO, FALAS_MUDA_IMINENTE = FALAS_MUDA_IMINENTE }, Lingua.extra("estado"))
 
