@@ -113,8 +113,7 @@ function Yomimon:addToMainMenu(menu_items)
         sub_item_table = {
             { text = T"Open Yomimon", callback = function() self:onMostrarTraca() end },
             {
-                -- Bilingual on purpose: someone on the wrong language must be able to find it.
-                text = "Language / Idioma",
+                text = T"Language",
                 sub_item_table_func = function() return self:itensIdioma() end,
             },
             { text = T"About and disclaimer", callback = function() self:mostrarSobre() end },
@@ -136,7 +135,9 @@ function Yomimon:itensIdioma()
         }
     end
     local itens = { item(T"Automatic (KOReader language)", "auto") }
-    for _, idioma in ipairs(Lingua.available()) do itens[#itens + 1] = item(idioma.name, idioma.code) end
+    local ok, idiomas = pcall(Lingua.available)
+    if not ok or #idiomas == 0 then idiomas = { { code = "en", name = "English" }, { code = "pt", name = "Português (Brasil)" } } end
+    for _, idioma in ipairs(idiomas) do itens[#itens + 1] = item(idioma.name, idioma.code) end
     return itens
 end
 

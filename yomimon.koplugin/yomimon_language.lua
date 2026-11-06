@@ -45,9 +45,10 @@ function Lingua.codes()
     local ok, lfs = pcall(require, "libs/libkoreader-lfs")
     if not ok then return { "en", "pt" } end
     local codes = {}
-    local listing, dir = pcall(lfs.dir, PLUGIN_DIR .. "/yomimon_locales")
+    local listing, iter, state = pcall(lfs.dir, PLUGIN_DIR .. "/yomimon_locales")
     if not listing then return { FALLBACK } end
-    for entry in dir do
+    -- lfs.dir returns the iterator and the directory object it needs as its state: both must reach the loop.
+    for entry in iter, state do
         if entry:sub(1, 1) ~= "." and lfs.attributes(string.format("%s/yomimon_locales/%s/locale.lua", PLUGIN_DIR, entry), "mode") == "file" then
             codes[#codes + 1] = entry
         end

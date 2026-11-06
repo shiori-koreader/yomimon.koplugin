@@ -1,4 +1,5 @@
 return {
+    ["Language"] = "Idioma",
     ["LANGUAGE"] = "IDIOMA",
     ["CHANGE THE LANGUAGE"] = "TROCAR O IDIOMA",
     ["Open Yomimon"] = "Abrir o Yomimon",

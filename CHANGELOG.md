@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.2 (2026-11-06)
+
+- Fixed a crash when opening the language menu (the folder scan did not pass the directory handle to the loop).
+  The menu entry is now named in the language in use, not in both.
+
 ## 1.0.1 (2026-11-06)
 
 - The language can now be changed from *Tools > Yomimon > Language / Idioma* and from the Yomimon screen's menu

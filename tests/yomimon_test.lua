@@ -66,6 +66,26 @@ assert(Lingua.t("BACK") == "BACK", "unknown locale falls back to English")
 assert(Lingua.content("state") and Lingua.format().thousands == ",")
 print("ok languages")
 
+-- lfs.dir returns the iterator and the directory object it needs as state; the language scan must pass both.
+do
+    local real = package.loaded["libs/libkoreader-lfs"]
+    package.loaded["libs/libkoreader-lfs"] = {
+        dir = function()
+            local list, i = { ".", "..", "en", "pt", "README.md" }, 0
+            return function(state)
+                assert(state == "dir object", "the iterator lost its state")
+                i = i + 1
+                return list[i]
+            end, "dir object"
+        end,
+        attributes = function(path) return not path:find("README") and "file" or nil end,
+    }
+    local codes = Lingua.codes()
+    assert(#codes == 2 and codes[1] == "en" and codes[2] == "pt", table.concat(codes, ","))
+    package.loaded["libs/libkoreader-lfs"] = real
+end
+print("ok language scan")
+
 -- Pokédex description: keeps the latest English entry on one line, without characters the pixel font lacks.
 package.loaded["libs/libkoreader-lfs"] = {}
 package.loaded["logger"] = { warn = function() end }
