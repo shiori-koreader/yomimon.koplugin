@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.2.0 (2026-11-06)
 
 - 26 new Pokémon-life phrases in each language (ball, Pokédex, moves, rivals, evolution itch, saving the game), with
   versions for the Home card; some are tied to hunger, a full belly, night, sadness, happiness or an imminent

@@ -4,7 +4,7 @@ local language = choice ~= "auto" and choice or tostring(g and g:readSetting("la
 local portuguese = language:lower():match("^pt")
 
 return {
-    version = "1.1.0",
+    version = "1.2.0",
     fullname = "Yomimon",
     description = portuguese and [[Um bichinho virtual que mora no KOReader e comenta o que você lê.]]
         or [[A virtual pet that lives in KOReader and comments on what you read.]],
