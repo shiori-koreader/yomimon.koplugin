@@ -1213,7 +1213,7 @@ function M.signals(textValue, book, chapter)
             accumulate(signal.refs, w)
         elseif isName(w) and (KNOWN_PLACES[w] or (nextItem and AFTER_PLACE[nextItem.w]) or afterPlace(i)) then
             accumulate(signal.places, w)
-        elseif isName(w) and in_lowercase[w:lower()] and not (prev_tok and TITLES[prev_tok.w]) then
+        elseif isName(w) and in_lowercase[w:lower()] and not (prev_tok and TITLES[prev_tok.w]) then  -- luacheck: ignore 542
             -- common word with a capital: not a name
         elseif tk.beginning and isName(w) then
             accumulate(signal.chars_start, w)  -- only counts if already known as a character
@@ -1530,7 +1530,7 @@ end
 local Content = Language.content("memory")
 local SPEECHES_EVENT, SPEECHES_NEW, SPEECHES_VANISHED = Content.SPEECHES_EVENT, Content.SPEECHES_NEW, Content.SPEECHES_VANISHED
 local SPEECHES_SOURED, SPEECHES_SWEETENED, SPEECHES_TURNED = Content.SPEECHES_SOURED, Content.SPEECHES_SWEETENED, Content.SPEECHES_TURNED
-local SPEECHES_THEME, C = Content.SPEECHES_THEME, Content.C
+local SPEECHES_THEME, COMMENTS = Content.SPEECHES_THEME, Content.C
 local SPEECHES_REFERENCE, SPEECHES_NARRATOR, SPEECHES_QUOTATION = Content.SPEECHES_REFERENCE, Content.SPEECHES_NARRATOR, Content.SPEECHES_QUOTATION
 
 
@@ -1583,9 +1583,9 @@ function M.chapterCard(s, L, chapter_name, ended, now, book)
     local subjects = chapter_name:find(" %(%d+%)$") and {} or M.titleSubjects(chapter_name)
     if ended then for as in pairs(M.chapterSubjects(L, C)) do subjects[as] = true end end
     if not next(subjects) then return end
-    local okCalibration, Cards = pcall(require, "yomimon_cards")
+    local okCards, Cards = pcall(require, "yomimon_cards")
     local okState, State = pcall(require, "yomimon_state")
-    if not (okCalibration and okState) then return end
+    if not (okCards and okState) then return end
     -- {character}: who appears most in the chapter (by the most used name of the person)
     local person = {}
     for _, p in ipairs(M.charactersInfoOf(L)) do for _, f in ipairs(p.forms or { p.nameText }) do person[f] = p end end
@@ -1710,7 +1710,7 @@ function M.perception(s, book)
     table.sort(out.places, function(a, b) return a[2] > b[2] end)
     for t, c in pairs(L.themes or {}) do out.themes[#out.themes + 1] = { t, c } end
     table.sort(out.themes, function(a, b) return a[2] > b[2] end)
-    for nameText, C in pairs(L.caps or {}) do out.chapters[#out.chapters + 1] = { nameText = nameText, C = C } end
+    for nameText, cap in pairs(L.caps or {}) do out.chapters[#out.chapters + 1] = { nameText = nameText, C = cap } end
     table.sort(out.chapters, function(a, b) return a.C.order > b.C.order end)
     return out
 end
@@ -1746,8 +1746,8 @@ function M.speech(s, draw, temperament)
     if quoted then
         local bank = SPEECHES_QUOTATION[temperament == "young" and "young" or "old"]
         options[#options + 1] = function()
-            local t = draws(bank, draw):gsub("{nameText}", quoted.nameText):gsub("{speech}", function() return quoted.speech end)
-            return (t:gsub("([%?!])\226\128\157,", "%1\226\128\157"):gsub("%.\226\128\157,", ",\226\128\157"))
+            local line = draws(bank, draw):gsub("{nameText}", quoted.nameText):gsub("{speech}", function() return quoted.speech end)
+            return (line:gsub("([%?!])\226\128\157,", "%1\226\128\157"):gsub("%.\226\128\157,", ",\226\128\157"))
         end
     end
     local narration = M.narrator(L)
@@ -1758,7 +1758,7 @@ function M.speech(s, draw, temperament)
 end
 
 -- Notebook: comments with context ------------------------------------------------
--- 
+--
 -- No AI: Yomimon gathers real clues from the passage (characters cited, subject, length,
 -- note, time, chapter, how many highlights the book has) and picks a ready-made phrase that
 -- matches them. The choice is stable: the same passage always gets the same comment.
@@ -1803,7 +1803,7 @@ function M.contextComment(item, ctx)
     local h = hash(textValue)
     local function takes(list) return list[h % #list + 1] end
     local temp = ctx.temperament or "old"
-    if temp == "egg" then return takes(C.general.egg) end
+    if temp == "egg" then return takes(COMMENTS.general.egg) end
 
     local candidates = {}
     local function add(f) candidates[#candidates + 1] = f end
@@ -1811,21 +1811,21 @@ function M.contextComment(item, ctx)
     if item.grade and item.grade ~= "" then
         local grade = item.grade:gsub("%s+", " ")
         if #grade > 60 then grade = grade:sub(1, 57):gsub("[\192-\255][\128-\191]*$", "") .. "…" end
-        add(string.format(takes(C.grade), grade))
+        add(string.format(takes(COMMENTS.grade), grade))
     end
     local names = textNames(textValue, ctx.characters)
-    if #names >= 2 then add(string.format(takes(C.two), names[1], names[2])) end
-    if #names >= 1 then add(string.format(takes(C.character), names[1])) end
+    if #names >= 2 then add(string.format(takes(COMMENTS.two), names[1], names[2])) end
+    if #names >= 1 then add(string.format(takes(COMMENTS.character), names[1])) end
     local theme = M.textTheme(textValue)
-    if theme and C.theme[theme] then add(takes(C.theme[theme])) end
+    if theme and COMMENTS.theme[theme] then add(takes(COMMENTS.theme[theme])) end
     local n_words = select(2, textValue:gsub("%S+", ""))
-    if n_words <= 6 then add(takes(C.short_one)) elseif n_words >= 70 then add(takes(C.long)) end
+    if n_words <= 6 then add(takes(COMMENTS.short_one)) elseif n_words >= 70 then add(takes(COMMENTS.long)) end
     local hour = tonumber((item.data or ""):match(" (%d%d):"))
-    if hour and hour >= 0 and hour < 5 then add(string.format(takes(C.small_hours), tostring(hour))) end
-    if ctx.order == 1 and ctx.book then add(string.format(takes(C.first_one), ctx.book)) end
-    if ctx.total and ctx.total >= 10 and ctx.order == ctx.total then add(string.format(takes(C.many), ctx.total)) end
-    if item.chapter and (ctx.in_chapter or 0) >= 3 then add(string.format(takes(C.chapter), item.chapter)) end
-    add(takes(C.general[temp] or C.general.old))
+    if hour and hour >= 0 and hour < 5 then add(string.format(takes(COMMENTS.small_hours), tostring(hour))) end
+    if ctx.order == 1 and ctx.book then add(string.format(takes(COMMENTS.first_one), ctx.book)) end
+    if ctx.total and ctx.total >= 10 and ctx.order == ctx.total then add(string.format(takes(COMMENTS.many), ctx.total)) end
+    if item.chapter and (ctx.in_chapter or 0) >= 3 then add(string.format(takes(COMMENTS.chapter), item.chapter)) end
+    add(takes(COMMENTS.general[temp] or COMMENTS.general.old))
 
     -- specific clues come first; the general comment only enters when there is no other
     if #candidates > 1 then table.remove(candidates) end
@@ -1849,6 +1849,6 @@ end
 -- New batches of phrases (yomimon_locales/<code>/data/extra.lua) add to the lists above.
 Language.append({ SPEECHES_EVENT = SPEECHES_EVENT, SPEECHES_NEW = SPEECHES_NEW, SPEECHES_VANISHED = SPEECHES_VANISHED,
     SPEECHES_SOURED = SPEECHES_SOURED, SPEECHES_SWEETENED = SPEECHES_SWEETENED, SPEECHES_TURNED = SPEECHES_TURNED, SPEECHES_THEME = SPEECHES_THEME,
-    C = C, SPEECHES_QUOTATION = SPEECHES_QUOTATION, SPEECHES_REFERENCE = SPEECHES_REFERENCE }, Language.extra("memory"))
+    C = COMMENTS, SPEECHES_QUOTATION = SPEECHES_QUOTATION, SPEECHES_REFERENCE = SPEECHES_REFERENCE }, Language.extra("memory"))
 
 return M

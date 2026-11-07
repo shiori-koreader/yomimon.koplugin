@@ -19,7 +19,7 @@ return {
         escape = "an escape", crime = "a crime",
     },
 
-    -- base personality (50)
+    -- base personality
     base = {
         -- survival
         { "Someone wiped the bottom shelf with alcohol. I moved out without leaving a note or missing anyone.", situation = "survival" },
@@ -92,6 +92,33 @@ return {
         { "If I were {character}, I'd have asked to go back in the ball already. But then there'd be no story.", situation = "context" },
         { "{event} happened and all I thought was: no Pokémon Center can fix that.", situation = "context" },
         { "A book is a status move: it changes your mood without dealing damage. Side effect: sleep.", situation = "context" },
+        -- Pokémon life, second batch
+        { "The ball is cosy until someone says 'go'. I'm afraid of that word.", situation = "survival", short = "The ball is cosy until someone says 'go'." },
+        { "They say a Pokémon's happiness depends on its trainer. Mine depends on whether the page stays open.", situation = "survival" },
+        { "I've learned four moves so far: Munch, Hide, Sleep and Pretend I Didn't Hear.", situation = "survival", short = "Moves: Munch, Hide, Sleep, Pretend." },
+        { "My hunger bar is lower than my HP and my patience. Feed me and all three recover.", situation = "survival", when = "hunger" },
+        { "Full belly, full HP, empty mind. The perfect state to start a chapter.", situation = "survival", when = "full" },
+        { "Night: the hour when wild Pokémon roam and tired ones go back in the ball. I do both.", situation = "survival", when = "night", short = "Night: wild ones roam, tired ones go in the ball." },
+        { "Low on HP and morale. A sad chapter isn't a potion, but it keeps me company.", situation = "reading", when = "sad" },
+        { "Happiness maxed out. I'd evolve right now if it worked that way.", situation = "growth", when = "happy" },
+        { "“{book}” has a plot twist. I didn't see it coming, and I scan everything.", situation = "reading" },
+        { "Every time “{book}” changes tone, I feel a type disadvantage.", situation = "reading", short = "“{book}” changes tone. Type disadvantage." },
+        { "The word “{word}” has an effect I can't classify. Poison? Sleep? Nostalgia?", situation = "reading" },
+        { "A long chapter is a dungeon: you go in with a plan and come out with half the supplies.", situation = "reading" },
+        { "{author} would make a good gym leader: tough, patient, and I always lose the first round.", situation = "reading" },
+        { "Reading “{book}” is a long route between two towns. Nobody warns you about the tall grass.", situation = "reading", short = "“{book}” is a long route. Mind the tall grass." },
+        { "In the Pokédex I'd be 'hatchling'. I prefer 'work in progress'.", situation = "growth", stage = "nymph", short = "Pokédex: 'hatchling'. I prefer 'in progress'." },
+        { "Someone said I look stronger. I only grew into the corner of the ball.", situation = "growth", stage = "young" },
+        { "At this level every move costs more and teaches less. Experience is expensive.", situation = "growth", stage = "adult" },
+        { "Final form reached. The Pokédex has no entry for what comes next, so the writing is on me.", situation = "growth", stage = "elder" },
+        { "Itching all over. Either evolution or the book's dust.", situation = "growth", when = "formChange", stage = { "nymph", "young", "adult" }, short = "Itching all over. Evolution or dust?" },
+        { "You skip some chapters like cutscenes. I notice. I don't forgive, but I notice.", situation = "reader" },
+        { "You take a break and I save the game. When you come back, we load from the same line.", situation = "reader", short = "You pause, I save. We load from the same line." },
+        { "Another day reading together. In trainer terms, we're building a bond.", situation = "reader", short = "Another day reading together. Bond +1." },
+        { "You never use a Repel on the dull chapters. I admire that. I'd use two.", situation = "reader" },
+        { "{character} has the energy of a rival who shows up at the worst moment.", situation = "context", short = "{character}: the rival at the worst moment." },
+        { "{event} in the chapter. In a game, that would be a cutscene with no skip button.", situation = "context" },
+        { "I met “{word}” and it was a critical hit. On the vocabulary, I mean.", situation = "context" },
     },
 
     influences = {

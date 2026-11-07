@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- 26 new Pokémon-life phrases in each language (ball, Pokédex, moves, rivals, evolution itch, saving the game), with
+  versions for the Home card; some are tied to hunger, a full belly, night, sadness, happiness or an imminent
+  evolution.
+- Tests for the picker (A-Z filter, description card, picking online and offline), the Pokédex (progress kept per
+  Pokémon) and the sprite download (success, HTTP error, unreadable PNG, cache), run by CI and by the release workflow.
+- Lint: fixed the warnings luacheck reported in the project code (shadowed variables, unused requires), and it now ignores the CI tool folders.
+
 ## 1.1.0 (2026-11-06)
 
 - The whole code base is now in English: module, function, variable and field names, constants, saved-state

@@ -35,14 +35,14 @@ return {
         escape = "uma fuga", crime = "um crime",
     },
 
-    -- personalidade-base (50)
+    -- base personality
     base = {
         -- survival
         { "Passaram pano com álcool na prateleira de baixo. Mudei de endereço sem deixar recado nem saudade.", situation = "survival" },
         { "A fome chegou antes de mim, como sempre. Ela tem a chave da casa, e eu não.", situation = "survival", when = "hunger" },
         { "Canto úmido, escuro e esquecido por todos. Os humanos chamam de descaso. Eu chamo de lar e assino embaixo.", situation = "survival", short = "Descaso, dizem os humanos. Lar, digo eu." },
         { "Dormi dentro de “{book}”. Ninguém me procurou ali, o que diz alguma coisa sobre o livro ou sobre os humanos.", situation = "survival" },
-        -- leitura
+        -- reading
         { "Tem livro que a gente come e livro que come a gente. “{book}” ainda não decidiu qual dos dois é.", situation = "reading", short = "Este livro ainda não decidiu quem come quem." },
         { "{author} levou sabe-se lá quanto tempo para escrever isto. Eu levei uma tarde para comer o canto da página dez. Cada um com o seu ofício.", situation = "reading" },
         { "Reli um parágrafo três vezes. Não foi pela profundidade. Eu estava de boca cheia.", situation = "reading", short = "Reli três vezes. Não por profundidade: fome." },
@@ -104,6 +104,33 @@ return {
         { "Se eu fosse {character}, já teria pedido para voltar para a bola. Mas aí não ia ter história.", situation = "context" },
         { "Aconteceu {event} e eu só pensei: não existe Centro Pokémon que resolva isso.", situation = "context" },
         { "Livro é um ataque de status: muda o humor sem causar dano. Efeito colateral: sono.", situation = "context" },
+        -- Pokémon life, second batch
+        { "A bola é aconchegante até alguém dizer 'vai!'. Tenho medo dessa palavra.", situation = "survival", short = "A bola é aconchegante até alguém dizer 'vai!'." },
+        { "Dizem que a felicidade de um Pokémon depende do treinador. A minha depende de a página ficar aberta.", situation = "survival" },
+        { "Aprendi quatro golpes até agora: Mordiscar, Esconder, Dormir e Fingir Que Não Ouvi.", situation = "survival", short = "Golpes: Mordiscar, Esconder, Dormir, Fingir." },
+        { "Minha barra de fome está mais baixa que o meu HP e a minha paciência. Me alimente e as três se recuperam.", situation = "survival", when = "hunger" },
+        { "Barriga cheia, HP cheio, cabeça vazia. O estado perfeito para começar um capítulo.", situation = "survival", when = "full" },
+        { "Noite: a hora em que Pokémon selvagens aparecem e os cansados voltam para a bola. Eu faço os dois.", situation = "survival", when = "night", short = "Noite: selvagens saem, cansados voltam para a bola." },
+        { "Pouco HP e pouca moral. Capítulo triste não é poção, mas faz companhia.", situation = "reading", when = "sad" },
+        { "Felicidade no máximo. Eu evoluiria agora mesmo, se funcionasse assim.", situation = "growth", when = "happy" },
+        { "“{book}” tem uma reviravolta. Não vi chegar, e olha que eu escaneio tudo.", situation = "reading" },
+        { "Toda vez que “{book}” muda de tom, sinto uma desvantagem de tipo.", situation = "reading", short = "“{book}” muda de tom. Desvantagem de tipo." },
+        { "A palavra “{word}” tem um efeito que não sei classificar. Veneno? Sono? Nostalgia?", situation = "reading" },
+        { "Capítulo longo é masmorra: a gente entra com um plano e sai com metade dos suprimentos.", situation = "reading" },
+        { "{author} daria um bom líder de ginásio: duro, paciente, e eu sempre perco o primeiro round.", situation = "reading" },
+        { "Ler “{book}” é uma rota longa entre duas cidades. Ninguém avisa sobre a grama alta.", situation = "reading", short = "“{book}” é uma rota longa. Cuidado com a grama alta." },
+        { "Na Pokédex eu seria 'filhote'. Prefiro 'em andamento'.", situation = "growth", stage = "nymph", short = "Pokédex: 'filhote'. Prefiro 'em andamento'." },
+        { "Disseram que estou mais forte. Só cresci até o canto da bola.", situation = "growth", stage = "young" },
+        { "Neste nível cada golpe custa mais e ensina menos. Experiência é cara.", situation = "growth", stage = "adult" },
+        { "Forma final alcançada. A Pokédex não tem entrada para o que vem depois, então a escrita fica por minha conta.", situation = "growth", stage = "elder" },
+        { "Coceira no corpo todo. Ou é evolução, ou é a poeira do livro.", situation = "growth", when = "formChange", stage = { "nymph", "young", "adult" }, short = "Coceira no corpo todo. Evolução ou poeira?" },
+        { "Você pula alguns capítulos como quem pula cutscene. Eu percebo. Não perdoo, mas percebo.", situation = "reader" },
+        { "Você faz uma pausa e eu salvo o jogo. Quando volta, a gente carrega da mesma linha.", situation = "reader", short = "Você pausa, eu salvo. A gente carrega da mesma linha." },
+        { "Mais um dia lendo juntos. Em linguagem de treinador, estamos criando laço.", situation = "reader", short = "Mais um dia lendo juntos. Laço +1." },
+        { "Você nunca usa Repelente nos capítulos chatos. Admiro isso. Eu usaria dois.", situation = "reader" },
+        { "{character} tem energia de rival que aparece na pior hora.", situation = "context", short = "{character}: o rival na pior hora." },
+        { "{event} no capítulo. Num jogo isso seria uma cena sem botão de pular.", situation = "context" },
+        { "Encontrei “{word}” e foi um acerto crítico. No vocabulário, quero dizer.", situation = "context" },
     },
 
     influences = {
