@@ -120,7 +120,7 @@ B.speeches.brave = {
         "Se tiver um mapa no livro, eu vou junto.",
         "Hoje encaro qualquer capítulo. Até os sem figura.",
         "Pulei três linhas de uma vez! Aventura!",
-        "Quando eu crescer, quero ser exploradora de estante.",
+        "Quando eu crescer, quero explorar estantes.",
         "Me leva na próxima viagem? Eu caibo no bolso.",
         "Hoje subi até o topo da página sem olhar pra baixo.",
         "Tô ficando com coragem. Acho que foi aquele livro do navio.",
@@ -255,8 +255,8 @@ B.speeches.popular = {
 
 B.speeches.erudite = {
     young = {
-        "Hoje aprendi três palavras com mais de quatro sílabas. Me sinto alta.",
-        "Acho que estou ficando culta. Comi uma metáfora inteira.",
+        "Hoje aprendi três palavras com mais de quatro sílabas. Me sinto nas alturas.",
+        "Acho que minha cultura está crescendo. Comi uma metáfora inteira.",
         "Quero ler um livro de filosofia. Só pra dizer que li.",
         "Hoje usei a palavra “efêmero”. Ninguém percebeu. Efêmero.",
         "Tô ficando chique. Só como papel-bíblia agora.",
@@ -273,7 +273,7 @@ B.speeches.erudite = {
     old = {
         "Minha dieta agora é de clássicos. O resto me dá azia.",
         "Já não aceito frase sem oração subordinada.",
-        "Fiquei erudita. Ninguém me entende. Exatamente como planejei.",
+        "Virei pura erudição. Ninguém me entende. Exatamente como planejei.",
         "Cito Montaigne no café da manhã. Ninguém responde.",
         "Leio o que é difícil por princípio. E por vaidade.",
         "Uma boa vírgula vale mais que muita trama.",
@@ -374,7 +374,7 @@ B.diary.fearful = {
 }
 B.diary.brave = {
     [1] = { "Estou ficando com coragem. Deve ter sido “{book}”.", "Hoje encarei um capítulo de tempestade sem piscar." },
-    [2] = { "Virei aventureira. Me dê um mapa e um livro e eu sumo." },
+    [2] = { "Virei puro espírito de aventura. Me dê um mapa e um livro e eu sumo." },
     fadeBack = { "A coragem foi tirar uma folga." },
 }
 B.diary.cynical = {
@@ -389,12 +389,12 @@ B.diary.romantic = {
 }
 B.diary.popular = {
     [1] = { "Ando gostando de leitura rápida. Culpa de “{book}”.", "Percebi que já pulo as descrições compridas. Antes eu não fazia isso." },
-    [2] = { "Virei leitora de best-seller. Minha erudição pediu demissão.", "Agora só quero ritmo. Palavra difícil me dá preguiça." },
+    [2] = { "Virei fã de best-seller. Minha erudição pediu demissão.", "Agora só quero ritmo. Palavra difícil me dá preguiça." },
     fadeBack = { "Voltei a ter paciência com frase comprida.", "Já não tenho tanta pressa para ler." },
 }
 B.diary.erudite = {
-    [1] = { "Estou ficando culta. Deve ter sido “{book}”.", "Percebi que agora eu cito autores. Que horror. Que delícia." },
-    [2] = { "Virei erudita. Ninguém me entende, como deve ser.", "Agora só digiro frase com oração subordinada. Seus livros me estragaram." },
+    [1] = { "Estou ganhando cultura. Deve ter sido “{book}”.", "Percebi que agora eu cito autores. Que horror. Que delícia." },
+    [2] = { "Virei pura erudição. Ninguém me entende, como deve ser.", "Agora só digiro frase com oração subordinada. Seus livros me estragaram." },
     fadeBack = { "A erudição deu uma descansada.", "Voltei a gostar de frase curta." },
 }
 B.diary.diurnal = {

@@ -33,7 +33,7 @@ B.day.feast = {
     "{n} páginas de “{book}”. Minha barriga pediu arrego.",
 }
 B.day.huge_one = {
-    "{n} páginas de “{book}” num dia só. Estou redonda.",
+    "{n} páginas de “{book}” num dia só. Barriga redonda.",
     "{n} páginas. Você não leu “{book}”, você atravessou.",
     "Maratona: {n} páginas de “{book}”. Preciso me deitar.",
 }
@@ -155,7 +155,7 @@ B.ending.trait = {
     cynical = { "Saí com mais desconfiança do que entrei.", "Esse livro me ensinou a seguir o dinheiro." },
     romantic = { "Saí com mais romantismo do que entrei.", "Esse livro me amoleceu. Que vergonha." },
     popular = { "Saí com pressa de ler. Mau sinal.", "Esse livro me acostumou mal com o ritmo." },
-    erudite = { "Saí mais culta do que entrei. Insuportável.", "Esse livro me deixou citando autores." },
+    erudite = { "Saí com mais cultura do que entrei. Insuportável.", "Esse livro me deixou citando autores." },
 }
 B.ending.grade = {
     young = { "Nota: {n} estrelinhas.", "Dou {n} estrelinhas.", "{n} estrelinhas de 5." },

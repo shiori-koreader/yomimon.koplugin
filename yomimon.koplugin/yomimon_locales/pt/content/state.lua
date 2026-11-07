@@ -129,7 +129,7 @@ T.SPEECHES = {
 T.SPEECHES_BOOK = {
     young = {
         "Será que “%s” acaba bem? Me conta sem me contar.",
-        "Sonhei com “%s” ontem. <brave:Eu era a heroína.|romantic:Foi um sonho bonito.|Fiquei com medo.>",
+        "Sonhei com “%s” ontem. <brave:Eu salvava o dia.|romantic:Foi um sonho bonito.|Fiquei com medo.>",
     },
     old = {
         "“%s”? Já comi piores. Já comi melhores. Continuo com fome.<domain: Este cheirava a {smell}.|>",

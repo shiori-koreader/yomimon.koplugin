@@ -7,6 +7,8 @@
   evolution.
 - Tests for the picker (A-Z filter, description card, picking online and offline), the Pokédex (progress kept per
   Pokémon) and the sprite download (success, HTTP error, unreadable PNG, cache), run by CI and by the release workflow.
+- Portuguese voice: about 30 phrases that still used a gendered word for the creature, the reader or a character
+  ("Velha, ...", "Conselho de velha", "Sou nova", "fiquei mais culta", "Você está apaixonado"...) were rewritten.
 - Lint: fixed the warnings luacheck reported in the project code (shadowed variables, unused requires), and it now ignores the CI tool folders.
 
 ## 1.1.0 (2026-11-06)

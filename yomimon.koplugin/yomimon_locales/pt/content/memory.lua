@@ -115,7 +115,7 @@ T.SPEECHES_NARRATOR = {
 T.C = {}
 local C = T.C  -- phrase banks by clue; %s = character, book or chapter
 C.character = {
-    "%s de novo? Você está apaixonado ou só desconfiado?",
+    "%s de novo? É paixão ou só desconfiança?",
     "Tudo gira em torno de %s. Até você.",
     "Eu não confiaria em %s nem para guardar um marcador.",
     "%s fala bonito. Gente que fala bonito esconde coisa.",
@@ -156,7 +156,7 @@ C.theme = {
     politics = { "Política sublinhada. Vai discutir no jantar?", "Reis e leis. Você gosta de poder ou de ver ele cair?" },
     science = { "Ciência sublinhada. Cuidado com o que você cria.", "Um experimento. Espero que dê errado, é mais divertido." },
     solitude = { "Sublinhou a solidão. Estou aqui. Mais ou menos.", "Esse trecho é sozinho. Como quem sublinhou." },
-    art = { "Arte sublinhada. Que leitor sensível. Que perigo.", "Um verso. Guardei antes que fugisse." },
+    art = { "Arte sublinhada. Que sensibilidade. Que perigo.", "Um verso. Guardei antes que fugisse." },
     animals = { "Sublinhou um bicho. Eu sou um bicho. Anotei.", "Animal no trecho. Os bichos sempre entendem tudo." },
     night = { "Noite sublinhada. Você também gosta do escuro.", "Lua no trecho. Clichê bonito." },
     travel = { "Sublinhou uma estrada. Quer ir embora?", "Viagem. Leve um livro. Me leve junto." },
