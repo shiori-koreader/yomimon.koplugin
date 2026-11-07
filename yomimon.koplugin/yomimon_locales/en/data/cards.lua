@@ -8,28 +8,28 @@ Turned off as in Portuguese: omen and father (the word lists light up in the wro
 
 return {
     {
-        id = "pressagio",
+        id = "omen",
         speech = "Cards on the table, {character}'s fortune. Mine? Nobody reads it and everybody knows.",
-        when = { screen = "home", subject = "pressagio" },
+        when = { screen = "home", subject = "omen" },
         turned_off = true,
     },
     {
-        id = "alexandria_ancia",
+        id = "alexandria_elder",
         speech = "Did I mention Alexandria? The whole family. One day.",
-        when = { screen = "home", subject = "antepassados", stored = "contou de Alexandria", stage = "elder" },
+        when = { screen = "home", subject = "ancestors", stored = "told_of_alexandria", stage = "elder" },
     },
     {
         id = "alexandria",
         speech = "Ancestors came up. Mine died in the fire at Alexandria. My grandmother told me.",
-        when = { screen = "home", subject = "antepassados" },
-        records = "contou de Alexandria",
+        when = { screen = "home", subject = "ancestors" },
+        records = "told_of_alexandria",
         once = true,
     },
     {
-        id = "pai",
+        id = "father",
         speech = "A father giving advice. My father? Never met him. Crushed by an Encyclopaedia Britannica. "
             .. "He died doing what he loved: trying to reach the letter M.",
-        when = { screen = "home", subject = "pai" },
+        when = { screen = "home", subject = "father" },
         records = "contou do pai",
         once = true,
         turned_off = true,

@@ -6,8 +6,6 @@
 
 **A little creature that lives in KOReader and comments on what you read.**
 
-*Em português: [README.pt-BR.md](README.pt-BR.md).*
-
 Yomimon (*yomi* 読み, "reading", plus "-mon") keeps track of the pages you really read and reacts to them: finished
 books, reading habits, the time of day you read. It runs on your e-reader with **no AI**, and your reading never
 leaves the device. The only network use is a one-time download of the sprite of the creature you choose.

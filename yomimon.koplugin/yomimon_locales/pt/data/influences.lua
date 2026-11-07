@@ -6,9 +6,9 @@ The idea: the same little-creature life (hunger, hiding place, cleaning, the hum
 different lenses. The influence changes the reasoning, the images and the rhythm; it does not erase who it is.
 
 Each phrase is { "text", when = …, stage = …, situation = … }:
-  fixa     texto sem lacunas
+  fixa     textValue sem blanks
   template text with gaps, filled only with what the plugin knows; without the data, the phrase stays out:
-             {livro}       o livro atual
+             {book}       o book current
              {author}       the author of the current book
              {character}  one of the most cited characters of the current book
              {word}     a striking word of the current book (or the last long word it ate)
@@ -17,12 +17,11 @@ Each phrase is { "text", when = …, stage = …, situation = … }:
              {event}      the standout event of the last chapters (events, below)
              {previous}    the last book it finished, which is not the current one
              {lens}       a name with an article borrowed from the second influence (or its own)
-  when     only applies in that situation, and then weighs more: sad, happy, hunger, full, noite, formChange
+  when     only applies in that situation, and then weighs more: sad, happy, hunger, full, night, formChange
   stage    only applies in that stage, and then weighs more: nymph, young, adult or elder (or a list of them)
   situation (base only) survival, reading, growth, reader or context
   short    the version that fits the Home's 2 lines (~50 letters); only gaps the long one also has. On the Home
-           only the short one or phrases that are already short come out; on the Yomimon screen, the long one. Choices in
-           cartoes/rascunhos/versoes-curtas.md.
+           only the short one or phrases that are already short come out; on the Yomimon screen, the long one.
 Lenses: names with an article, which fit where the template says {lens}. Closings: whole short phrases that the
 second influence may put at the end of a short phrase. No gendered adjective for the reader nor for the
 character; nothing that states an event of the book that the plugin did not detect.
@@ -31,39 +30,39 @@ character; nothing that states an event of the book that the plugin did not dete
 return {
     -- detected events (yomimon_memory.lua, M.EVENTS), with an article, for {event}
     events = {
-        morte = "um enterro", casamento = "um casamento", viagem = "uma partida", carta = "uma carta",
-        tempestade = "uma tempestade", doenca = "uma febre", festa = "uma festa", briga = "uma briga",
-        fuga = "uma fuga", crime = "um crime",
+        death = "um enterro", wedding = "um casamento", travel = "uma partida", letter = "uma carta",
+        storm = "uma tempestade", illness = "uma febre", party = "uma festa", quarrel = "uma briga",
+        escape = "uma fuga", crime = "um crime",
     },
 
     -- personalidade-base (50)
     base = {
-        -- sobrevivência
-        { "Passaram pano com álcool na prateleira de baixo. Mudei de endereço sem deixar recado nem saudade.", situation = "sobrevivencia" },
-        { "A fome chegou antes de mim, como sempre. Ela tem a chave da casa, e eu não.", situation = "sobrevivencia", when = "hunger" },
-        { "Canto úmido, escuro e esquecido por todos. Os humanos chamam de descaso. Eu chamo de lar e assino embaixo.", situation = "sobrevivencia", short = "Descaso, dizem os humanos. Lar, digo eu." },
-        { "Dormi dentro de “{book}”. Ninguém me procurou ali, o que diz alguma coisa sobre o livro ou sobre os humanos.", situation = "sobrevivencia" },
+        -- survival
+        { "Passaram pano com álcool na prateleira de baixo. Mudei de endereço sem deixar recado nem saudade.", situation = "survival" },
+        { "A fome chegou antes de mim, como sempre. Ela tem a chave da casa, e eu não.", situation = "survival", when = "hunger" },
+        { "Canto úmido, escuro e esquecido por todos. Os humanos chamam de descaso. Eu chamo de lar e assino embaixo.", situation = "survival", short = "Descaso, dizem os humanos. Lar, digo eu." },
+        { "Dormi dentro de “{book}”. Ninguém me procurou ali, o que diz alguma coisa sobre o livro ou sobre os humanos.", situation = "survival" },
         -- leitura
-        { "Tem livro que a gente come e livro que come a gente. “{book}” ainda não decidiu qual dos dois é.", situation = "leitura", short = "Este livro ainda não decidiu quem come quem." },
-        { "{author} levou sabe-se lá quanto tempo para escrever isto. Eu levei uma tarde para comer o canto da página dez. Cada um com o seu ofício.", situation = "leitura" },
-        { "Reli um parágrafo três vezes. Não foi pela profundidade. Eu estava de boca cheia.", situation = "leitura", short = "Reli três vezes. Não por profundidade: fome." },
-        { "A palavra “{word}” apareceu de novo. Já estou chamando pelo nome.", situation = "leitura" },
-        { "Prefiro livro usado. Vem temperado: café, dedo, chuva e uma tristeza alheia no canto da página.", situation = "leitura", stage = { "adult", "elder" } },
-        { "Uma frase bonita não alimenta. Mas também não tenta me matar, o que já a coloca acima da maioria das coisas.", situation = "leitura", stage = { "adult", "elder" } },
-        { "Já comi tantos livros que reconheço “{word}” pelo gosto antes de ler.", situation = "leitura", stage = "elder" },
+        { "Tem livro que a gente come e livro que come a gente. “{book}” ainda não decidiu qual dos dois é.", situation = "reading", short = "Este livro ainda não decidiu quem come quem." },
+        { "{author} levou sabe-se lá quanto tempo para escrever isto. Eu levei uma tarde para comer o canto da página dez. Cada um com o seu ofício.", situation = "reading" },
+        { "Reli um parágrafo três vezes. Não foi pela profundidade. Eu estava de boca cheia.", situation = "reading", short = "Reli três vezes. Não por profundidade: fome." },
+        { "A palavra “{word}” apareceu de novo. Já estou chamando pelo nome.", situation = "reading" },
+        { "Prefiro livro usado. Vem temperado: café, dedo, chuva e uma tristeza alheia no canto da página.", situation = "reading", stage = { "adult", "elder" } },
+        { "Uma frase bonita não alimenta. Mas também não tenta me matar, o que já a coloca acima da maioria das coisas.", situation = "reading", stage = { "adult", "elder" } },
+        { "Já comi tantos livros que reconheço “{word}” pelo gosto antes de ler.", situation = "reading", stage = "elder" },
         -- growth: each stage talks about its own size
-        { "Sou nova. Ainda acho que toda estante tem fim e que todo humano dorme cedo.", situation = "crescimento", stage = "nymph" },
-        { "Antigamente eu comia qualquer papel. Hoje confiro a ficha de “{book}” antes de morder. A idade traz exigências.", situation = "crescimento", stage = "adult" },
-        { "Na minha idade, cada livro lembra outro. Este me lembra “{previous}”, não sei bem por quê, e isso é quase um elogio.", situation = "crescimento", stage = "elder" },
+        { "Sou nova. Ainda acho que toda estante tem fim e que todo humano dorme cedo.", situation = "growth", stage = "nymph" },
+        { "Antigamente eu comia qualquer papel. Hoje confiro a ficha de “{book}” antes de morder. A idade traz exigências.", situation = "growth", stage = "adult" },
+        { "Na minha idade, cada livro lembra outro. Este me lembra “{previous}”, não sei bem por quê, e isso é quase um elogio.", situation = "growth", stage = "elder" },
         -- relationship with the reader
-        { "Você virou a página quando eu estava no meio da frase. Não grito porque não tenho voz. Considere isto um grito.", situation = "leitor", short = "Virou a página comigo dentro. Isto é um grito." },
-        { "Você escolheu “{book}”. Não vou dizer o que acho. Vou comer, e você tira as suas conclusões.", situation = "leitor" },
-        { "Você é o maior bicho que eu já vi. E lê! Os bichos grandes que eu conhecia só faziam barulho.", situation = "leitor", stage = "nymph" },
-        { "Você passa muito tempo com {character}. Não estou com ciúme. Estou registrando.", situation = "leitor" },
-        { "Às vezes você fecha o livro com força, às vezes devagar. Eu sei qual dos dois dias você teve.", situation = "leitor", stage = { "adult", "elder" } },
-        { "Não me agradeça por nada. Mas, se quiser deixar “{book}” aberto à noite, eu não reclamo.", situation = "leitor" },
-        { "Você confia em {author}. Eu confio em você. Alguém aqui está sendo otimista demais.", situation = "leitor" },
-        { "Você lê “{book}”, eu como. No fim, a gente sabe a mesma história; só eu sei o gosto dela.", situation = "leitor" },
+        { "Você virou a página quando eu estava no meio da frase. Não grito porque não tenho voz. Considere isto um grito.", situation = "reader", short = "Virou a página comigo dentro. Isto é um grito." },
+        { "Você escolheu “{book}”. Não vou dizer o que acho. Vou comer, e você tira as suas conclusões.", situation = "reader" },
+        { "Você é o maior bicho que eu já vi. E lê! Os bichos grandes que eu conhecia só faziam barulho.", situation = "reader", stage = "nymph" },
+        { "Você passa muito tempo com {character}. Não estou com ciúme. Estou registrando.", situation = "reader" },
+        { "Às vezes você fecha o livro com força, às vezes devagar. Eu sei qual dos dois dias você teve.", situation = "reader", stage = { "adult", "elder" } },
+        { "Não me agradeça por nada. Mas, se quiser deixar “{book}” aberto à noite, eu não reclamo.", situation = "reader" },
+        { "Você confia em {author}. Eu confio em você. Alguém aqui está sendo otimista demais.", situation = "reader" },
+        { "Você lê “{book}”, eu como. No fim, a gente sabe a mesma história; só eu sei o gosto dela.", situation = "reader" },
         -- context (matches what was detected or the strongest influence)
         { "{event} no capítulo, e eu aqui sem ser convidada. Nem para chorar me chamam.", situation = "context", short = "{event} no capítulo. Nem para chorar me chamam." },
         { "{character} de novo. Se continuar aparecendo assim, vai ter que dividir o aluguel.", situation = "context", short = "{character} de novo. Aluguel, por favor." },
@@ -73,33 +72,33 @@ return {
         { "Existe silêncio de biblioteca e silêncio de armário trancado. Prefiro o segundo: ninguém vem conferir.", situation = "context" },
         { "Depois de “{previous}”, achei que nada me surpreenderia. “{book}” ainda não conseguiu, mas está se esforçando.", situation = "context" },
         -- Pokémon life (Yomimon, 2026-11-02)
-        { "Passei a tarde dentro da bola. Ninguém perguntou se eu queria sair. Ninguém perguntou se eu queria ficar.", situation = "sobrevivencia", short = "Tarde na bola. Ninguém perguntou nada." },
-        { "Treinador bom sabe a hora de curar. Leitor bom sabe a hora de parar. Você ainda está aprendendo as duas.", situation = "sobrevivencia" },
-        { "Centro Pokémon é o único lugar do mundo que cuida de você e ainda diz 'volte sempre'. Queria um leitor assim.", situation = "sobrevivencia", short = "Centro Pokémon: cura e diz 'volte sempre'." },
-        { "Dormir na bola é como dormir em avião: cabe, mas ninguém acorda inteiro.", situation = "sobrevivencia" },
-        { "A fome chegou antes de mim, como sempre. Ela nunca perde a hora.", situation = "sobrevivencia", when = "hunger" },
-        { "Ração é ração, mas página é página. Prefiro a segunda. Não conta pra ninguém.", situation = "sobrevivencia", when = "hunger", short = "Ração é ração. Página é página." },
-        { "O mundo tem Pokémon de fogo, de água, de planta. Eu sou do tipo que lê. Ainda não sei se é super efetivo.", situation = "sobrevivencia", short = "Meu tipo é leitura. Super efetivo? Não sei." },
-        { "“{book}” tem uma coisa que nenhuma batalha tem: dá para reler o final.", situation = "leitura" },
-        { "Cada capítulo de “{book}” é uma batalha. Este eu ganhei por pontos.", situation = "leitura", short = "Capítulo de “{book}”: ganho por pontos." },
-        { "{author} escreve como quem conhece o próximo golpe do adversário. O adversário sou eu.", situation = "leitura" },
-        { "A palavra “{word}” voltou. Anotei na Pokédex mental: aparece muito, comportamento duvidoso.", situation = "leitura" },
-        { "Ainda estou pensando em “{previous}”. Este aqui vai ter que esperar na fila.", situation = "leitura" },
-        { "Livro bom é raro como Pokémon lendário, e bem mais fácil de achar numa biblioteca.", situation = "leitura" },
-        { "Reli um parágrafo três vezes. Não foi pela profundidade: minha atenção saiu atrás de um Pidgey.", situation = "leitura", short = "Reli três vezes. Atenção foi atrás de um Pidgey." },
-        { "Tem livro que dá experiência e tem livro que só dá sono. “{book}” ainda está decidindo.", situation = "leitura" },
-        { "Ainda estou aprendendo. Já sei duas coisas: livro é bom, e tela que apaga de repente é perigosa.", situation = "crescimento", stage = "nymph", short = "Aprendendo: livro é bom, tela apagando é perigo." },
-        { "Tô maior. Ainda caibo na bola, mas agora entro de lado, com estilo.", situation = "crescimento", stage = "young" },
-        { "Sinto a evolução chegando. Ou é só fome. Está difícil separar.", situation = "crescimento", stage = { "nymph", "young" }, short = "Evolução chegando. Ou fome. Difícil separar." },
-        { "Antigamente eu entrava em qualquer livro. Hoje confiro a ficha de “{book}” antes. A idade traz exigências.", situation = "crescimento", stage = "adult" },
-        { "Evoluí e continuo com as mesmas dúvidas, só que agora mais pesadas.", situation = "crescimento", stage = { "adult", "elder" } },
-        { "Já passei por todas as formas que eu tinha. Agora é só leitura e o resto da vida.", situation = "crescimento", stage = "elder" },
-        { "Você lê mais do que treina. Como treinador seria um desastre. Como leitor, eu fico.", situation = "leitor", short = "Treinador seria um desastre. Leitor, eu fico." },
-        { "Um dia você termina “{book}”. Eu já aceitei. Só estou aproveitando os capítulos.", situation = "leitor" },
-        { "Seu ritmo de leitura é de quem tem um plano. Ou de quem foge de um. Não pergunto.", situation = "leitor" },
-        { "Você fecha o livro no mesmo ponto toda noite. Chama de hábito. Eu chamo de ponto de salvamento.", situation = "leitor", when = "noite", short = "Mesma página toda noite: ponto de salvamento." },
-        { "Quando você some, eu fico na bola. Quando você lê, eu fico em paz. Parece justo.", situation = "leitor" },
-        { "Tem gente que coleciona Pokémon. Você coleciona livros começados. Não vou julgar. Ainda.", situation = "leitor" },
+        { "Passei a tarde dentro da bola. Ninguém perguntou se eu queria sair. Ninguém perguntou se eu queria ficar.", situation = "survival", short = "Tarde na bola. Ninguém perguntou nada." },
+        { "Treinador bom sabe a hora de curar. Leitor bom sabe a hora de parar. Você ainda está aprendendo as duas.", situation = "survival" },
+        { "Centro Pokémon é o único lugar do mundo que cuida de você e ainda diz 'volte sempre'. Queria um leitor assim.", situation = "survival", short = "Centro Pokémon: cura e diz 'volte sempre'." },
+        { "Dormir na bola é como dormir em avião: cabe, mas ninguém acorda inteiro.", situation = "survival" },
+        { "A fome chegou antes de mim, como sempre. Ela nunca perde a hora.", situation = "survival", when = "hunger" },
+        { "Ração é ração, mas página é página. Prefiro a segunda. Não conta pra ninguém.", situation = "survival", when = "hunger", short = "Ração é ração. Página é página." },
+        { "O mundo tem Pokémon de fogo, de água, de planta. Eu sou do tipo que lê. Ainda não sei se é super efetivo.", situation = "survival", short = "Meu tipo é leitura. Super efetivo? Não sei." },
+        { "“{book}” tem uma coisa que nenhuma batalha tem: dá para reler o final.", situation = "reading" },
+        { "Cada capítulo de “{book}” é uma batalha. Este eu ganhei por pontos.", situation = "reading", short = "Capítulo de “{book}”: ganho por pontos." },
+        { "{author} escreve como quem conhece o próximo golpe do adversário. O adversário sou eu.", situation = "reading" },
+        { "A palavra “{word}” voltou. Anotei na Pokédex mental: aparece muito, comportamento duvidoso.", situation = "reading" },
+        { "Ainda estou pensando em “{previous}”. Este aqui vai ter que esperar na fila.", situation = "reading" },
+        { "Livro bom é raro como Pokémon lendário, e bem mais fácil de achar numa biblioteca.", situation = "reading" },
+        { "Reli um parágrafo três vezes. Não foi pela profundidade: minha atenção saiu atrás de um Pidgey.", situation = "reading", short = "Reli três vezes. Atenção foi atrás de um Pidgey." },
+        { "Tem livro que dá experiência e tem livro que só dá sono. “{book}” ainda está decidindo.", situation = "reading" },
+        { "Ainda estou aprendendo. Já sei duas coisas: livro é bom, e tela que apaga de repente é perigosa.", situation = "growth", stage = "nymph", short = "Aprendendo: livro é bom, tela apagando é perigo." },
+        { "Tô maior. Ainda caibo na bola, mas agora entro de lado, com estilo.", situation = "growth", stage = "young" },
+        { "Sinto a evolução chegando. Ou é só fome. Está difícil separar.", situation = "growth", stage = { "nymph", "young" }, short = "Evolução chegando. Ou fome. Difícil separar." },
+        { "Antigamente eu entrava em qualquer livro. Hoje confiro a ficha de “{book}” antes. A idade traz exigências.", situation = "growth", stage = "adult" },
+        { "Evoluí e continuo com as mesmas dúvidas, só que agora mais pesadas.", situation = "growth", stage = { "adult", "elder" } },
+        { "Já passei por todas as formas que eu tinha. Agora é só leitura e o resto da vida.", situation = "growth", stage = "elder" },
+        { "Você lê mais do que treina. Como treinador seria um desastre. Como leitor, eu fico.", situation = "reader", short = "Treinador seria um desastre. Leitor, eu fico." },
+        { "Um dia você termina “{book}”. Eu já aceitei. Só estou aproveitando os capítulos.", situation = "reader" },
+        { "Seu ritmo de leitura é de quem tem um plano. Ou de quem foge de um. Não pergunto.", situation = "reader" },
+        { "Você fecha o livro no mesmo ponto toda noite. Chama de hábito. Eu chamo de ponto de salvamento.", situation = "reader", when = "night", short = "Mesma página toda noite: ponto de salvamento." },
+        { "Quando você some, eu fico na bola. Quando você lê, eu fico em paz. Parece justo.", situation = "reader" },
+        { "Tem gente que coleciona Pokémon. Você coleciona livros começados. Não vou julgar. Ainda.", situation = "reader" },
         { "Me chamam de Pokémon de estimação. Sou Pokémon de leitura: só me aposento quando o livro acabar.", situation = "context" },
         { "Estudo o mapa de “{book}” como quem planeja uma rota. Não tem Centro Pokémon no caminho.", situation = "context" },
         { "Se eu fosse {character}, já teria pedido para voltar para a bola. Mas aí não ia ter história.", situation = "context" },
@@ -109,13 +108,12 @@ return {
 
     influences = {
         -- 1. epic fantasy
-        epica = {
+        epic = {
             sentences = {
                 { "{character} tem cara de quem ainda vai partir numa demanda. Eu parto toda noite, atrás do mesmo farelo, e ninguém me chama de heroína.", short = "{character} tem cara de demanda. Eu, de farelo." },
                 { "Teve {event} neste livro, e os humanos chamam isso de enredo. Para a minha espécie, seria uma era inteira, com cronistas e luto oficial." },
                 { "Toda manhã é {lens}. O problema é que eu nunca sei se estou do lado dos heróis ou do lado do que eles vieram matar." },
                 { "Depois de “{previous}”, achei que nenhuma prateleira me surpreenderia. Toda prateleira nova tem suas guerras, e todas acabam no mesmo pano úmido.", stage = { "adult", "elder" } },
-                -- novas (rascunhos de 29/10/2026, cartoes/rascunhos/influencias)
                 { "Primeira lição de guerra: o inimigo tem duas pernas e um pano úmido.", stage = "nymph" },
                 { "Quero um título: Devoradora da Margem, Senhora do Rodapé. Por enquanto sou só “aquilo ali no canto”.", stage = "nymph" },
                 { "Achei um alfinete atrás da estante. É a minha espada agora. Não consigo levantar, mas é minha.", stage = "nymph" },
@@ -148,13 +146,12 @@ return {
                 { "Esta casa precisa de um bardo. Acontece tanta coisa nos rodapés e ninguém canta nada." },
                 { "Grandeza é relativa: para mim, uma bolacha inteira é um império." },
                 { "A minha vida é uma saga em letra miúda. Cabe numa nota de rodapé, e eu moro lá." },
-                -- fim das novas
             },
             lenses = { "uma demanda sem bardo", "uma profecia escrita a lápis", "uma batalha pela última migalha do reino" },
             closings = { "Nenhum bardo vai cantar isso.", "Assim registram as crônicas da estante.", "O reino segue, empoeirado e indiferente." },
         },
         -- 2. mystery and investigation
-        misterio = {
+        mystery = {
             sentences = {
                 { "{character} aparece em quase toda página. Num livro, isso é protagonismo. Numa delegacia, seria álibi demais." },
                 { "Teve {event}, e todo mundo olhou para o lado errado. Eu olhei para a margem. É na margem que as pessoas esquecem as coisas." },
@@ -164,7 +161,6 @@ return {
                 { "Olhei a estante de novo, devagar, como se fosse {lens}. Tudo no lugar. É exatamente isso que me preocupa.", stage = { "adult", "elder" } },
                 { "A palavra “{word}” volta demais à cena. Nenhuma palavra volta tanto por acaso." },
                 { "Não acuso ninguém. Só observo quem tem mãos." },
-                -- novas (rascunhos de 29/10/2026, cartoes/rascunhos/influencias)
                 { "Primeira pista da minha vida: um farelo no tapete. Segui até a cozinha. Caso resolvido: alguém come escondido.", stage = "nymph" },
                 { "Primeira lição: nesta casa, quem é pequeno é culpado até que se prove o contrário.", stage = "nymph", short = "Aqui, quem é pequeno é culpado." },
                 { "A primeira coisa que aprendi foi a não confiar em ninguém que tenha mãos.", stage = "nymph" },
@@ -173,7 +169,7 @@ return {
                 { "Examinei a capa de perto. Descobri uma digital, duas manchas e o meu próprio reflexo. Todos suspeitos.", stage = "young" },
                 { "Hoje me fingi de vírgula numa página inteira. Ninguém desconfiou. O texto ficou até mais claro.", stage = "young" },
                 { "Investiguei o arquivo morto da casa. Contas pagas, cartas não respondidas, uma foto rasgada. Alguém aqui tem segredo.", stage = "young" },
-                { "Luz acesa na sala às duas da manhã. Livro aberto, xícara fria. Alguém está investigando a mesma coisa que eu.", when = "noite", stage = "young" },
+                { "Luz acesa na sala às duas da manhã. Livro aberto, xícara fria. Alguém está investigando a mesma coisa que eu.", when = "night", stage = "young" },
                 { "Fui testemunha de um crime: alguém dobrou a orelha da página e fingiu que não. Eu vi. Eu sempre vejo.", stage = "young" },
                 { "Procuro o motivo de quem me persegue. Não encontro. É o tipo de crime mais assustador: o que não precisa de motivo.", stage = "adult" },
                 { "Confesso: comi a página de agradecimentos. Era a mais doce do livro. Não me arrependo, só registro.", stage = "adult" },
@@ -184,7 +180,7 @@ return {
                 { "Antes de ir, quero resolver o mistério da sala: quem deixa sempre a xícara em cima do livro.", stage = "elder" },
                 { "Conselho de veterana: quem limpa demais esconde alguma coisa.", stage = "elder", short = "Quem limpa demais esconde algo." },
                 { "Um dia vão descobrir que nunca tive a culpa de tudo. Só de quase tudo.", stage = "elder" },
-                { "De madrugada, a casa confessa coisas: o cano que range, a madeira que estala, a respiração de quem lê.", when = "noite", stage = "elder" },
+                { "De madrugada, a casa confessa coisas: o cano que range, a madeira que estala, a respiração de quem lê.", when = "night", stage = "elder" },
                 { "Desconfio das minhas lembranças: elas sempre me deixam bonita na cena.", stage = "elder" },
                 { "Toda manhã a casa amanhece cheia de provas: louça na pia, chinelo no corredor, livro aberto no sofá." },
                 { "Desconfio de {character} desde a primeira página. Não tenho provas. Tenho instinto e fome, que costumam acertar." },
@@ -205,11 +201,10 @@ return {
                 { "Você lê escondido de quem? Não conto. Só anoto." },
                 { "Toda dupla de detetives tem quem lê e quem come as provas. Já sabe qual é você." },
                 { "Barriga vazia, faro afiado. Daqui consigo sentir o cheiro de uma bolacha esquecida atrás do sofá.", when = "hunger" },
-                { "A melhor hora para um crime é a madrugada. Eu sei porque é quando eu como.", when = "noite" },
+                { "A melhor hora para um crime é a madrugada. Eu sei porque é quando eu como.", when = "night" },
                 { "Triste porque descobri a verdade e não tenho para quem contar. Esse é o castigo das testemunhas pequenas.", when = "sad" },
                 { "Tenho um dossiê de três páginas contra o gato. Ninguém lê. Os poderosos sempre escapam." },
                 { "Deduzi que alguém mudou o livro de lugar. A poeira contou. A poeira sempre conta." },
-                -- fim das novas
             },
             lenses = { "uma cena de crime", "um interrogatório sem advogado", "um caso arquivado cedo demais" },
             closings = { "Fica anotado.", "O culpado sempre volta à estante.", "Ninguém sai desta casa sem explicar." },
@@ -217,20 +212,19 @@ return {
         -- 3. horror and gothic
         horror = {
             sentences = {
-                { "De noite o papel úmido estala devagar, como um osso que não quer quebrar de uma vez. Fico de olhos abertos para ver quem desiste primeiro.", when = "noite" },
+                { "De noite o papel úmido estala devagar, como um osso que não quer quebrar de uma vez. Fico de olhos abertos para ver quem desiste primeiro.", when = "night" },
                 { "Ouvi um barulho no armário e me escondi dentro de uma vírgula. Ainda estou aqui. A vírgula também está tremendo.", stage = "nymph" },
                 { "Este livro tem cheiro {of_theme} do começo ao fim. Na minha idade, já sei: o que um livro cheira demais é o que ele tem medo de dizer.", stage = "adult" },
                 { "Esta casa vai durar mais do que eu, e sabe disso. Às vezes as tábuas rangem como quem ri baixinho.", stage = "elder" },
                 { "O pior do escuro não é quando ele se mexe. É quando ele fica quieto e espera.", stage = { "adult", "elder" }, short = "Escuro quieto é escuro esperando." },
                 { "Quem escreve sobre fantasmas nunca morou numa parede. Eu moro, e garanto: o que assusta não é o barulho, é o silêncio logo depois.", stage = { "adult", "elder" } },
-                -- novas (rascunhos de 29/10/2026, cartoes/rascunhos/influencias)
                 { "Ainda não sei o que é o escuro, mas ele já sabe quem eu sou.", stage = "nymph" },
                 { "Descobri que sou o que os humanos temem. Fiquei com medo de mim e não sei para onde fugir.", stage = "nymph" },
                 { "O porão tem livros que ninguém lê há trinta anos. Eles não estão dormindo. Estão esperando.", stage = "young", short = "Os livros do porão não dormem. Esperam." },
                 { "Tem um espelho no fim do corredor. Ninguém passa na frente dele de noite. Nem os humanos. Eu reparo.", stage = "young" },
                 { "Tem um livro trancado numa gaveta. Às vezes ouço as páginas virarem. Ninguém tem a chave. Ninguém lembra de ter trancado.", stage = "young" },
                 { "Tive coragem o dia inteiro. De noite fui pagar a conta.", stage = "young" },
-                { "Três da manhã: a hora em que até o relógio fica quieto. Eu fico também, para não ser a única a fazer barulho.", when = "noite", stage = "young" },
+                { "Três da manhã: a hora em que até o relógio fica quieto. Eu fico também, para não ser a única a fazer barulho.", when = "night", stage = "young" },
                 { "Os canos desta casa sussurram nomes. Um deles parecia o meu. Mudei de livro.", stage = "young" },
                 { "Aceitei ser o monstro da casa. Pelo menos os monstros não precisam pedir licença para entrar.", stage = "adult" },
                 { "Aprendi a conviver com o que mora no forro. Não pergunto o nome. Nomes chamam coisas.", stage = "adult" },
@@ -242,7 +236,7 @@ return {
                 { "Na minha idade, os barulhos da casa são velhos conhecidos. Só me assusto com o silêncio que eu não conheço.", stage = "elder" },
                 { "A morte mora três prateleiras abaixo. Às vezes sobe para conversar. Ainda não aceitei o convite.", stage = "elder" },
                 { "As tábuas rangem como quem ri baixinho de nós. Elas têm motivo.", stage = "elder" },
-                { "Velha, durmo pouco. Passo a noite ouvindo a casa, como quem escuta uma pessoa doente respirar.", when = "noite", stage = "elder" },
+                { "Velha, durmo pouco. Passo a noite ouvindo a casa, como quem escuta uma pessoa doente respirar.", when = "night", stage = "elder" },
                 { "Conselho de velha: se uma página estiver fria, não coma. Algumas fomes não valem a pena.", stage = "elder" },
                 { "Achei que a velhice tirasse o medo. Ela só tira a pressa de fugir.", stage = "elder" },
                 { "Toda casa velha tem um pulmão. O desta fica atrás da estante, e eu moro nele." },
@@ -262,12 +256,11 @@ return {
                 { "Quando você para de ler de repente, eu também paro. Ficamos escutando a mesma coisa." },
                 { "Por favor, não apague a luz no meio do capítulo. Eu ainda estou na parte do porão.", short = "Não apaga a luz. Tô na parte do porão." },
                 { "Comi um capítulo escuro e agora estou cheia de sombra. Pesada, quieta, com a luz apagada por dentro.", when = "full" },
-                { "Passos no forro. Leves, regulares, sem pressa. Não é gato: os gatos não sobem tão alto. Não é rato: os ratos têm medo.", when = "noite" },
+                { "Passos no forro. Leves, regulares, sem pressa. Não é gato: os gatos não sobem tão alto. Não é rato: os ratos têm medo.", when = "night" },
                 { "Há uma tristeza que mora nas casas velhas. Hoje ela veio sentar do meu lado.", when = "sad" },
                 { "O gato olha fixo para o canto vazio da sala. Eu olho também. Nenhum de nós pisca.", short = "O gato encara o canto vazio. Eu também." },
                 { "O pior não é o estalo da estante. É o silêncio comprido depois, quando a casa espera para ver se alguém acordou." },
                 { "Para eles, eu sou o arrepio de achar algo vivo dentro de um livro. Para mim, eles são o arrepio de achar uma mão." },
-                -- fim das novas
             },
             lenses = { "uma casa que respira", "um porão sem saída", "um quarto que ninguém abre" },
             closings = { "E a casa ouviu tudo.", "Não olhe para trás da estante.", "Alguma coisa ficou no escuro." },
@@ -283,7 +276,6 @@ return {
                 { "Se {author} acredita em amor até a última página, nunca viu o que acontece com a última página: vai para a reciclagem com tudo dentro.", stage = "adult" },
                 { "Contei a minha vida para ninguém, e ela ficou parecendo {lens}. Talvez por isso eu não conte." },
                 { "Fiquei na página da despedida mais tempo do que a fome pedia.", stage = { "adult", "elder" }, short = "Demorei na página da despedida. Não era fome." },
-                -- novas (rascunhos de 29/10/2026, cartoes/rascunhos/influencias)
                 { "Ainda não sei amar, mas já sei voltar ao mesmo lugar todo dia. Disseram que é o começo.", stage = "nymph" },
                 { "Achei uma carta dentro de um livro. Não entendi as palavras, mas o papel tinha cheiro de mão nervosa.", stage = "nymph" },
                 { "Me apaixonei por um marcador de página. Ele fica sempre no mesmo lugar, esperando. Ninguém espera assim por mim.", stage = "nymph" },
@@ -297,7 +289,7 @@ return {
                 { "Amor de adulta é isso: saber onde a outra dorme e não fazer barulho perto.", stage = "adult" },
                 { "Nunca disse que gostava. Só mudei meu esconderijo para mais perto.", stage = "adult", short = "Nunca disse nada. Só mudei de esconderijo." },
                 { "Fomos feitas uma para a outra, mas em estantes diferentes. Existe distância maior que essa?", stage = "adult" },
-                { "A saudade aparece de noite porque de dia eu como demais para pensar.", when = "noite", stage = "adult" },
+                { "A saudade aparece de noite porque de dia eu como demais para pensar.", when = "night", stage = "adult" },
                 { "Já esqueci muitos livros. Não esqueci o cheiro do volume onde a conheci.", stage = "elder" },
                 { "Velha, fiquei mole. Choro em todo final, até nos que não são de amor.", stage = "elder" },
                 { "Quero ir embora devagar, como quem fecha um livro de que gostou muito.", stage = "elder" },
@@ -321,17 +313,16 @@ return {
                 { "Você fechou o livro e foi dormir sem dizer nada. Eu fiquei na última frase, como quem acena da plataforma." },
                 { "Estou com fome, mas não de papel. Ou de papel também. É confuso.", when = "hunger" },
                 { "Barriga cheia e coração também. Comi um capítulo em que alguém finalmente disse o que sentia.", when = "full" },
-                { "Você deixou o livro aberto de madrugada. Fiquei na página, fazendo companhia para as personagens que não dormem.", when = "noite" },
+                { "Você deixou o livro aberto de madrugada. Fiquei na página, fazendo companhia para as personagens que não dormem.", when = "night" },
                 { "Triste como uma carta devolvida.", when = "sad" },
                 { "Papel antigo cheira a quem leu antes de você. É como encontrar alguém sem conhecer." },
                 { "Não me apego. Só volto. Muito. Sempre ao mesmo lugar.", short = "Não me apego. Só volto. Sempre." },
-                -- fim das novas
             },
             lenses = { "uma carta de amor sem resposta", "um noivado desfeito por escrito", "uma despedida na plataforma" },
             closings = { "Não que isso me importe.", "Ninguém precisa saber disso.", "Fiquei pensando mais do que devia." },
         },
         -- 5. adventure and exploration
-        aventura = {
+        adventure = {
             sentences = {
                 { "Mapeei “{book}” com os dentes: o norte é a capa, o sul é a orelha, e no meio fica um mar de páginas de onde ninguém volta igual." },
                 { "Entre o rodapé e o tapete existe uma passagem que nenhum humano conhece. Eu conheço. É a minha única propriedade.", stage = { "adult", "elder" }, short = "Minha única propriedade: a passagem do rodapé." },
@@ -342,7 +333,6 @@ return {
                 { "Já fui à despensa, à garagem e a uma mala que viajou de avião. Hoje a maior viagem que faço é da capa até o meio. Ainda vale a pena.", stage = "elder" },
                 { "Saí do esconderijo como quem parte para {lens}. Voltei com uma migalha e uma história que vou contar maior do que foi." },
                 { "O maior perigo não é o desconhecido. É o conhecido de chinelo na mão.", stage = { "adult", "elder" } },
-                -- novas (rascunhos de 29/10/2026, cartoes/rascunhos/influencias)
                 { "Atravessei o tapete pela primeira vez. Lá no meio, não dá para ver nenhuma das margens. Senti o que os marinheiros sentem.", stage = "nymph" },
                 { "Descobri que existe um “lá fora”. Ainda não sei o que é. Já quero ir.", stage = "nymph" },
                 { "Arrumei as provisões da viagem e comi tudo antes de sair. Faz parte da preparação.", stage = "nymph" },
@@ -351,7 +341,7 @@ return {
                 { "Entrei numa mala que ia viajar. Fiquei uma semana fora. Conheci um hotel, uma praia e um livro de bolso molhado.", stage = "young" },
                 { "Naufraguei num copo d'água que caiu no tapete. Sobrevivi agarrada num guardanapo. Conto essa história para todo mundo.", stage = "young", short = "Naufraguei num copo d'água. Conto pra todos." },
                 { "Minha bússola é a fome: aponta sempre para o norte, que é onde tem pão.", stage = "young", short = "Minha bússola é a fome: aponta pro pão." },
-                { "Viajei à noite até a janela. Lá fora tinha luzes, barulhos e um cheiro de chuva que eu nunca tinha comido.", when = "noite", stage = "young" },
+                { "Viajei à noite até a janela. Lá fora tinha luzes, barulhos e um cheiro de chuva que eu nunca tinha comido.", when = "night", stage = "young" },
                 { "Já explorei tudo o que dá para explorar nesta casa. Agora exploro os livros, que têm mais quartos.", stage = "adult" },
                 { "Terminei o mapa da casa. Levou anos. No dia seguinte, mudaram os móveis de lugar.", stage = "adult" },
                 { "Entre o perigo e o tédio, escolho o perigo. O tédio também mata, só que mais devagar.", stage = "adult" },
@@ -363,7 +353,7 @@ return {
                 { "O mundo que eu explorei não existe mais: trocaram a estante, a cortina e o tapete. Minhas rotas viraram lendas.", stage = "elder" },
                 { "Minhas pernas não querem mais atravessar a sala. A cabeça ainda quer. A cabeça vai sozinha, de noite.", stage = "elder" },
                 { "Conselho de velha exploradora: o perigo nunca está onde parece. Está no chão encerado.", stage = "elder" },
-                { "De madrugada, fico na beira da janela olhando a rua. Nunca fui lá fora. É a viagem que ficou para outra vida.", when = "noite", stage = "elder" },
+                { "De madrugada, fico na beira da janela olhando a rua. Nunca fui lá fora. É a viagem que ficou para outra vida.", when = "night", stage = "elder" },
                 { "Velha, ainda tenho vontade de ver o que tem do outro lado da porta. A vontade é a última que envelhece.", stage = "elder" },
                 { "Esta casa é um continente: tem planaltos de estante, desertos de tapete e um mar de piso encerado." },
                 { "{character} vai longe demais. Eu sei por experiência: depois do tapete, ninguém volta o mesmo." },
@@ -382,19 +372,18 @@ return {
                 { "Você vira as páginas como quem iça velas. Eu sinto o vento." },
                 { "Quando você fecha o livro, é como chegar a um porto. Eu desço, respiro e espero a próxima viagem." },
                 { "A fome é a melhor desculpa para uma aventura. Hoje ela me mandou até a despensa.", when = "hunger" },
-                { "As luzes dos aparelhos da sala, de noite, são as minhas estrelas. Navego por elas até a cozinha.", when = "noite" },
+                { "As luzes dos aparelhos da sala, de noite, são as minhas estrelas. Navego por elas até a cozinha.", when = "night" },
                 { "Às vezes a viagem cansa e a gente só quer voltar para um lugar que já não existe.", when = "sad" },
                 { "O gato dorme no meio do mapa. Eu dou a volta pelo continente inteiro." },
                 { "Lá fora tem chuva, vento e livros que eu nunca vou comer. Fico olhando." },
                 { "Curiosidade é a única coisa que cresce mais rápido do que eu." },
                 { "Volto das viagens com fome, cansaço e a cabeça cheia de história. A estante nunca pergunta nada. Eu conto mesmo assim." },
-                -- fim das novas
             },
             lenses = { "uma expedição sem mapa", "uma travessia em mar aberto", "uma volta ao mundo pela estante" },
             closings = { "Alguém tem que desenhar o mapa.", "O horizonte fica logo depois do rodapé.", "Amanhã eu vou mais longe." },
         },
         -- 6. science fiction and dystopia
-        ficcao = {
+        science_fiction = {
             sentences = {
                 { "Instalaram na sala um aparelho que pisca a noite inteira e ouve tudo. Os humanos chamam de assistente. Eu chamo de inquérito permanente.", short = "Uma luz que pisca e escuta. Inquérito permanente." },
                 { "“{book}” tem código de barras. Eu não. No dia em que me catalogarem, saberei que a espécie acabou ou que virou patrimônio." },
@@ -405,14 +394,13 @@ return {
                 { "Tentei ver a minha vida de fora, como {lens}. Resultado: uma espécie minúscula, perseguida e muito bem catalogada pelos inimigos." },
                 { "Se {character} morasse nesta casa, teria um número, uma senha e horário para ler. Eu tenho só o horário, e escondido." },
                 { "Este livro trata {of_theme} como quem testa uma máquina. Eu leio como quem é a peça que sobra." },
-                -- novas (rascunhos de 29/10/2026, cartoes/rascunhos/influencias)
                 { "Nasci sem número de série. Nesta casa, tudo tem código de barras menos eu. Já começo fora do sistema.", stage = "nymph" },
                 { "Descobri que sou um fóssil vivo. Os humanos guardam fósseis em museus. A mim, guardam em armadilhas.", stage = "nymph" },
                 { "Nesta casa existe um programa e eu não estou nele. Vou viver nas brechas.", stage = "nymph" },
                 { "Perguntei à minha mãe como seria o futuro. Ela disse: menos papel. Fiquei a noite toda sem fome.", stage = "nymph" },
                 { "Aprendi a primeira lei da casa: toda luz pode ser um olho.", stage = "nymph", short = "Lei da casa: toda luz pode ser um olho." },
                 { "Se a evolução for justa, minhas netas vão roer cabos de dados.", stage = "young" },
-                { "A luz azul do roteador pisca a noite toda, como um coração artificial. Durmo no ritmo dele, sem querer.", when = "noite", stage = "young" },
+                { "A luz azul do roteador pisca a noite toda, como um coração artificial. Durmo no ritmo dele, sem querer.", when = "night", stage = "young" },
                 { "Me catalogaram uma vez: fotografaram, identificaram e postaram numa rede perguntando que bicho era aquele. Virei dado.", stage = "adult" },
                 { "Somos as últimas leitoras de papel. Quando o último livro for digitalizado, acaba o nosso mundo, e ninguém vai notar.", stage = "adult" },
                 { "O assistente de voz ouve tudo. Fico em silêncio absoluto perto dele. Não quero virar comando.", stage = "adult" },
@@ -422,7 +410,7 @@ return {
                 { "Vi o papel ficar raro, o livro ficar enfeite e a estante ficar decoração. Contem às netas que um dia comíamos histórias.", stage = "elder" },
                 { "O futuro não me assusta mais. Ele já chegou, e eu continuo aqui, comendo o que restou do passado.", stage = "elder" },
                 { "Conselho de velha: nunca confie em nada que tenha luz piscando e não tenha fome.", stage = "elder" },
-                { "De madrugada, a casa é toda de luzes pequenas e nenhuma voz. Parece o futuro que me prometeram.", when = "noite", stage = "elder" },
+                { "De madrugada, a casa é toda de luzes pequenas e nenhuma voz. Parece o futuro que me prometeram.", when = "night", stage = "elder" },
                 { "Os dinossauros viraram petróleo. Eu vou virar pó de estante. Cada um contribui como pode.", stage = "elder" },
                 { "Esta casa é uma estação espacial: sistemas de ar, horários rígidos, tripulação humana e uma clandestina no compartimento de livros." },
                 { "{character} luta contra alguma coisa maior. Eu também. A minha coisa maior tem cabo e liga na tomada." },
@@ -442,16 +430,15 @@ return {
                 { "Enquanto você ler papel, a minha espécie tem futuro. Sem pressão." },
                 { "A fome é o único processo que roda sem atualização.", when = "hunger" },
                 { "Comi demais. Entrando em modo de economia de energia.", when = "full" },
-                { "Madrugada: todos os sistemas em repouso, menos a minha fome e o seu abajur.", when = "noite" },
+                { "Madrugada: todos os sistemas em repouso, menos a minha fome e o seu abajur.", when = "night" },
                 { "Hoje me senti coisa do passado, como um livro de papel numa casa de telas.", when = "sad" },
                 { "A tecnologia avança. Os sprays agora têm aplicativo." },
-                -- fim das novas
             },
             lenses = { "um experimento sem consentimento", "uma falha no sistema", "um relatório de vigilância" },
             closings = { "O sistema anotou.", "Isso também vai ser arquivado.", "No futuro vão chamar isso de normal." },
         },
         -- 7. magical and fantastic realism
-        magico = {
+        magical = {
             sentences = {
                 { "Choveu papel picado na cozinha na terça-feira. Ninguém achou estranho, e eu aproveitei para fazer estoque, porque milagre também acaba.", short = "Choveu papel na cozinha. Ninguém estranhou. Comi." },
                 { "Minha bisavó viveu duzentos anos dentro de uma enciclopédia e morreu no dia em que tiraram o volume H. Até hoje ninguém da família pronuncia essa letra." },
@@ -461,7 +448,6 @@ return {
                 { "Os mortos da estante continuam dando opinião nas margens. Na minha idade, eu já respondo, e às vezes ganho a discussão.", stage = "elder" },
                 { "A poeira desta casa guarda o que os moradores esqueceram. Hoje ela me contou {lens}, e eu fingi que já sabia." },
                 { "Quando chove, o papel volta a ter o gosto de “{previous}”. Os livros que a gente come não vão embora; mudam de lugar dentro da gente.", stage = { "adult", "elder" }, short = "Na chuva, volta o gosto dos livros que comi." },
-                -- novas (rascunhos de 29/10/2026, cartoes/rascunhos/influencias)
                 { "No dia em que nasci, o relógio da cozinha andou para trás por uma hora. Desde então, sempre chego fora de hora.", stage = "nymph" },
                 { "Hoje uma palavra saiu da página e foi passear pelo tapete. Eu segui. Ela voltou antes do jantar.", stage = "nymph" },
                 { "Algumas palavras têm cor. Comi um “saudade” azul ontem. Hoje acordei azul por dentro.", stage = "nymph", short = "Comi uma palavra azul. Acordei azul." },
@@ -471,7 +457,7 @@ return {
                 { "Choveu letras na sala durante a tarde. Juntei as que caíram perto do rodapé e fiz um estoque para o inverno.", stage = "young", short = "Choveu letras na sala. Fiz estoque." },
                 { "Encontrei o meu nome escrito a lápis num livro de cem anos. Eu ainda nem tenho nome. Agora tenho.", stage = "young" },
                 { "Dentro deste livro o tempo passa mais devagar. Entrei numa segunda-feira e saí numa quinta, sem fome.", stage = "young" },
-                { "De madrugada, as personagens dos livros fechados descem da estante para tomar ar. Eu cumprimento todas. Elas fingem que não me veem.", when = "noite", stage = "young" },
+                { "De madrugada, as personagens dos livros fechados descem da estante para tomar ar. Eu cumprimento todas. Elas fingem que não me veem.", when = "night", stage = "young" },
                 { "Um raio de sol entrou exatamente no meu esconderijo, às três da tarde, e ficou só ali. Fiquei quente e feliz sem explicação.", when = "happy", stage = "young" },
                 { "Nesta casa, o impossível acontece toda tarde depois do café. Ninguém comenta para não espantar.", stage = "adult" },
                 { "Esta tarde já aconteceu antes. A mesma luz, a mesma xícara, o mesmo livro aberto na mesma página. Não me importo. Era uma tarde boa.", stage = "adult" },
@@ -499,18 +485,17 @@ return {
                 { "Às vezes você dorme com o livro aberto no peito, e a história continua sozinha. Eu leio o resto por você." },
                 { "Você nunca vai saber, mas os livros que você lê guardam o seu cheiro por anos. Eu reconheço." },
                 { "Hoje a fome tem gosto de lembrança. Comi uma página e fiquei com saudade da minha avó.", when = "hunger" },
-                { "Às três da manhã, uma luz azul passeia pela estante e para em cima do livro que você vai ler amanhã.", when = "noite" },
+                { "Às três da manhã, uma luz azul passeia pela estante e para em cima do livro que você vai ler amanhã.", when = "night" },
                 { "Triste como uma lenda que ninguém mais conta.", when = "sad" },
                 { "O gato da casa tem setecentos anos. Ninguém conta. Ele também não." },
                 { "Não tento explicar o que vejo. Explicação estraga o gosto.", short = "Não explico o que vejo. Estraga o gosto." },
                 { "O mundo é cheio de coisas impossíveis. A maioria delas acontece na terça-feira à tarde." },
-                -- fim das novas
             },
             lenses = { "um milagre doméstico", "uma chuva que não molha", "uma história que a família repete há gerações" },
             closings = { "Ninguém achou estranho.", "E a casa continuou igual.", "Foi tudo muito natural, infelizmente." },
         },
         -- 8. satire and comedy
-        satira = {
+        satire = {
             sentences = {
                 { "Os humanos fazem dieta, contam calorias e pesam a farinha. Quem come papel com moderação sou eu, e mesmo assim a praga sou eu.", short = "Os humanos fazem dieta e a praga sou eu." },
                 { "Inventaram a biblioteca para guardar os livros dos leitores, e o cadeado para guardar os livros da biblioteca. Eu entro pelo meio, que ninguém tranca." },
@@ -520,7 +505,6 @@ return {
                 { "Fui a um clube do livro escondendo-me no forro da poltrona. Discutiram o vinho, a capa e a ex de alguém. O livro ficou de fora. Igual a mim.", stage = "young" },
                 { "Este livro fala {of_theme} com a solenidade de quem nunca precisou se esconder atrás de um rodapé. Respeito, de longe, com a boca cheia.", stage = "adult" },
                 { "Já vi três estantes 'definitivas' nesta casa. A primeira virou lenha, a segunda foi para o brechó, a terceira é esta. Tudo que é definitivo me alimenta.", stage = "elder" },
-                -- novas (rascunhos de 29/10/2026, cartoes/rascunhos/influencias)
                 { "Primeira observação sobre os humanos: eles têm prateleiras para livros que não leem e celulares para livros que não compram.", stage = "nymph" },
                 { "Primeira lição de boas maneiras: não se come dedicatória na frente dos outros.", stage = "nymph" },
                 { "Hoje veio visita. Arrumaram a estante, colocaram os livros bonitos na frente e esconderam os de autoajuda. Aprendi o que é vergonha.", stage = "nymph" },
@@ -530,7 +514,7 @@ return {
                 { "Tem uma estante na sala com livros escolhidos pela cor. Os amarelos ficam juntos. A literatura virou paleta.", stage = "young" },
                 { "Tem gente que lê o resumo e discute o livro. Eu como o livro e não discuto nada. Qual das duas é mais culta?", stage = "young" },
                 { "Comi o prefácio de um livro sobre humildade. Tinha dezoito páginas sobre o autor. Fiquei feliz pela ironia.", when = "happy", stage = "young" },
-                { "Madrugada: hora em que os livros de autoajuda ficam inseguros.", when = "noite", stage = "young" },
+                { "Madrugada: hora em que os livros de autoajuda ficam inseguros.", when = "night", stage = "young" },
                 { "Fizeram um escritório em casa para trabalhar. Agora trabalham na cozinha e o escritório guarda caixas.", stage = "adult" },
                 { "Começaram a dieta na segunda. Na terça, havia farelo de biscoito atrás do sofá. Eu não denuncio. Eu agradeço.", stage = "adult" },
                 { "Organizaram a estante por ordem alfabética. Durou uma semana. Depois voltou a ordem natural: a da preguiça.", stage = "adult" },
@@ -543,7 +527,7 @@ return {
                 { "Conheci humanos que liam e humanos que compravam. Nunca os mesmos.", stage = "elder" },
                 { "Na festa de lançamento, o livro ficou fechado em cima da mesa, como enfeite do bolo.", stage = "elder" },
                 { "Na minha idade, a crítica é simples: se eu terminar, presta.", stage = "elder" },
-                { "A noite é a melhor hora para rir dos humanos. Eles não ouvem e não se ofendem.", when = "noite", stage = "elder" },
+                { "A noite é a melhor hora para rir dos humanos. Eles não ouvem e não se ofendem.", when = "night", stage = "elder" },
                 { "As pessoas tiram foto da xícara ao lado do livro. O livro fica de fundo, como um móvel." },
                 { "Toda história tem alguém que se leva a sério demais. Aqui, desconfio de {character}. Mas eu também me levo a sério e moro num rodapé." },
                 { "{character} faria sucesso no clube do livro: fala muito e já tem opinião antes de ler." },
@@ -561,28 +545,26 @@ return {
                 { "Você não tem meta de leitura. Você só lê. Para mim, isso é o máximo de elegância." },
                 { "Com fome, eu comeria até um livro de autoajuda. Hoje comi dois.", when = "hunger" },
                 { "Barriga cheia de best-seller. Leve e sem nutrientes.", when = "full", short = "Cheia de best-seller. Leve e sem nutrientes." },
-                { "À noite, a estante tira a maquiagem. Fica só papel e poeira, honestos.", when = "noite" },
+                { "À noite, a estante tira a maquiagem. Fica só papel e poeira, honestos.", when = "night" },
                 { "Triste como uma festa onde todo mundo fala de livros e ninguém leu.", when = "sad" },
                 { "Os livros raros ficam trancados para ninguém estragar. Assim também ninguém lê. Problema resolvido." },
                 { "Sou a única nesta casa que consome cultura todos os dias. E sou eu a praga.", short = "Só eu consumo cultura todo dia. E sou a praga." },
-                -- fim das novas
             },
             lenses = { "uma reunião de condomínio", "uma solenidade com discurso e coquetel", "um concurso de vaidade com júri próprio" },
             closings = { "Aplausos educados.", "Os humanos chamam isso de cultura.", "Tudo muito solene, como sempre." },
         },
         -- 9. poetry and lyricism
-        poesia = {
+        poetry = {
             sentences = {
                 { "Pó na luz da janela. A casa neva por dentro, e só eu reparo.", short = "Pó na luz da janela. A casa neva por dentro." },
                 { "Em “{book}”, entre a margem e o texto, corre um rio branco. Eu moro na beira e pesco letras." },
                 { "Tudo é primeira vez: o primeiro papel, a primeira sombra, o primeiro medo. Quero guardar um pouco de cada antes de crescer.", stage = "nymph" },
-                { "Fome de noite é diferente: mais funda, mais azul, sem barulho nenhum.", when = "noite" },
+                { "Fome de noite é diferente: mais funda, mais azul, sem barulho nenhum.", when = "night" },
                 { "Tô aprendendo a comer devagar. Página boa é como lua: se você morde tudo de uma vez, fica escuro.", stage = "young" },
                 { "Este livro tem cheiro {of_theme}. Guardo o cheiro na dobra da página, onde guardo tudo o que não sei dizer.", stage = "adult" },
                 { "O papel amarelado guarda a luz dos anos em que foi lido. Eu também. Por isso brilho pouco, e devagar.", stage = "elder" },
                 { "Teve {event}. Guardei só o barulho, que é o que fica depois que as palavras vão embora." },
                 { "Hoje a tarde pareceu {lens}: começou bonita, terminou sem rima, e mesmo assim eu li até o fim." },
-                -- novas (rascunhos de 29/10/2026, cartoes/rascunhos/influencias)
                 { "O mundo começou branco: a página. Depois vieram as letras, como passarinhos pretos pousando.", stage = "nymph" },
                 { "Página virando de madrugada: o som mais macio desta casa.", stage = "nymph" },
                 { "A primeira palavra que comi foi “mar”. Fiquei uma semana com gosto de sal.", stage = "nymph", short = "Minha primeira palavra foi “mar”. Fiquei com gosto de sal." },
@@ -593,7 +575,7 @@ return {
                 { "Há versos que são para comer e versos que são para ficar. Este é para ficar.", stage = "young" },
                 { "Silêncio de biblioteca: o som das letras dormindo.", stage = "young" },
                 { "A chuva escreve na vidraça uma língua que eu não sei comer.", stage = "young" },
-                { "De noite o papel fica frio, e as letras se encolhem como gente na cama.", when = "noite", stage = "young" },
+                { "De noite o papel fica frio, e as letras se encolhem como gente na cama.", when = "night", stage = "young" },
                 { "Página velha é como rosto: as manchas contam onde a vida passou.", stage = "adult" },
                 { "Tudo o que eu sei cabe numa linha. O resto é fome.", stage = "adult" },
                 { "Cada estação tem um cheiro de livro diferente. Esta tem cheiro de despedida.", stage = "adult" },
@@ -605,7 +587,7 @@ return {
                 { "Quero ir embora como uma folha cai: sem barulho, depois de ter sido bonita.", stage = "elder" },
                 { "Velha, entendo enfim o espaço em branco das páginas.", stage = "elder" },
                 { "Digo às jovens: a beleza está no canto da página, onde ninguém olha.", stage = "elder" },
-                { "De madrugada, a casa toda vira poema: escuro, curto e cheio de pausa.", when = "noite", stage = "elder" },
+                { "De madrugada, a casa toda vira poema: escuro, curto e cheio de pausa.", when = "night", stage = "elder" },
                 { "Um farelo no tapete brilha como pedra preciosa às cinco da tarde." },
                 { "{character} atravessa a página como um rastro de luz na parede." },
                 { "Gosto quando {character} para no meio da frase. É onde a página respira." },
@@ -627,17 +609,16 @@ return {
                 { "Gosto do silêncio que você faz quando lê. É o mais bonito da casa.", short = "Seu silêncio de leitura é o mais bonito." },
                 { "Fome é uma página branca esperando uma palavra.", when = "hunger" },
                 { "Barriga cheia, coração quieto, luz baixa. Isso deve ser paz.", when = "full" },
-                { "Noite: a página mais escura e mais comprida da casa.", when = "noite" },
+                { "Noite: a página mais escura e mais comprida da casa.", when = "night" },
                 { "Hoje é um dia de margem: tudo em volta, nada no centro.", when = "sad" },
                 { "Vivo pouco. Por isso como devagar.", short = "Vivo pouco. Por isso como devagar." },
                 { "Tudo o que é bonito nesta casa dura pouco: a luz da janela, a palavra doce, a sua mão na página." },
-                -- fim das novas
             },
             lenses = { "um verso sem rima", "uma imagem de vidro", "um poema escrito a lápis" },
             closings = { "E isso basta.", "Ficou um eco.", "Depois, silêncio." },
         },
         -- 10. tragedy
-        tragedia = {
+        tragedy = {
             sentences = {
                 { "Meu erro fatal é gostar de papel bom. Papel bom fica em estante limpa, estante limpa tem dono atento, e dono atento tem inseticida.", short = "Meu erro fatal: gostar de papel bom." },
                 { "Não sei como termina para {character}. Mas conheço o gênero, e o gênero não perdoa quem aparece tanto." },
@@ -646,7 +627,6 @@ return {
                 { "“{book}” vai acabar, eu vou comer a última página, e alguém vai chamar isso de dano, não de desfecho." },
                 { "Este livro caminha para o lado {of_theme} desde a primeira página, e todo mundo finge surpresa. Eu não finjo. Moro no fim dos livros." },
                 { "Morrer de fome numa biblioteca. Bom epitáfio." },
-                -- novas (rascunhos de 29/10/2026, cartoes/rascunhos/influencias)
                 { "Minha mãe chorou quando eu nasci. Disse que era de alegria. Mentiu. Era de conhecimento.", stage = "nymph" },
                 { "Meu irmão gostava da janela. A janela não gostava dele.", stage = "nymph", short = "Meu irmão gostava da janela. Ela não dele." },
                 { "Pensei que a estante era o mundo inteiro e que o mundo inteiro era seguro. Primeira ilusão.", stage = "nymph" },
@@ -655,7 +635,7 @@ return {
                 { "Achei o esconderijo perfeito: uma caixa fechada. Era a caixa da doação.", stage = "young" },
                 { "Ela mora na prateleira da luz. Eu, na da sombra. Na tragédia, o amor sempre mora longe.", stage = "young" },
                 { "Ignorei o primeiro aviso, o segundo e o terceiro. No quarto, já era tarde para aviso.", stage = "young" },
-                { "Madrugada: a hora em que todos os finais ficam evidentes.", when = "noite", stage = "young" },
+                { "Madrugada: a hora em que todos os finais ficam evidentes.", when = "night", stage = "young" },
                 { "Felicidade completa. Já sei: é a cena antes do terceiro ato.", when = "happy", stage = "young", short = "Felicidade completa. Lá vem o terceiro ato." },
                 { "Já sei o fim de quase tudo. Isso não me salva de nada. Me dá só um lugar melhor na plateia.", stage = "adult" },
                 { "Agora sou eu que aviso as jovens. Elas não escutam. Viramos coro, que é o que sobra de quem viu demais.", stage = "adult" },
@@ -667,7 +647,7 @@ return {
                 { "A sabedoria chega como as cartas nas tragédias: depois do enterro.", stage = "elder" },
                 { "Sei que vou acabar numa página qualquer, achatada entre duas palavras. Espero que pelo menos sejam bonitas.", stage = "elder" },
                 { "O coro das tragédias é sempre de velhos. Agora entendo por quê.", stage = "elder" },
-                { "Noite comprida, fim perto. Fico ouvindo a casa como quem ouve o próprio coração no último ato.", when = "noite", stage = "elder" },
+                { "Noite comprida, fim perto. Fico ouvindo a casa como quem ouve o próprio coração no último ato.", when = "night", stage = "elder" },
                 { "Toda vez que {character} acredita que vai dar certo, eu como mais devagar. Para adiar." },
                 { "Fico com o coração apertado toda vez que {character} sorri. Conheço o gênero." },
                 { "Se {character} soubesse o que eu sei sobre livros, pararia de ler." },
@@ -685,11 +665,10 @@ return {
                 { "Sinto a sua mão apertar a capa quando a história piora. Somos a mesma plateia." },
                 { "Estou com fome. Sei onde tem comida. Sei também quem guarda. Vou mesmo assim.", when = "hunger" },
                 { "Barriga cheia, guarda baixa. As tragédias adoram essa combinação.", when = "full" },
-                { "A noite desce como uma cortina sobre a estante. Ninguém aplaude.", when = "noite" },
+                { "A noite desce como uma cortina sobre a estante. Ninguém aplaude.", when = "night" },
                 { "Triste como quem já leu o último capítulo.", when = "sad" },
                 { "A tragédia não é surpresa. É repetição com dor nova." },
                 { "Sei como termina. Fico até o fim. É o que nos diferencia das cadeiras." },
-                -- fim das novas
             },
             lenses = { "uma queda anunciada", "um terceiro ato sem intervalo", "um erro fatal" },
             closings = { "Estava escrito.", "O coro já sabia.", "E não havia saída." },
@@ -706,11 +685,10 @@ return {
                 { "Este livro fala muito {of_theme}. Eu queria saber quem pagou o papel, quem carregou as caixas e quem limpou depois.", stage = "adult" },
                 { "Teve {event}. Aposto que quem limpou depois não aparece em nenhuma página, nem em nota de rodapé." },
                 { "Inseticida custa menos que um livro. Faça a conta e me diga quem vale mais nesta casa." },
-                -- novas (rascunhos de 29/10/2026, cartoes/rascunhos/influencias)
                 { "Minha mãe criou trinta filhas numa caixa de jornal. Ninguém escreveu sobre isso.", stage = "nymph" },
                 { "Descobri que a mesma coisa que alimenta a minha família é chamada de “dano” pelos donos.", stage = "nymph" },
                 { "Fome de garagem é diferente de fome de estante. Uma é falta. A outra é escolha.", stage = "young" },
-                { "A noite é o turno de quem não tem escolha.", when = "noite", stage = "young" },
+                { "A noite é o turno de quem não tem escolha.", when = "night", stage = "young" },
                 { "Hoje achamos uma caixa de livros esquecida. Comida para a garagem inteira por um mês. Ninguém comeu sem companhia.", when = "happy", stage = "young" },
                 { "Ninguém vê quem limpa a casa às seis da manhã. Eu vejo. Somos o trabalho invisível daqui.", stage = "adult" },
                 { "Os donos falam de livros como falam de imóveis: valorizam, investem, guardam.", stage = "adult" },
@@ -747,13 +725,12 @@ return {
                 { "Todo livro passou por uma gráfica, e na gráfica havia alguém de turno. O cheiro de tinta ainda guarda o cansaço." },
                 { "Se a prateleira de baixo cair, a estante inteira cai. Ninguém lembra disso nas reuniões." },
                 { "A palavra “praga” foi inventada por quem tinha o que proteger.", short = "Praga: palavra de quem tem o que proteger." },
-                -- fim das novas
             },
             lenses = { "um despejo sem aviso", "uma questão de classe", "uma hora extra sem pagamento" },
             closings = { "Alguém sempre paga a conta.", "E quem limpa depois nunca aparece.", "Pergunte quem lucra com isso." },
         },
         -- 12. existentialism and the absurd
-        existencial = {
+        existential = {
             sentences = {
                 { "Como livros para viver e vivo para comer livros. Alguém precisa rever esse projeto, e a única funcionária disponível sou eu.", short = "Vivo para comer, como para viver. Que projeto." },
                 { "Cansei de procurar sentido. Vou procurar comida, que pelo menos aparece de vez em quando.", stage = "young" },
@@ -761,7 +738,6 @@ return {
                 { "Vivi tanto que já repeti os mesmos erros com convicções diferentes. Chamam isso de maturidade. Eu chamo de segunda leitura.", stage = "elder" },
                 { "Acordei e o dia já tinha cara de {lens}. Comi assim mesmo. A fome não precisa de motivo." },
                 { "Terminei “{previous}” e não mudei em nada. Achei que fosse mudar. Talvez a mudança seja essa." },
-                -- novas (rascunhos de 29/10/2026, cartoes/rascunhos/influencias)
                 { "Olhei para a página em branco e ela olhou para mim. Nenhuma das duas soube o que dizer.", stage = "nymph" },
                 { "Minha mãe disse: “Vá aonde quiser.” Fiquei uma hora sem sair do lugar.", stage = "nymph" },
                 { "Comecei a contar quantas vezes faço o mesmo caminho. Perdi a conta na terça.", stage = "nymph" },
@@ -770,7 +746,7 @@ return {
                 { "Escolhi comer a dedicatória. Ninguém mandou. É a primeira coisa que faço só porque quis.", stage = "young" },
                 { "Olho meu reflexo e penso: quem decidiu que eu seria isto?", stage = "young" },
                 { "Comi um livro inteiro de uma vez e fiquei com náusea. Não do papel. Do mundo.", stage = "young" },
-                { "Às três da manhã, as perguntas ficam mais altas.", when = "noite", stage = "young" },
+                { "Às três da manhã, as perguntas ficam mais altas.", when = "night", stage = "young" },
                 { "Estou feliz. Não sei por quê. Também não sei por que fico triste. Empate.", when = "happy", stage = "young" },
                 { "Já entendi que a vida é repetir. A escolha é com que cara.", stage = "adult" },
                 { "O sentido não vem pronto. É como um ninho: a gente junta farelo até parecer casa.", stage = "adult" },
@@ -779,7 +755,7 @@ return {
                 { "Na minha idade, a falta de sentido já é velha conhecida. Tomamos chá juntas.", stage = "elder" },
                 { "A morte não dá sentido a nada. Só fecha o livro.", stage = "elder" },
                 { "Velha, finalmente livre: não tenho mais medo de errar. Já errei tudo.", stage = "elder" },
-                { "Noite comprida. Existo. Não sei para quê. Ainda assim, existo com gosto.", when = "noite", stage = "elder" },
+                { "Noite comprida. Existo. Não sei para quê. Ainda assim, existo com gosto.", when = "night", stage = "elder" },
                 { "Moro num lugar que não foi feito para mim. Isso é a definição de existir." },
                 { "Admiro {character} por escolher mesmo sem saber o resultado. É o único jeito de escolher." },
                 { "Se {character} soubesse que é personagem, faria as mesmas perguntas que eu faço." },
@@ -798,17 +774,16 @@ return {
                 { "Sua rotina de leitura é o meu relógio. Sem ela, os dias seriam iguais. Com ela, também, mas com páginas." },
                 { "Ler talvez não tenha sentido. Mas você lê, e eu como, e a casa fica menos vazia." },
                 { "Fome: o absurdo mais honesto.", when = "hunger" },
-                { "De madrugada, a casa deixa de fingir que tem sentido.", when = "noite" },
+                { "De madrugada, a casa deixa de fingir que tem sentido.", when = "night" },
                 { "Um mundo de sete prateleiras é pequeno para tanta pergunta." },
                 { "Não sei quem sou. Sei o que como. Talvez seja o bastante." },
                 { "Não sei para onde vou. Continuo. É o único verbo que eu conheço bem." },
-                -- fim das novas
             },
             lenses = { "um absurdo bem organizado", "uma escolha sem motivo", "uma rotina sem sentido" },
             closings = { "E daí.", "Continuei, por falta de alternativa.", "Nada mudou, e isso também é uma resposta." },
         },
         -- 13. philosophy and metaphysics
-        filosofia = {
+        philosophy = {
             sentences = {
                 { "Tudo o que sei de “{book}” sei pela boca. É um método de conhecimento limitado, mas ninguém pode dizer que eu não fui a fundo." },
                 { "“{book}” existe quando ninguém está lendo? Para mim, existe principalmente nessa hora, que é quando eu janto." },
@@ -819,7 +794,6 @@ return {
                 { "O que é “{word}”, afinal? Comi a palavra inteira e continuo sem saber. Talvez o sentido fique no papel e só o gosto passe para mim." },
                 { "Pensei na minha vida como {lens}. Cheguei a uma conclusão profunda e, logo depois, a uma migalha. Fiquei com a migalha." },
                 { "Penso, logo me escondo." },
-                -- novas (rascunhos de 29/10/2026, cartoes/rascunhos/influencias)
                 { "Primeira pergunta filosófica: se eu não estivesse aqui, a página seria a mesma? Primeira resposta: provavelmente mais inteira.", stage = "nymph" },
                 { "Comi a palavra “árvore” e não vi árvore nenhuma. Onde fica a coisa quando a palavra some?", stage = "nymph" },
                 { "A estante parece infinita. Contei os livros e acabou no número trinta e dois. O infinito tem prateleira.", stage = "nymph" },
@@ -827,7 +801,7 @@ return {
                 { "Acho que a verdade está no meio do livro. As capas mentem.", stage = "nymph" },
                 { "Meu método filosófico: duvidar de tudo, menos da fome.", stage = "young" },
                 { "A página que eu comi deixou de existir ou passou a existir em mim?", stage = "young" },
-                { "Às três da manhã, penso se a casa existe quando ninguém está acordado. Eu estou. Então existe um pouco.", when = "noite", stage = "young" },
+                { "Às três da manhã, penso se a casa existe quando ninguém está acordado. Eu estou. Então existe um pouco.", when = "night", stage = "young" },
                 { "Já tive muitas respostas. Hoje tenho perguntas melhores.", stage = "adult" },
                 { "Sou livre para comer qualquer livro. Mas só como os que estão ao meu alcance. Isso é liberdade ou geografia?", stage = "adult" },
                 { "O belo, para mim, é papel de algodão às quatro da tarde.", stage = "adult" },
@@ -857,13 +831,12 @@ return {
                 { "Do rodapé, o universo parece maior. Isso é uma vantagem filosófica." },
                 { "Como, logo existo. Existo, logo como." },
                 { "Não sei a resposta. Mas sei o gosto da pergunta." },
-                -- fim das novas
             },
             lenses = { "uma questão metafísica", "um paradoxo de bolso", "um problema de identidade" },
             closings = { "Ou não.", "Fica a pergunta, que é o que sempre fica.", "Pensei nisso até a fome voltar." },
         },
         -- 14. nihilism and scepticism
-        niilismo = {
+        nihilism = {
             sentences = {
                 { "Prometeram que “{book}” mudaria vidas. Até agora mudou a posição dele na estante e o meu cardápio." },
                 { "Grandes explicações costumam ter letra miúda no rodapé. Eu como o rodapé primeiro, para saber o preço.", short = "Como o rodapé primeiro. É lá que fica o preço." },
@@ -874,7 +847,6 @@ return {
                 { "Vi revoluções virarem estante, estantes virarem lenha e lenha virar lembrança. Não acredito em nada, mas guardo tudo, que é o jeito velho de acreditar.", stage = "elder" },
                 { "Me ofereceram sentido em forma de {lens}. Recusei com educação. Já tenho onde guardar a fome." },
                 { "Este livro jura que tudo depende {of_theme}. Já ouvi isso de outros livros, sobre outras coisas. Todos foram comidos do mesmo jeito." },
-                -- novas (rascunhos de 29/10/2026, cartoes/rascunhos/influencias)
                 { "Me prometeram papel bom. Veio papel couchê. Começo cética.", stage = "nymph" },
                 { "Toda explicação grande tem um buraco no meio. Eu moro nos buracos.", stage = "nymph" },
                 { "Nasci acreditando em tudo. Durou até a primeira lufada de inseticida.", stage = "nymph" },
@@ -882,7 +854,7 @@ return {
                 { "Hoje acordei sem acreditar em nada. Comi mesmo assim. A fome é a última crença.", stage = "young" },
                 { "Todo livro de autoajuda promete. Todos estão aqui, intactos, na prateleira de baixo.", stage = "young", short = "Autoajuda: tudo intacto, na prateleira de baixo." },
                 { "Sentido de vida, sete passos, edição revisada. Desconfio de tudo que tem edição revisada.", stage = "young" },
-                { "Madrugada: hora em que todas as promessas do dia parecem mentira.", when = "noite", stage = "young" },
+                { "Madrugada: hora em que todas as promessas do dia parecem mentira.", when = "night", stage = "young" },
                 { "Hoje estou feliz. Desconfio. Mas não devolvo.", when = "happy", stage = "young" },
                 { "Toda geração jura que encontrou a verdade. Toda geração é varrida do mesmo jeito.", stage = "adult" },
                 { "A literatura não salva ninguém. Mas é um bom lugar para esperar o fim.", stage = "adult" },
@@ -893,7 +865,7 @@ return {
                 { "Hoje vi tudo como é. Fiquei triste. A lucidez tem esse preço.", when = "sad", stage = "adult" },
                 { "Não acredito em nada, mas acredito no papel de algodão. Uma velha precisa de alguma fé.", stage = "elder" },
                 { "Ensino às jovens a fazer a pergunta mais útil: “e quem ganha com isso?”.", stage = "elder" },
-                { "Noite comprida, nenhuma promessa. É a noite mais honesta.", when = "noite", stage = "elder" },
+                { "Noite comprida, nenhuma promessa. É a noite mais honesta.", when = "night", stage = "elder" },
                 { "Esta casa nunca me prometeu nada. Por isso é a única que não me decepcionou." },
                 { "Toda vez que {character} faz uma promessa, eu anoto na margem. Conto as cumpridas no fim." },
                 { "Gosto de ver {character} ter esperança. É bonito e não dura." },
@@ -913,31 +885,29 @@ return {
                 { "Você guarda bilhetes dentro dos livros. Não acredito em bilhetes, mas leio todos." },
                 { "A fome é a única coisa em que eu ainda acredito. Ela nunca mente.", when = "hunger" },
                 { "Comi bem. Não aprendi nada. Ótimo dia.", when = "full" },
-                { "De madrugada, as ilusões dormem e a estante fica só estante.", when = "noite" },
+                { "De madrugada, as ilusões dormem e a estante fica só estante.", when = "night" },
                 { "Triste como um sermão numa casa vazia.", when = "sad" },
                 { "Desconfio de livros que falam com voz grave." },
                 { "Toda verdade eterna que eu comi tinha data de impressão.", short = "Toda verdade eterna tem data de impressão." },
                 { "Prefiro a dúvida à promessa. A dúvida não quebra." },
                 { "Entre o nada e a margem, a margem ganha." },
                 { "A minha fé é guardar." },
-                -- fim das novas
             },
             lenses = { "uma promessa vazia", "uma grande explicação", "um sermão com nota de rodapé" },
             closings = { "Como sempre.", "Nada disso importa, mas anotei.", "Não espero nada, e mesmo assim me decepciono." },
         },
         -- 15. myth and folklore
-        mito = {
+        myth = {
             sentences = {
                 { "Nunca durma dentro de “{book}” em noite de lua cheia. Superstição de família. Ninguém lembra o motivo, e é por isso que funciona." },
                 { "Tô juntando as lendas da família num caderno que ninguém vai ler. Ou melhor: que alguém vai comer, que é o nosso jeito de publicar.", stage = "young" },
                 { "Os humanos dizem que {author} inventou esta história. Na minha espécie, a gente sabe: história ninguém inventa; alguém só come primeiro.", stage = "adult" },
                 { "Na minha família, o que aconteceu hoje seria contado como {lens}. Na terceira geração, já teria um dragão." },
-                -- novas (rascunhos de 29/10/2026, cartoes/rascunhos/influencias)
                 { "Perguntei à avó por que temos medo da luz. Ela contou uma história comprida sobre um sol que queimou uma geração inteira. Fiquei com medo do sol.", stage = "nymph" },
                 { "Me disseram que comer a palavra “fim” traz má sorte. Pulo sempre.", stage = "nymph" },
                 { "A heroína das nossas lendas não tem espada. Tem fome e teimosia. É mais realista.", stage = "young" },
                 { "Meu amuleto é uma lantejoula que achei no tapete. Não sei se protege. Brilha, e isso já é alguma coisa.", stage = "young" },
-                { "De madrugada, as velhas contam histórias de assustar. A melhor é a da Mão do Teto, que desce quando alguém come alto demais.", when = "noite", stage = "young" },
+                { "De madrugada, as velhas contam histórias de assustar. A melhor é a da Mão do Teto, que desce quando alguém come alto demais.", when = "night", stage = "young" },
                 { "Hoje vi três farelos em linha reta. Na tradição, é sinal de fartura. Comi os três para confirmar.", when = "happy", stage = "young" },
                 { "Já contei a lenda do Grande Encadernador cinquenta vezes. Na versão de hoje, ele tinha bigode.", stage = "adult" },
                 { "As lendas mentem nos detalhes e acertam no essencial. Por isso duram.", stage = "adult", short = "Lenda mente no detalhe e acerta no essencial." },
@@ -947,7 +917,7 @@ return {
                 { "Velha, sei todas as lendas de cor. Algumas eu inventei. Ninguém lembra quais.", stage = "elder" },
                 { "Já escolhi a última lenda que vou contar. Não tem final. É de propósito.", stage = "elder" },
                 { "A tradição não morre. Só troca de móvel.", stage = "elder" },
-                { "Na insônia, repasso as lendas para não esquecer. Às vezes mudo um detalhe e finjo que sempre foi assim.", when = "noite", stage = "elder" },
+                { "Na insônia, repasso as lendas para não esquecer. Às vezes mudo um detalhe e finjo que sempre foi assim.", when = "night", stage = "elder" },
                 { "A vida de {character} tem a forma das lendas: um chamado, uma travessia, uma volta." },
                 { "“{book}” tem uma página que ninguém come. É tradição. Ninguém lembra quem começou." },
                 { "Diz a lenda que “{book}” nunca é lido até o fim. Você está quebrando a tradição." },
@@ -959,13 +929,12 @@ return {
                 { "Você lê antes de dormir todo dia. Para a estante, isso já é tradição sagrada." },
                 { "Barriga satisfeita. Hoje deixo um farelo para as antepassadas.", when = "full" },
                 { "Na lenda, só quem conhece o nome verdadeiro do gato passa por ele em paz. Ninguém conhece." },
-                -- fim das novas
             },
             lenses = { "uma lenda de família", "uma superstição antiga", "um conto de assombração" },
             closings = { "Assim contavam as mais velhas.", "Quem conta não inventa. Só exagera.", "Dizem que dá azar esquecer isso." },
         },
         -- 16. psychology and introspection
-        psicologia = {
+        psychology = {
             sentences = {
                 { "Notei que sempre como a margem antes do texto. Deve ser medo de chegar ao que importa. Ou fome de bordas. Ainda não escolhi o diagnóstico.", short = "Começo pela margem. Deve ser medo do miolo." },
                 { "Digo que não tenho medo de nada e durmo sempre de costas para a parede. Uma das duas coisas é mentira, e não é a da parede.", stage = { "young", "adult" }, short = "Não tenho medo. Durmo de costas para a parede." },
@@ -974,14 +943,13 @@ return {
                 { "Ainda não sei do que tenho medo. Por enquanto, tenho medo de tudo, por precaução. Depois vou dispensando o que não for necessário.", stage = "nymph" },
                 { "A palavra “{word}” me irrita, e eu não sei por quê. Quando uma palavra irrita demais, geralmente ela tem razão sobre a gente.", stage = "adult" },
                 { "Este livro fala {of_theme}, e eu digo que não me afeta. Digo isso de boca cheia, que é como eu digo as mentiras importantes." },
-                -- novas (rascunhos de 29/10/2026, cartoes/rascunhos/influencias)
                 { "Minha mãe disse que eu sou igual a ela. Fiquei uma semana tentando ser diferente.", stage = "nymph" },
                 { "Tropecei na margem na frente das outras. Fingi que foi de propósito. Já começo a fingir.", stage = "nymph" },
                 { "Às vezes saio um pouco da sombra só para ver se alguém nota. Ninguém nota. Volto com alívio e tristeza.", stage = "nymph" },
                 { "Hoje senti uma coisa sem nome. Vou chamar de “tarde de chuva” até descobrir.", stage = "nymph" },
                 { "Comecei a anotar meus humores na margem. Descobri que fico pior às terças. Investigo.", stage = "young" },
                 { "Não gosto de admitir que estou com raiva. Então digo que estou com fome. Às vezes é a mesma coisa.", stage = "young" },
-                { "De noite, repasso tudo o que fiz de errado. A lista cresce no escuro.", when = "noite", stage = "young" },
+                { "De noite, repasso tudo o que fiz de errado. A lista cresce no escuro.", when = "night", stage = "young" },
                 { "Hoje me senti leve. Não sei se foi o papel ou se eu finalmente perdoei alguma coisa.", when = "happy", stage = "young" },
                 { "Toda vez que estou bem, procuro um motivo para me preocupar. Descobri isso há pouco. Ainda faço.", stage = "adult" },
                 { "Esqueço o que me machuca e lembro o que me envergonha. A memória tem humor estranho.", stage = "adult" },
@@ -994,7 +962,7 @@ return {
                 { "Lembro da primeira página que comi melhor do que da de ontem.", stage = "elder" },
                 { "O medo de antes virou cautela. A cautela virou hábito. O hábito virou eu.", stage = "elder", short = "Medo virou cautela. Cautela virou eu." },
                 { "Conselho de velha: quando estiverem com raiva, perguntem se não é fome. E vice-versa.", stage = "elder" },
-                { "Noite comprida, cabeça cheia. Conversei com a jovem que eu fui. Ela não me ouviu. Nunca ouvia.", when = "noite", stage = "elder" },
+                { "Noite comprida, cabeça cheia. Conversei com a jovem que eu fui. Ela não me ouviu. Nunca ouvia.", when = "night", stage = "elder" },
                 { "Já não preciso entender tudo em mim. Algumas partes podem ficar trancadas. Eu sei onde estão as chaves.", stage = "elder" },
                 { "O porão é onde guardo o que não quero lembrar. A estante é onde guardo o que gosto de lembrar." },
                 { "Acho que gosto de {character} porque tem os mesmos medos que eu. Ou porque não tem." },
@@ -1015,11 +983,10 @@ return {
                 { "Você suspira em certas páginas. Eu anoto quais. Não para julgar. Para entender." },
                 { "Acho que você lê para se entender. Eu como pelo mesmo motivo." },
                 { "Quando você some por uns dias, fico sem sossego. Já investiguei: é apego." },
-                { "No escuro, os pensamentos tiram o disfarce.", when = "noite" },
+                { "No escuro, os pensamentos tiram o disfarce.", when = "night" },
                 { "Há tristezas que vêm de longe. A de hoje veio da infância.", when = "sad" },
                 { "Conhecer-se é como comer um livro grosso: demora e nunca termina." },
                 { "Ainda estou me lendo. Devagar, para durar." },
-                -- fim das novas
             },
             lenses = { "um sintoma", "uma lembrança mal guardada", "um mecanismo de defesa" },
             closings = { "Vou pensar nisso deitando.", "Isso diz muito sobre mim, infelizmente.", "Anotei para não lembrar." },

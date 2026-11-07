@@ -138,13 +138,13 @@ function C.pace(s)
 end
 
 --- true if the page was really read (shapes Yomimon); if so, it enters the reader's pace.
-function C.reallyRead(s, tempo, letters, chapter, textValue)
+function C.reallyRead(s, time, letters, chapter, textValue)
     if not textValue or letters < C.MIN_PAGE_LETTERS or C.matter(chapter, textValue) then return false end
     local minimum = math.max(C.ABSOLUTE_MIN, C.PACE_FRACTION * C.pace(s) * letters)
-    if tempo < minimum then return false end
-    if tempo <= C.MAX_OPEN then
+    if time < minimum then return false end
+    if time <= C.MAX_OPEN then
         s.pace = type(s.pace) == "table" and s.pace or {}
-        s.pace[#s.pace + 1] = tempo / letters
+        s.pace[#s.pace + 1] = time / letters
         while #s.pace > C.PACE_SAMPLES do table.remove(s.pace, 1) end
     end
     return true

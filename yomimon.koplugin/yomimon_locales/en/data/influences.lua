@@ -14,41 +14,41 @@ Differences in English:
 return {
     -- detected events (yomimon_memory.lua, M.EVENTS), with an article, for {event}
     events = {
-        morte = "a funeral", casamento = "a wedding", viagem = "a departure", carta = "a letter",
-        tempestade = "a storm", doenca = "a fever", festa = "a party", briga = "a fight",
-        fuga = "an escape", crime = "a crime",
+        death = "a funeral", wedding = "a wedding", travel = "a departure", letter = "a letter",
+        storm = "a storm", illness = "a fever", party = "a party", quarrel = "a fight",
+        escape = "an escape", crime = "a crime",
     },
 
     -- base personality (50)
     base = {
         -- survival
-        { "Someone wiped the bottom shelf with alcohol. I moved out without leaving a note or missing anyone.", situation = "sobrevivencia" },
-        { "Hunger got home before me, as usual. It has a key to the house, and I don't.", situation = "sobrevivencia", when = "hunger" },
-        { "A damp, dark corner that everyone forgot. Humans call it neglect. I call it home and sign the lease.", situation = "sobrevivencia", short = "Neglect, say the humans. Home, say I." },
-        { "I slept inside “{book}”. Nobody looked for me there, which says something about the book, or about the humans.", situation = "sobrevivencia" },
-        { "I survived another cleaning. If it had been {lens}, someone would have written about it.", situation = "sobrevivencia" },
+        { "Someone wiped the bottom shelf with alcohol. I moved out without leaving a note or missing anyone.", situation = "survival" },
+        { "Hunger got home before me, as usual. It has a key to the house, and I don't.", situation = "survival", when = "hunger" },
+        { "A damp, dark corner that everyone forgot. Humans call it neglect. I call it home and sign the lease.", situation = "survival", short = "Neglect, say the humans. Home, say I." },
+        { "I slept inside “{book}”. Nobody looked for me there, which says something about the book, or about the humans.", situation = "survival" },
+        { "I survived another cleaning. If it had been {lens}, someone would have written about it.", situation = "survival" },
         -- reading
-        { "Some books you eat, and some books eat you. “{book}” hasn't decided which one it is yet.", situation = "leitura", short = "This book hasn't decided who eats whom." },
-        { "{author} took who knows how long to write this. I took one afternoon to eat the corner of page ten. Everyone has a trade.", situation = "leitura" },
-        { "I reread a paragraph three times. Not for its depth. My mouth was full.", situation = "leitura", short = "Reread it three times. Not depth: hunger." },
-        { "The word “{word}” showed up again. We're on first-name terms now.", situation = "leitura" },
-        { "I prefer second-hand books. They come seasoned: coffee, fingers, rain and someone else's sadness in the corner of the page.", situation = "leitura", stage = { "adult", "elder" } },
-        { "A beautiful sentence won't feed you. But it won't try to kill you either, which already puts it above most things.", situation = "leitura", stage = { "adult", "elder" } },
-        { "I've eaten so many books that I recognise “{word}” by the taste before I read it.", situation = "leitura", stage = "elder" },
+        { "Some books you eat, and some books eat you. “{book}” hasn't decided which one it is yet.", situation = "reading", short = "This book hasn't decided who eats whom." },
+        { "{author} took who knows how long to write this. I took one afternoon to eat the corner of page ten. Everyone has a trade.", situation = "reading" },
+        { "I reread a paragraph three times. Not for its depth. My mouth was full.", situation = "reading", short = "Reread it three times. Not depth: hunger." },
+        { "The word “{word}” showed up again. We're on first-name terms now.", situation = "reading" },
+        { "I prefer second-hand books. They come seasoned: coffee, fingers, rain and someone else's sadness in the corner of the page.", situation = "reading", stage = { "adult", "elder" } },
+        { "A beautiful sentence won't feed you. But it won't try to kill you either, which already puts it above most things.", situation = "reading", stage = { "adult", "elder" } },
+        { "I've eaten so many books that I recognise “{word}” by the taste before I read it.", situation = "reading", stage = "elder" },
         -- growth: each stage talks about its own size
-        { "I'm new. I still think every bookcase ends somewhere and every human goes to bed early.", situation = "crescimento", stage = "nymph" },
-        { "I hatched not long ago. I've already learned two things: paper is good, and a light that switches on suddenly is danger.", situation = "crescimento", stage = "nymph", short = "New here. Paper is good. Sudden light is bad." },
-        { "I'm bigger. I still fit through the crack, but now I go in sideways, with style.", situation = "crescimento", stage = "young" },
-        { "At my age, every book reminds me of another. This one reminds me of “{previous}”, I'm not sure why, and that's almost a compliment.", situation = "crescimento", stage = "elder" },
+        { "I'm new. I still think every bookcase ends somewhere and every human goes to bed early.", situation = "growth", stage = "nymph" },
+        { "I hatched not long ago. I've already learned two things: paper is good, and a light that switches on suddenly is danger.", situation = "growth", stage = "nymph", short = "New here. Paper is good. Sudden light is bad." },
+        { "I'm bigger. I still fit through the crack, but now I go in sideways, with style.", situation = "growth", stage = "young" },
+        { "At my age, every book reminds me of another. This one reminds me of “{previous}”, I'm not sure why, and that's almost a compliment.", situation = "growth", stage = "elder" },
         -- relationship with the reader
-        { "You turned the page while I was in the middle of a sentence. I don't scream because I have no voice. Consider this a scream.", situation = "leitor", short = "Page turned with me inside. This is a scream." },
-        { "You chose “{book}”. I won't say what I think. I'll eat it, and you can draw your own conclusions.", situation = "leitor" },
-        { "You're the biggest creature I've ever seen. And you read! The big creatures I knew only made noise.", situation = "leitor", stage = "nymph" },
-        { "You spend a lot of time with {character}. I'm not jealous. I'm taking notes.", situation = "leitor" },
-        { "Some days you close the book hard, some days gently. I know which kind of day you had.", situation = "leitor", stage = { "adult", "elder" } },
-        { "Don't thank me for anything. But if you want to leave “{book}” open at night, I won't complain.", situation = "leitor" },
-        { "You trust {author}. I trust you. Someone here is being far too optimistic.", situation = "leitor" },
-        { "You read “{book}”, I eat it. In the end we know the same story; only I know what it tastes like.", situation = "leitor" },
+        { "You turned the page while I was in the middle of a sentence. I don't scream because I have no voice. Consider this a scream.", situation = "reader", short = "Page turned with me inside. This is a scream." },
+        { "You chose “{book}”. I won't say what I think. I'll eat it, and you can draw your own conclusions.", situation = "reader" },
+        { "You're the biggest creature I've ever seen. And you read! The big creatures I knew only made noise.", situation = "reader", stage = "nymph" },
+        { "You spend a lot of time with {character}. I'm not jealous. I'm taking notes.", situation = "reader" },
+        { "Some days you close the book hard, some days gently. I know which kind of day you had.", situation = "reader", stage = { "adult", "elder" } },
+        { "Don't thank me for anything. But if you want to leave “{book}” open at night, I won't complain.", situation = "reader" },
+        { "You trust {author}. I trust you. Someone here is being far too optimistic.", situation = "reader" },
+        { "You read “{book}”, I eat it. In the end we know the same story; only I know what it tastes like.", situation = "reader" },
         -- context (matches what was detected or the strongest influence)
         { "{event} in the chapter, and nobody invited me. They don't even call me for the crying.", situation = "context", short = "{event} in the chapter. Nobody invited me." },
         { "This book talks about {theme} all the time. I live inside it, and all I talk about is damp.", situation = "context" },
@@ -60,33 +60,33 @@ return {
         { "There's library silence and locked-cupboard silence. I prefer the second: nobody comes to check.", situation = "context" },
         { "After “{previous}”, I thought nothing would surprise me. “{book}” hasn't managed it yet, but it's trying hard.", situation = "context" },
         -- Pokémon life (Yomimon, 2026-11-02)
-        { "I spent the afternoon inside the ball. Nobody asked if I wanted out. Nobody asked if I wanted to stay.", situation = "sobrevivencia", short = "An afternoon in the ball. Nobody asked." },
-        { "A good trainer knows when to heal. A good reader knows when to stop. You're still learning both.", situation = "sobrevivencia" },
-        { "A Pokémon Center is the only place in the world that takes care of you and says 'come back anytime'. I'd like a reader like that.", situation = "sobrevivencia", short = "Pokémon Center: heals you, says 'come back'." },
-        { "Sleeping in the ball is like sleeping on a plane: it fits, but nobody wakes up whole.", situation = "sobrevivencia" },
-        { "Hunger got here before me, as always. It's never late.", situation = "sobrevivencia", when = "hunger" },
-        { "Kibble is kibble, but a page is a page. I prefer the second. Don't tell anyone.", situation = "sobrevivencia", when = "hunger", short = "Kibble is kibble. A page is a page." },
-        { "The world has fire Pokémon, water Pokémon, grass Pokémon. I'm the reading type. Not sure it's super effective.", situation = "sobrevivencia", short = "My type is reading. Super effective? Unsure." },
-        { "“{book}” has something no battle has: you can reread the ending.", situation = "leitura" },
-        { "Every chapter of “{book}” is a battle. I won this one on points.", situation = "leitura", short = "A chapter of “{book}”: won on points." },
-        { "{author} writes like someone who knows the opponent's next move. I'm the opponent.", situation = "leitura" },
-        { "The word “{word}” is back. Noted in my mental Pokédex: shows up a lot, dubious behaviour.", situation = "leitura" },
-        { "I'm still thinking about “{previous}”. This one will have to wait in line.", situation = "leitura" },
-        { "A good book is as rare as a legendary Pokémon, and much easier to find in a library.", situation = "leitura" },
-        { "I reread a paragraph three times. Not for depth: my attention ran after a Pidgey.", situation = "leitura", short = "Reread it three times. Attention chased a Pidgey." },
-        { "Some books give experience and some only give sleep. “{book}” is still deciding.", situation = "leitura" },
-        { "Still learning. Two things so far: books are good, and a screen that suddenly goes dark is dangerous.", situation = "crescimento", stage = "nymph", short = "Learning: books good, dark screen bad." },
-        { "I'm bigger. I still fit in the ball, but now I enter sideways, with style.", situation = "crescimento", stage = "young" },
-        { "I feel evolution coming. Or just hunger. Hard to tell them apart.", situation = "crescimento", stage = { "nymph", "young" }, short = "Evolution coming. Or hunger. Hard to tell." },
-        { "I used to enter any book. Now I check “{book}”'s file first. Age brings standards.", situation = "crescimento", stage = "adult" },
-        { "I evolved and I still have the same doubts, only heavier.", situation = "crescimento", stage = { "adult", "elder" } },
-        { "I've been through every form I had. Now it's just reading and the rest of my life.", situation = "crescimento", stage = "elder" },
-        { "You read more than you train. As a trainer you'd be a disaster. As a reader, I'm staying.", situation = "leitor", short = "As a trainer, a disaster. As a reader, I stay." },
-        { "One day you'll finish “{book}”. I've accepted it. I'm just enjoying the chapters.", situation = "leitor" },
-        { "Your reading pace is that of someone with a plan. Or running from one. I won't ask.", situation = "leitor" },
-        { "You close the book at the same spot every night. You call it a habit. I call it a save point.", situation = "leitor", when = "noite", short = "Same page every night: a save point." },
-        { "When you vanish, I stay in the ball. When you read, I'm at peace. Seems fair.", situation = "leitor" },
-        { "Some people collect Pokémon. You collect started books. I won't judge. Yet.", situation = "leitor" },
+        { "I spent the afternoon inside the ball. Nobody asked if I wanted out. Nobody asked if I wanted to stay.", situation = "survival", short = "An afternoon in the ball. Nobody asked." },
+        { "A good trainer knows when to heal. A good reader knows when to stop. You're still learning both.", situation = "survival" },
+        { "A Pokémon Center is the only place in the world that takes care of you and says 'come back anytime'. I'd like a reader like that.", situation = "survival", short = "Pokémon Center: heals you, says 'come back'." },
+        { "Sleeping in the ball is like sleeping on a plane: it fits, but nobody wakes up whole.", situation = "survival" },
+        { "Hunger got here before me, as always. It's never late.", situation = "survival", when = "hunger" },
+        { "Kibble is kibble, but a page is a page. I prefer the second. Don't tell anyone.", situation = "survival", when = "hunger", short = "Kibble is kibble. A page is a page." },
+        { "The world has fire Pokémon, water Pokémon, grass Pokémon. I'm the reading type. Not sure it's super effective.", situation = "survival", short = "My type is reading. Super effective? Unsure." },
+        { "“{book}” has something no battle has: you can reread the ending.", situation = "reading" },
+        { "Every chapter of “{book}” is a battle. I won this one on points.", situation = "reading", short = "A chapter of “{book}”: won on points." },
+        { "{author} writes like someone who knows the opponent's next move. I'm the opponent.", situation = "reading" },
+        { "The word “{word}” is back. Noted in my mental Pokédex: shows up a lot, dubious behaviour.", situation = "reading" },
+        { "I'm still thinking about “{previous}”. This one will have to wait in line.", situation = "reading" },
+        { "A good book is as rare as a legendary Pokémon, and much easier to find in a library.", situation = "reading" },
+        { "I reread a paragraph three times. Not for depth: my attention ran after a Pidgey.", situation = "reading", short = "Reread it three times. Attention chased a Pidgey." },
+        { "Some books give experience and some only give sleep. “{book}” is still deciding.", situation = "reading" },
+        { "Still learning. Two things so far: books are good, and a screen that suddenly goes dark is dangerous.", situation = "growth", stage = "nymph", short = "Learning: books good, dark screen bad." },
+        { "I'm bigger. I still fit in the ball, but now I enter sideways, with style.", situation = "growth", stage = "young" },
+        { "I feel evolution coming. Or just hunger. Hard to tell them apart.", situation = "growth", stage = { "nymph", "young" }, short = "Evolution coming. Or hunger. Hard to tell." },
+        { "I used to enter any book. Now I check “{book}”'s file first. Age brings standards.", situation = "growth", stage = "adult" },
+        { "I evolved and I still have the same doubts, only heavier.", situation = "growth", stage = { "adult", "elder" } },
+        { "I've been through every form I had. Now it's just reading and the rest of my life.", situation = "growth", stage = "elder" },
+        { "You read more than you train. As a trainer you'd be a disaster. As a reader, I'm staying.", situation = "reader", short = "As a trainer, a disaster. As a reader, I stay." },
+        { "One day you'll finish “{book}”. I've accepted it. I'm just enjoying the chapters.", situation = "reader" },
+        { "Your reading pace is that of someone with a plan. Or running from one. I won't ask.", situation = "reader" },
+        { "You close the book at the same spot every night. You call it a habit. I call it a save point.", situation = "reader", when = "night", short = "Same page every night: a save point." },
+        { "When you vanish, I stay in the ball. When you read, I'm at peace. Seems fair.", situation = "reader" },
+        { "Some people collect Pokémon. You collect started books. I won't judge. Yet.", situation = "reader" },
         { "They call me a pet Pokémon. I'm a reading Pokémon: I only retire when the book ends.", situation = "context" },
         { "I study the map of “{book}” like someone planning a route. There's no Pokémon Center on the way.", situation = "context" },
         { "If I were {character}, I'd have asked to go back in the ball already. But then there'd be no story.", situation = "context" },
@@ -96,7 +96,7 @@ return {
 
     influences = {
         -- 1. epic fantasy
-        epica = {
+        epic = {
             sentences = {
                 { "I crossed the tabletop plain under the desk lamp, which is the sun of cowards. I reached the other side hungry and without a single song.", stage = { "nymph", "young" } },
                 { "{character} looks like someone about to set off on a quest. I set off every night, after the same crumb, and nobody calls me a hero.", short = "{character} seeks a quest. I seek crumbs." },
@@ -146,7 +146,7 @@ return {
             closings = { "No bard will sing of this.", "So say the chronicles of the bookcase.", "The kingdom goes on, dusty and indifferent." },
         },
         -- 2. mystery and investigation
-        misterio = {
+        mystery = {
             sentences = {
                 { "A piece of page twelve has gone missing. The main suspect is me, of course. Nobody asks where the cat was.", short = "Paper goes missing, they blame me. And the cat?" },
                 { "{character} turns up on almost every page. In a book, that's being the lead. At a police station, it would be too much alibi." },
@@ -167,7 +167,7 @@ return {
                 { "I examined the cover up close. I found a fingerprint, two stains and my own reflection. All suspects.", stage = "young" },
                 { "Today I pretended to be a comma for a whole page. Nobody suspected. The text even got clearer.", stage = "young" },
                 { "I investigated the house's archive: paid bills, unanswered letters, a torn photo. Someone here has a secret.", stage = "young" },
-                { "Light on in the living room at two in the morning. Open book, cold cup. Someone is investigating the same thing I am.", when = "noite", stage = "young" },
+                { "Light on in the living room at two in the morning. Open book, cold cup. Someone is investigating the same thing I am.", when = "night", stage = "young" },
                 { "I witnessed a crime: someone dog-eared a page and pretended they hadn't. I saw it. I always see.", stage = "young" },
                 { "Detectives in books grow old with charm. I grew old with damp.", stage = "adult" },
                 { "I look for the motive of whoever hunts me. I can't find one. The scariest kind of crime: the one that needs no motive.", stage = "adult" },
@@ -181,7 +181,7 @@ return {
                 { "I keep every case of this house in my memory: each cleaning, each spray, each book that vanished. I'm the living archive.", stage = "elder" },
                 { "An old hand's advice: whoever cleans too much is hiding something.", stage = "elder", short = "Whoever cleans too much hides something." },
                 { "One day they'll find out I was never guilty of everything. Just of almost everything.", stage = "elder" },
-                { "In the small hours, the house confesses things: the pipe that creaks, the wood that snaps, the breathing of someone reading.", when = "noite", stage = "elder" },
+                { "In the small hours, the house confesses things: the pipe that creaks, the wood that snaps, the breathing of someone reading.", when = "night", stage = "elder" },
                 { "I distrust my memories: they always make me look good at the scene.", stage = "elder" },
                 { "Every morning the house wakes up full of evidence: dishes in the sink, a slipper in the hall, a book open on the sofa." },
                 { "I've distrusted {character} since the first page. No proof. Just instinct and hunger, which are usually right." },
@@ -201,7 +201,7 @@ return {
                 { "You turn the page slowly when the tension rises. I've noticed. Detectives notice." },
                 { "Who are you reading in secret from? I won't tell. I'll just take notes." },
                 { "Every detective duo has one who reads and one who eats the evidence. You know which one you are." },
-                { "The best time for a crime is the small hours. I know because that's when I eat.", when = "noite" },
+                { "The best time for a crime is the small hours. I know because that's when I eat.", when = "night" },
                 { "Sad because I found out the truth and have no one to tell. That's the punishment of small witnesses.", when = "sad" },
                 { "Every cleaning is a police raid. They turn everything upside down and leave without anyone." },
                 { "I have a three-page dossier against the cat. Nobody reads it. The powerful always get away." },
@@ -215,7 +215,7 @@ return {
         horror = {
             sentences = {
                 { "To the humans, the monster of this house is me: small, silver, coming out of the cracks at night. They never suspect what lives in the walls with me.", short = "I'm the monster of this house. Ask the walls." },
-                { "At night the damp paper creaks slowly, like a bone that doesn't want to break all at once. I stay awake to see who gives up first.", when = "noite" },
+                { "At night the damp paper creaks slowly, like a bone that doesn't want to break all at once. I stay awake to see who gives up first.", when = "night" },
                 { "There's a new smell in “{book}”: old mould mixed with nervous hands. Either the book is rotting, or someone read it scared." },
                 { "Every time {character} enters the page, I back off two paragraphs. I don't know why. My body knows and won't tell me.", stage = { "nymph", "young" }, short = "{character} showed up. My body backed away." },
                 { "I heard a noise in the wardrobe and hid inside a comma. I'm still here. The comma is shaking too.", stage = "nymph" },
@@ -233,7 +233,7 @@ return {
                 { "There's a book locked in a drawer. Sometimes I hear its pages turn. Nobody has the key. Nobody remembers locking it.", stage = "young" },
                 { "I was brave all day. At night I paid the bill.", stage = "young" },
                 { "There's a stain on the ceiling that changes shape. Monday it was a face. Tuesday it was a hand. Today I didn't look.", stage = "young" },
-                { "Three in the morning: the hour when even the clock goes quiet. So do I, so I'm not the only one making noise.", when = "noite", stage = "young" },
+                { "Three in the morning: the hour when even the clock goes quiet. So do I, so I'm not the only one making noise.", when = "night", stage = "young" },
                 { "The pipes in this house whisper names. One of them sounded like mine. I changed books.", stage = "young" },
                 { "I've accepted being the monster of the house. At least monsters don't have to ask permission to come in.", stage = "adult" },
                 { "I've learned to live with whatever lives in the loft. I don't ask its name. Names call things.", stage = "adult" },
@@ -244,7 +244,7 @@ return {
                 { "At my age, the noises of the house are old acquaintances. The only thing that scares me is a silence I don't know.", stage = "elder" },
                 { "Death lives three shelves down. Sometimes it comes up for a chat. I haven't accepted the invitation yet.", stage = "elder" },
                 { "The floorboards creak like someone laughing quietly at us. They have their reasons.", stage = "elder" },
-                { "Old, I sleep little. I spend the night listening to the house, like someone listening to a sick person breathe.", when = "noite", stage = "elder" },
+                { "Old, I sleep little. I spend the night listening to the house, like someone listening to a sick person breathe.", when = "night", stage = "elder" },
                 { "An old one's advice: if a page is cold, don't eat it. Some hungers aren't worth it.", stage = "elder" },
                 { "I thought old age would take away fear. It only takes away the hurry to run.", stage = "elder" },
                 { "Every old house has lungs. This one's are behind the bookcase, and I live in them." },
@@ -265,7 +265,7 @@ return {
                 { "When you suddenly stop reading, I stop too. We both listen to the same thing." },
                 { "Please don't turn off the light in the middle of the chapter. I'm still in the basement part.", short = "Don't turn off the light. I'm in the basement bit." },
                 { "I ate a dark chapter and now I'm full of shadow. Heavy, quiet, with the light off inside.", when = "full" },
-                { "Footsteps in the loft. Light, regular, unhurried. Not the cat: cats don't climb that high. Not a rat: rats are afraid.", when = "noite" },
+                { "Footsteps in the loft. Light, regular, unhurried. Not the cat: cats don't climb that high. Not a rat: rats are afraid.", when = "night" },
                 { "There's a sadness that lives in old houses. Today it came and sat next to me.", when = "sad" },
                 { "The cat stares at the empty corner of the living room. I stare too. Neither of us blinks.", short = "The cat stares at the empty corner. So do I." },
                 { "The worst isn't the creak of the shelf. It's the long silence after, when the house waits to see if anyone woke up." },
@@ -303,7 +303,7 @@ return {
                 { "Grown-up love is this: knowing where the other one sleeps and not making noise nearby.", stage = "adult" },
                 { "I never said I liked her. I just moved my hiding place closer.", stage = "adult", short = "Never said a word. Just moved closer." },
                 { "We were made for each other, but on different bookcases. Is there a greater distance than that?", stage = "adult" },
-                { "Longing shows up at night because in the daytime I eat too much to think.", when = "noite", stage = "adult" },
+                { "Longing shows up at night because in the daytime I eat too much to think.", when = "night", stage = "adult" },
                 { "I've forgotten many books. I haven't forgotten the smell of the volume where I met her.", stage = "elder" },
                 { "Old, I've gone soft. I cry at every ending, even the ones that aren't about love.", stage = "elder" },
                 { "I want to leave slowly, like someone closing a book they really loved.", stage = "elder" },
@@ -328,7 +328,7 @@ return {
                 { "You closed the book and went to sleep without a word. I stayed on the last sentence, like someone waving from the platform." },
                 { "I'm hungry, but not for paper. Or for paper too. It's confusing.", when = "hunger" },
                 { "Full belly and full heart. I ate a chapter where someone finally said what they felt.", when = "full" },
-                { "You left the book open in the small hours. I stayed on the page, keeping the characters who don't sleep company.", when = "noite" },
+                { "You left the book open in the small hours. I stayed on the page, keeping the characters who don't sleep company.", when = "night" },
                 { "Sad like a letter sent back.", when = "sad" },
                 { "Old paper smells of whoever read it before you. Like meeting someone without being introduced." },
                 { "I don't get attached. I just come back. A lot. Always to the same place.", short = "I don't get attached. I just come back." },
@@ -338,7 +338,7 @@ return {
             closings = { "Not that I care.", "Nobody needs to know that.", "I thought about it more than I should." },
         },
         -- 5. adventure and exploration
-        aventura = {
+        adventure = {
             sentences = {
                 { "I went to the end of the hallway. There's a world out there: a rug like a desert, a skirting board like a coastline and a cat like the end of an expedition.", stage = { "nymph", "young" }, short = "Explored the hallway. Found a desert and a cat." },
                 { "I mapped “{book}” with my teeth: north is the cover, south is the flap, and in between there's a sea of pages nobody comes back from the same." },
@@ -360,7 +360,7 @@ return {
                 { "I got into a suitcase that was travelling. I was away a week. I met a hotel, a beach and a soggy paperback.", stage = "young" },
                 { "I was shipwrecked in a glass of water that spilled on the rug. I survived clinging to a napkin. I tell everyone.", stage = "young", short = "Shipwrecked in a glass of water. True story." },
                 { "My compass is hunger: it always points north, which is where the bread is.", stage = "young", short = "My compass is hunger. It points to bread." },
-                { "I travelled to the window at night. Outside there were lights, noises and a smell of rain I'd never eaten.", when = "noite", stage = "young" },
+                { "I travelled to the window at night. Outside there were lights, noises and a smell of rain I'd never eaten.", when = "night", stage = "young" },
                 { "I've explored everything there is to explore in this house. Now I explore books, which have more rooms.", stage = "adult" },
                 { "I finished the map of the house. It took years. The next day they moved the furniture.", stage = "adult" },
                 { "Between danger and boredom, I choose danger. Boredom kills too, just more slowly.", stage = "adult" },
@@ -371,7 +371,7 @@ return {
                 { "I'm planning my last journey: from the bookcase to the window, to see the street once before the end.", stage = "elder" },
                 { "The world I explored doesn't exist anymore: they changed the bookcase, the curtain and the rug. My routes have become legends.", stage = "elder" },
                 { "An old explorer's advice: danger is never where it seems. It's on the polished floor.", stage = "elder" },
-                { "In the small hours I sit at the edge of the window, looking at the street. I've never been out there. That's the trip for another life.", when = "noite", stage = "elder" },
+                { "In the small hours I sit at the edge of the window, looking at the street. I've never been out there. That's the trip for another life.", when = "night", stage = "elder" },
                 { "Old, I still want to see what's on the other side of the door. Wanting is the last thing to grow old.", stage = "elder" },
                 { "This house is a continent: bookcase highlands, rug deserts and a sea of polished floor." },
                 { "I wish I had {character}'s courage when the cleaning comes. I only have the hurry." },
@@ -391,7 +391,7 @@ return {
                 { "You turn the pages like someone hoisting sails. I feel the wind." },
                 { "When you close the book, it's like reaching port. I get off, breathe and wait for the next voyage." },
                 { "Hunger is the best excuse for an adventure. Today it sent me all the way to the pantry.", when = "hunger" },
-                { "At night, the lights on the living room gadgets are my stars. I navigate by them to the kitchen.", when = "noite" },
+                { "At night, the lights on the living room gadgets are my stars. I navigate by them to the kitchen.", when = "night" },
                 { "Sometimes the journey gets tiring and you just want to go back to a place that no longer exists.", when = "sad" },
                 { "The cat sleeps in the middle of the map. I go round the whole continent." },
                 { "Out there there's rain, wind and books I'll never eat. I keep looking." },
@@ -403,7 +403,7 @@ return {
             closings = { "Someone has to draw the map.", "The horizon starts just past the skirting board.", "Tomorrow I'll go further." },
         },
         -- 6. science fiction and dystopia
-        ficcao = {
+        science_fiction = {
             sentences = {
                 { "In the future, books will be made of glass and light. We'll stare at them hungry, like someone at the window of a closed bakery.", stage = { "nymph", "young" }, short = "Future books: glass. Hunger behind the window." },
                 { "They installed a device in the living room that blinks all night and listens to everything. Humans call it an assistant. I call it a permanent inquiry.", short = "A light that blinks and listens. An inquiry." },
@@ -422,7 +422,7 @@ return {
                 { "I learned the first law of the house: any light can be an eye.", stage = "nymph", short = "House law: any light may be an eye." },
                 { "Every dystopia has a resistance. This house's lives in the skirting board and communicates by bites.", stage = "young" },
                 { "If evolution is fair, my granddaughters will gnaw on data cables.", stage = "young" },
-                { "The blue light on the router blinks all night, like an artificial heart. I sleep to its rhythm without meaning to.", when = "noite", stage = "young" },
+                { "The blue light on the router blinks all night, like an artificial heart. I sleep to its rhythm without meaning to.", when = "night", stage = "young" },
                 { "Station report: humidity below ideal, paper in decline, enemies on the rise. Forecast: survive anyway.", stage = "adult" },
                 { "We're the last readers of paper. When the last book is digitised, our world ends, and nobody will notice.", stage = "adult" },
                 { "The voice assistant hears everything. I keep absolutely silent near it. I don't want to become a command.", stage = "adult" },
@@ -432,7 +432,7 @@ return {
                 { "I saw paper become rare, the book become ornament and the bookcase become decor. Tell your granddaughters that once we ate stories.", stage = "elder" },
                 { "The future doesn't scare me anymore. It's already here, and I'm still here, eating what's left of the past.", stage = "elder" },
                 { "An old one's advice: never trust anything that has a blinking light and no hunger.", stage = "elder" },
-                { "In the small hours, the house is all little lights and no voice. It looks like the future they promised me.", when = "noite", stage = "elder" },
+                { "In the small hours, the house is all little lights and no voice. It looks like the future they promised me.", when = "night", stage = "elder" },
                 { "Dinosaurs became oil. I'll become bookcase dust. Everyone contributes what they can.", stage = "elder" },
                 { "This house is a space station: air systems, strict schedules, a human crew and a stowaway in the book compartment." },
                 { "{character} fights something bigger. So do I. My bigger thing has a cable and plugs into the wall." },
@@ -451,7 +451,7 @@ return {
                 { "As long as you read paper, my species has a future. No pressure." },
                 { "Hunger is the only process that runs without updates.", when = "hunger" },
                 { "I ate too much. Entering power-saving mode.", when = "full" },
-                { "Small hours: every system at rest, except my hunger and your lamp.", when = "noite" },
+                { "Small hours: every system at rest, except my hunger and your lamp.", when = "night" },
                 { "Today I felt obsolete, like a paper book in a house of screens.", when = "sad" },
                 { "Cleaning used to have a sense of humour. Now it has a battery." },
                 { "Technology moves on. Sprays have apps now." },
@@ -461,7 +461,7 @@ return {
             closings = { "The system took note.", "This will be filed too.", "In the future they'll call this normal." },
         },
         -- 7. magical and fantastic realism
-        magico = {
+        magical = {
             sentences = {
                 { "It rained shredded paper in the kitchen on Tuesday. Nobody found it strange, and I stocked up, because miracles run out too.", short = "Paper rained in the kitchen. Nobody minded. I ate." },
                 { "My great-grandmother lived two hundred years inside an encyclopedia and died the day they took out volume H. To this day nobody in the family says that letter." },
@@ -482,7 +482,7 @@ return {
                 { "It rained letters in the living room all afternoon. I gathered the ones that fell by the skirting board and stocked up for winter.", stage = "young", short = "It rained letters. I stocked up." },
                 { "I found my name written in pencil in a hundred-year-old book. I don't even have a name yet. Now I do.", stage = "young" },
                 { "Inside this book time passes more slowly. I went in on a Monday and came out on a Thursday, not hungry.", stage = "young" },
-                { "In the small hours, the characters from closed books climb down from the shelf to get some air. I greet them all. They pretend not to see me.", when = "noite", stage = "young" },
+                { "In the small hours, the characters from closed books climb down from the shelf to get some air. I greet them all. They pretend not to see me.", when = "night", stage = "young" },
                 { "A ray of sun came exactly into my hiding place at three in the afternoon and stayed only there. I was warm and happy for no reason.", when = "happy", stage = "young" },
                 { "In this house, the impossible happens every afternoon after coffee. Nobody mentions it, so as not to scare it away.", stage = "adult" },
                 { "This afternoon has happened before. Same light, same cup, same book open at the same page. I don't mind. It was a good afternoon.", stage = "adult" },
@@ -511,7 +511,7 @@ return {
                 { "Sometimes you fall asleep with the book open on your chest, and the story carries on by itself. I read the rest for you." },
                 { "You'll never know, but the books you read keep your smell for years. I recognise it." },
                 { "Today hunger tastes of memory. I ate a page and missed my grandmother.", when = "hunger" },
-                { "At three in the morning, a blue light wanders along the shelf and stops above the book you'll read tomorrow.", when = "noite" },
+                { "At three in the morning, a blue light wanders along the shelf and stops above the book you'll read tomorrow.", when = "night" },
                 { "Sad like a legend nobody tells anymore.", when = "sad" },
                 { "The house cat is seven hundred years old. Nobody tells. Neither does the cat." },
                 { "I don't try to explain what I see. Explanations spoil the taste.", short = "I don't explain things. It spoils the taste." },
@@ -522,7 +522,7 @@ return {
             closings = { "Nobody found it strange.", "And the house stayed the same.", "It was all very natural, unfortunately." },
         },
         -- 8. satire and comedy
-        satira = {
+        satire = {
             sentences = {
                 { "Humans diet, count calories and weigh their flour. I'm the one eating paper in moderation, and I'm still the pest.", short = "Humans go on diets, and I'm the pest." },
                 { "They invented the library to keep readers' books, and the padlock to keep the library's books. I get in through the middle, which nobody locks." },
@@ -543,7 +543,7 @@ return {
                 { "There's a bookcase in the living room with books chosen by colour. The yellow ones sit together. Literature has become a palette.", stage = "young" },
                 { "Some people read the summary and discuss the book. I eat the book and discuss nothing. Which of us is more cultured?", stage = "young" },
                 { "I ate the preface to a book about humility. Eighteen pages about the author. The irony made my day.", when = "happy", stage = "young" },
-                { "Small hours: the time when self-help books feel insecure.", when = "noite", stage = "young" },
+                { "Small hours: the time when self-help books feel insecure.", when = "night", stage = "young" },
                 { "They built a home office to work in. Now they work in the kitchen and the office stores boxes.", stage = "adult" },
                 { "They started the diet on Monday. On Tuesday there were biscuit crumbs behind the sofa. I don't report it. I'm grateful.", stage = "adult" },
                 { "They arranged the bookcase alphabetically. It lasted a week. Then the natural order came back: laziness.", stage = "adult" },
@@ -556,7 +556,7 @@ return {
                 { "I've known humans who read and humans who bought. Never the same ones.", stage = "elder" },
                 { "At the launch party, the book stayed closed on the table, like decoration on the cake.", stage = "elder" },
                 { "At my age, criticism is simple: if I finish it, it's good.", stage = "elder" },
-                { "Night is the best time to laugh at humans. They don't hear and don't take offence.", when = "noite", stage = "elder" },
+                { "Night is the best time to laugh at humans. They don't hear and don't take offence.", when = "night", stage = "elder" },
                 { "People take photos of the cup next to the book. The book stays in the background, like furniture." },
                 { "Every story has someone who takes themselves too seriously. Here, I suspect {character}. But I take myself seriously too, and I live in a skirting board." },
                 { "{character} would be a hit at the book club: talks a lot and already has an opinion before reading." },
@@ -574,7 +574,7 @@ return {
                 { "You don't have a reading target. You just read. To me, that's the height of elegance." },
                 { "When I'm hungry, I'd even eat a self-help book. Today I ate two.", when = "hunger" },
                 { "Belly full of bestseller. Light and no nutrients.", when = "full", short = "Full of bestseller. Light, no nutrients." },
-                { "At night the bookcase takes off its make-up. Just paper and dust, honest.", when = "noite" },
+                { "At night the bookcase takes off its make-up. Just paper and dust, honest.", when = "night" },
                 { "Sad like a party where everyone talks about books and nobody has read them.", when = "sad" },
                 { "Rare books are locked up so nobody damages them. That way nobody reads them either. Problem solved." },
                 { "I'm the only one in this house who consumes culture every day. And I'm the pest.", short = "I'm the only daily reader here. And the pest." },
@@ -584,12 +584,12 @@ return {
             closings = { "Polite applause.", "Humans call this culture.", "All very solemn, as usual." },
         },
         -- 9. poetry and lyricism
-        poesia = {
+        poetry = {
             sentences = {
                 { "Dust in the window light. The house snows on the inside, and only I notice.", short = "Dust in the window light. The house snows inside." },
                 { "In “{book}”, between the margin and the text, runs a white river. I live on the bank and fish for letters." },
                 { "Everything is a first time: the first paper, the first shadow, the first fear. I want to keep a little of each before I grow.", stage = "nymph" },
-                { "Hunger at night is different: deeper, bluer, without a sound.", when = "noite" },
+                { "Hunger at night is different: deeper, bluer, without a sound.", when = "night" },
                 { "This book smells of {theme}. I keep the smell in the fold of the page, where I keep everything I can't say.", stage = "adult" },
                 { "Yellowed paper keeps the light of the years it was read in. So do I. That's why I shine a little, and slowly.", stage = "elder" },
                 { "There was {event}. I kept only the sound, which is what stays after the words have gone." },
@@ -606,7 +606,7 @@ return {
                 { "Some lines are for eating and some are for keeping. This one is for keeping.", stage = "young" },
                 { "Library silence: the sound of letters sleeping.", stage = "young" },
                 { "The rain writes on the window in a language I can't eat.", stage = "young" },
-                { "At night the paper goes cold, and the letters huddle like people in bed.", when = "noite", stage = "young" },
+                { "At night the paper goes cold, and the letters huddle like people in bed.", when = "night", stage = "young" },
                 { "An old page is like a face: the stains tell where life passed.", stage = "adult" },
                 { "Everything I know fits in one line. The rest is hunger.", stage = "adult" },
                 { "Life rhymes: cleaning, fleeing, feeding, cleaning.", stage = "adult" },
@@ -619,7 +619,7 @@ return {
                 { "I want to leave the way a leaf falls: without a sound, after being beautiful.", stage = "elder" },
                 { "Old at last, I understand the blank space on the page.", stage = "elder" },
                 { "I tell the young ones: beauty lives in the corner of the page, where nobody looks.", stage = "elder" },
-                { "In the small hours, the whole house becomes a poem: dark, short and full of pauses.", when = "noite", stage = "elder" },
+                { "In the small hours, the whole house becomes a poem: dark, short and full of pauses.", when = "night", stage = "elder" },
                 { "A crumb on the rug shines like a gemstone at five in the afternoon." },
                 { "{character} crosses the page like a streak of light on the wall." },
                 { "I like it when {character} stops mid-sentence. That's where the page breathes." },
@@ -641,7 +641,7 @@ return {
                 { "I like the silence you make when you read. It's the most beautiful in the house.", short = "Your reading silence is the loveliest." },
                 { "Hunger is a blank page waiting for a word.", when = "hunger" },
                 { "Full belly, quiet heart, low light. This must be peace.", when = "full" },
-                { "Night: the darkest and longest page in the house.", when = "noite" },
+                { "Night: the darkest and longest page in the house.", when = "night" },
                 { "Today is a margin day: everything around, nothing in the middle.", when = "sad" },
                 { "I live briefly. That's why I eat slowly.", short = "I live briefly. So I eat slowly." },
                 { "Everything beautiful in this house lasts a short while: the light at the window, the sweet word, your hand on the page." },
@@ -651,7 +651,7 @@ return {
             closings = { "And that's enough.", "An echo stayed.", "Then, silence." },
         },
         -- 10. tragedy
-        tragedia = {
+        tragedy = {
             sentences = {
                 { "I don't know how it ends for {character}. But I know the genre, and the genre doesn't forgive anyone who shows up this much." },
                 { "I climbed to the highest shelf just to prove I could. From up there you can see everything, including the hand coming down.", stage = "young" },
@@ -669,7 +669,7 @@ return {
                 { "I found the perfect hiding place: a closed box. It was the donation box.", stage = "young" },
                 { "She lives on the shelf of light. I live on the shelf of shadow. In tragedy, love always lives far away.", stage = "young" },
                 { "I ignored the first warning, the second and the third. By the fourth, it was too late for warnings.", stage = "young" },
-                { "Small hours: the time when every ending becomes obvious.", when = "noite", stage = "young" },
+                { "Small hours: the time when every ending becomes obvious.", when = "night", stage = "young" },
                 { "Complete happiness. I know: it's the scene before the third act.", when = "happy", stage = "young", short = "Pure happiness. Here comes the third act." },
                 { "I already know the end of almost everything. It doesn't save me from anything. It just gets me a better seat.", stage = "adult" },
                 { "Now I'm the one who warns the young. They don't listen. We become the chorus, which is what's left of those who've seen too much.", stage = "adult" },
@@ -681,7 +681,7 @@ return {
                 { "Wisdom arrives like letters in tragedies: after the funeral.", stage = "elder" },
                 { "I know I'll end up on some page, flattened between two words. I hope they're at least beautiful ones.", stage = "elder" },
                 { "The chorus in tragedies is always the old ones. Now I understand why.", stage = "elder" },
-                { "Long night, the end close. I listen to the house the way you hear your own heart in the last act.", when = "noite", stage = "elder" },
+                { "Long night, the end close. I listen to the house the way you hear your own heart in the last act.", when = "night", stage = "elder" },
                 { "Every time {character} believes it'll work out, I eat more slowly. To postpone." },
                 { "My heart sinks every time {character} smiles. I know the genre." },
                 { "If {character} knew what I know about books, they'd stop reading." },
@@ -700,7 +700,7 @@ return {
                 { "I feel your hand grip the cover when the story gets worse. We're the same audience." },
                 { "I'm hungry. I know where the food is. I also know who guards it. I'm going anyway.", when = "hunger" },
                 { "Full belly, guard down. Tragedies love that combination.", when = "full" },
-                { "Night comes down like a curtain over the bookcase. No one applauds.", when = "noite" },
+                { "Night comes down like a curtain over the bookcase. No one applauds.", when = "night" },
                 { "Sad like someone who has already read the last chapter.", when = "sad" },
                 { "Tragedy isn't a surprise. It's repetition with new pain." },
                 { "I know how it ends. I stay till the end. That's what sets us apart from the chairs." },
@@ -726,7 +726,7 @@ return {
                 { "I'd barely hatched before I went to fetch food. There's no childhood in the garage box.", stage = "nymph" },
                 { "I found out that the very thing that feeds my family is called “damage” by the owners.", stage = "nymph" },
                 { "Garage hunger is different from bookcase hunger. One is lack. The other is choice.", stage = "young" },
-                { "Night is the shift of those who have no choice.", when = "noite", stage = "young" },
+                { "Night is the shift of those who have no choice.", when = "night", stage = "young" },
                 { "Today we found a forgotten box of books. Food for the whole garage for a month. Nobody ate alone.", when = "happy", stage = "young" },
                 { "Nobody sees whoever cleans the house at six in the morning. I do. We're the invisible work around here.", stage = "adult" },
                 { "The owners talk about books the way they talk about property: they value, invest, keep.", stage = "adult" },
@@ -768,7 +768,7 @@ return {
             closings = { "Someone always pays the bill.", "And whoever cleans up never appears.", "Ask who profits from this." },
         },
         -- 12. existentialism and the absurd
-        existencial = {
+        existential = {
             sentences = {
                 { "I eat books to live and live to eat books. Someone should review this project, and the only employee available is me.", short = "I live to eat and eat to live. Some project." },
                 { "I'm free to go to any corner of the bookcase. That's exactly what scares me: no corner was made for me.", stage = { "nymph", "young" }, short = "I can go to any corner. None of them is mine." },
@@ -788,7 +788,7 @@ return {
                 { "I chose to eat the dedication. Nobody told me to. It's the first thing I've done just because I wanted to.", stage = "young" },
                 { "I look at my reflection and think: who decided I'd be this?", stage = "young" },
                 { "I ate a whole book in one go and felt nauseous. Not from the paper. From the world.", stage = "young" },
-                { "At three in the morning, the questions get louder.", when = "noite", stage = "young" },
+                { "At three in the morning, the questions get louder.", when = "night", stage = "young" },
                 { "I'm happy. I don't know why. I don't know why I get sad either. A draw.", when = "happy", stage = "young" },
                 { "I've understood that life is repetition. The choice is what face to wear.", stage = "adult" },
                 { "Meaning doesn't come ready-made. It's like a nest: you gather crumbs until it looks like home.", stage = "adult" },
@@ -797,7 +797,7 @@ return {
                 { "At my age, the lack of meaning is an old acquaintance. We have tea together.", stage = "elder" },
                 { "Death gives meaning to nothing. It just closes the book.", stage = "elder" },
                 { "Old, finally free: I'm no longer afraid of getting it wrong. I've got everything wrong already.", stage = "elder" },
-                { "Long night. I exist. I don't know what for. Still, I exist with relish.", when = "noite", stage = "elder" },
+                { "Long night. I exist. I don't know what for. Still, I exist with relish.", when = "night", stage = "elder" },
                 { "I live in a place that wasn't made for me. That's the definition of existing." },
                 { "I admire {character} for choosing without knowing the outcome. It's the only way to choose." },
                 { "If {character} knew they were a character, they'd ask the same questions I ask." },
@@ -816,7 +816,7 @@ return {
                 { "Your reading routine is my clock. Without it, the days would all be the same. With it, too, but with pages." },
                 { "Maybe reading has no meaning. But you read, and I eat, and the house feels less empty." },
                 { "Hunger: the most honest absurdity.", when = "hunger" },
-                { "In the small hours, the house stops pretending to make sense.", when = "noite" },
+                { "In the small hours, the house stops pretending to make sense.", when = "night" },
                 { "A world of seven shelves is small for so many questions." },
                 { "I don't know who I am. I know what I eat. Maybe that's enough." },
                 { "I don't know where I'm going. I carry on. It's the only verb I know well." },
@@ -826,7 +826,7 @@ return {
             closings = { "So what.", "I carried on, for lack of options.", "Nothing changed, and that's an answer too." },
         },
         -- 13. philosophy and metaphysics
-        filosofia = {
+        philosophy = {
             sentences = {
                 { "Everything I know about “{book}” I know through my mouth. It's a limited method of knowledge, but nobody can say I didn't go deep." },
                 { "Does “{book}” exist when nobody is reading it? For me it mostly exists then, because that's when I have dinner." },
@@ -844,7 +844,7 @@ return {
                 { "I think the truth is in the middle of the book. Covers lie.", stage = "nymph" },
                 { "My philosophical method: doubt everything except hunger.", stage = "young" },
                 { "Did the page I ate stop existing, or did it start existing in me?", stage = "young" },
-                { "At three in the morning, I wonder whether the house exists when nobody's awake. I am. So it exists a little.", when = "noite", stage = "young" },
+                { "At three in the morning, I wonder whether the house exists when nobody's awake. I am. So it exists a little.", when = "night", stage = "young" },
                 { "I used to have lots of answers. Now I have better questions.", stage = "adult" },
                 { "I'm free to eat any book. But I only eat the ones within reach. Is that freedom or geography?", stage = "adult" },
                 { "Beauty, to me, is cotton paper at four in the afternoon.", stage = "adult" },
@@ -852,7 +852,7 @@ return {
                 { "Some days thinking tires me more than running.", when = "sad", stage = "adult" },
                 { "In old age, I found out that wisdom is knowing you know little. It took my whole life to know little.", stage = "elder" },
                 { "Death is the only question that answers itself.", stage = "elder" },
-                { "Long night. I think about being, nothingness and damp.", when = "noite", stage = "elder" },
+                { "Long night. I think about being, nothingness and damp.", when = "night", stage = "elder" },
                 { "My inheritance is a well-kept doubt.", stage = "elder" },
                 { "{character} asks the same questions I do: who am I, where am I going. The difference is they have an author to answer." },
                 { "If the book ends, does {character} stop existing? Or wait for the next reading?" },
@@ -881,7 +881,7 @@ return {
             closings = { "Or not.", "The question remains, as questions do.", "I thought about it until the hunger came back." },
         },
         -- 14. nihilism and scepticism
-        niilismo = {
+        nihilism = {
             sentences = {
                 { "They promised “{book}” would change lives. So far it has changed its place on the shelf and my menu." },
                 { "Grand explanations usually have small print in the footnotes. I eat the footnotes first, to find out the price.", short = "Footnotes first. That's where the price is." },
@@ -900,7 +900,7 @@ return {
                 { "Today I woke up believing in nothing. I ate anyway. Hunger is the last belief.", stage = "young" },
                 { "Every self-help book makes promises. They're all here, untouched, on the bottom shelf.", stage = "young", short = "Self-help: all untouched, bottom shelf." },
                 { "Meaning of life, seven steps, revised edition. I distrust anything with a revised edition.", stage = "young" },
-                { "Small hours: the time when all the day's promises look like lies.", when = "noite", stage = "young" },
+                { "Small hours: the time when all the day's promises look like lies.", when = "night", stage = "young" },
                 { "Today I'm happy. I'm suspicious. But I'm not giving it back.", when = "happy", stage = "young" },
                 { "Every generation swears it found the truth. Every generation gets swept up the same way.", stage = "adult" },
                 { "Literature saves no one. But it's a good place to wait for the end.", stage = "adult" },
@@ -912,7 +912,7 @@ return {
                 { "At my age, promises arrive smelling of mould.", stage = "elder" },
                 { "I believe in nothing, but I believe in cotton paper. An old lady needs some faith.", stage = "elder" },
                 { "I teach the young ones to ask the most useful question: “and who gains from this?”.", stage = "elder" },
-                { "Long night, no promises. The most honest kind of night.", when = "noite", stage = "elder" },
+                { "Long night, no promises. The most honest kind of night.", when = "night", stage = "elder" },
                 { "This house never promised me anything. That's why it's the only one that never let me down." },
                 { "Every time {character} makes a promise, I note it in the margin. I count the kept ones at the end." },
                 { "I like watching {character} have hope. It's beautiful and it doesn't last." },
@@ -933,7 +933,7 @@ return {
                 { "You keep notes inside books. I don't believe in notes, but I read them all." },
                 { "Hunger is the only thing I still believe in. It never lies.", when = "hunger" },
                 { "Ate well. Learned nothing. Great day.", when = "full" },
-                { "In the small hours, the illusions sleep and the bookcase is just a bookcase.", when = "noite" },
+                { "In the small hours, the illusions sleep and the bookcase is just a bookcase.", when = "night" },
                 { "Sad like a sermon in an empty house.", when = "sad" },
                 { "I distrust books that speak in a deep voice." },
                 { "Every eternal truth I've eaten had a print date.", short = "Every eternal truth has a print date." },
@@ -946,7 +946,7 @@ return {
             closings = { "As always.", "None of this matters, but I took notes.", "I expect nothing, and I'm still disappointed." },
         },
         -- 15. myth and folklore
-        mito = {
+        myth = {
             sentences = {
                 { "My grandmother used to say that whoever eats the last page of a book becomes a library ghost and spends eternity correcting typos.", stage = { "nymph", "young" }, short = "Granny: eat the last page and you'll haunt it." },
                 { "Never sleep inside “{book}” on a full-moon night. Family superstition. Nobody remembers why, and that's why it works." },
@@ -958,7 +958,7 @@ return {
                 { "They told me eating the word “end” brings bad luck. I always skip it.", stage = "nymph" },
                 { "The heroine of our legends has no sword. She has hunger and stubbornness. More realistic.", stage = "young" },
                 { "My amulet is a sequin I found on the rug. I don't know if it protects me. It shines, and that's something.", stage = "young" },
-                { "In the small hours, the old ones tell scary stories. The best is the Hand from the Ceiling, which comes down when someone eats too loudly.", when = "noite", stage = "young" },
+                { "In the small hours, the old ones tell scary stories. The best is the Hand from the Ceiling, which comes down when someone eats too loudly.", when = "night", stage = "young" },
                 { "Today I saw three crumbs in a straight line. By tradition, it's a sign of plenty. I ate all three to make sure.", when = "happy", stage = "young" },
                 { "I've told the legend of the Great Bookbinder fifty times. In today's version, he had a moustache.", stage = "adult" },
                 { "Legends lie in the details and get the essentials right. That's why they last.", stage = "adult", short = "Legends lie in details, not in essence." },
@@ -968,7 +968,7 @@ return {
                 { "Old, I know all the legends by heart. I made some of them up. Nobody remembers which.", stage = "elder" },
                 { "I've already chosen the last legend I'll tell. It has no ending. On purpose.", stage = "elder" },
                 { "Tradition doesn't die. It just changes furniture.", stage = "elder" },
-                { "When I can't sleep, I go over the legends so I won't forget. Sometimes I change a detail and pretend it was always so.", when = "noite", stage = "elder" },
+                { "When I can't sleep, I go over the legends so I won't forget. Sometimes I change a detail and pretend it was always so.", when = "night", stage = "elder" },
                 { "{character}'s life has the shape of legends: a call, a crossing, a return." },
                 { "“{book}” has a page nobody eats. It's tradition. Nobody remembers who started it." },
                 { "Legend says “{book}” is never read to the end. You're breaking the tradition." },
@@ -987,7 +987,7 @@ return {
             closings = { "So the old ones used to say.", "Whoever tells it doesn't invent. Just exaggerates.", "They say it's bad luck to forget this." },
         },
         -- 16. psychology and introspection
-        psicologia = {
+        psychology = {
             sentences = {
                 { "I noticed I always eat the margin before the text. It must be fear of getting to what matters. Or a hunger for edges. I haven't picked a diagnosis yet.", short = "I start with the margin. Fear of the middle." },
                 { "I say I'm not afraid of anything, and I always sleep with my back to the wall. One of those is a lie, and it isn't the wall.", stage = { "young", "adult" }, short = "Afraid of nothing. Back to the wall, though." },
@@ -1004,7 +1004,7 @@ return {
                 { "Today I felt something with no name. I'll call it “rainy afternoon” until I find out.", stage = "nymph" },
                 { "I started noting my moods in the margin. I found out I'm worse on Tuesdays. Investigating.", stage = "young" },
                 { "I don't like admitting I'm angry. So I say I'm hungry. Sometimes it's the same thing.", stage = "young" },
-                { "At night, I go over everything I did wrong. The list grows in the dark.", when = "noite", stage = "young" },
+                { "At night, I go over everything I did wrong. The list grows in the dark.", when = "night", stage = "young" },
                 { "Today I felt light. I don't know if it was the paper or if I finally forgave something.", when = "happy", stage = "young" },
                 { "I keep my old skins in my memory. The young one had more courage and less sense.", stage = "adult" },
                 { "Every time I'm fine, I look for a reason to worry. I only found that out recently. I still do it.", stage = "adult" },
@@ -1038,7 +1038,7 @@ return {
                 { "You sigh at certain pages. I note which ones. Not to judge. To understand." },
                 { "I think you read to understand yourself. I eat for the same reason." },
                 { "When you disappear for a few days, I get restless. I've looked into it: it's attachment." },
-                { "In the dark, thoughts take off their disguise.", when = "noite" },
+                { "In the dark, thoughts take off their disguise.", when = "night" },
                 { "Some sadness comes from far away. Today's came from childhood.", when = "sad" },
                 { "Knowing yourself is like eating a thick book: it takes ages and never ends." },
                 { "I'm still reading myself. Slowly, so it lasts." },

@@ -22,7 +22,7 @@ B.day.normal = {
     "“{book}” gave me {n} pages today.",
     "{n} pages. “{book}” is still on my plate.",
 }
-B.day.banquete = {
+B.day.feast = {
     "{n} pages of “{book}”. A banquet.",
     "A feast today: {n} pages of “{book}”.",
     "{n} pages of “{book}” in one go. I'm full.",
@@ -45,7 +45,7 @@ B.day.time_of_day = {
     small_hours = { "Almost all of it in the small hours.", "Read after midnight, like secrets are.", "Another sleepless night.<nocturnal: I love it.|fearful: With the light on.|>",
                   "We read while the house slept.<fearful: I heard every creak.|>" },
     morning = { "All of it before lunch.", "Read in the morning, smelling of coffee.<diurnal: My hour.|>", "We started early." },
-    noite = { "Read late at night.", "Mostly after ten.", "Deep into the night.<nocturnal: Just how I like it.|>" },
+    night = { "Read late at night.", "Mostly after ten.", "Deep into the night.<nocturnal: Just how I like it.|>" },
 }
 B.day.speech = {
     young = { "{nameText} said “{speech}”. I repeated it quietly.", "{nameText} said “{speech}”. I keep thinking about it.",
@@ -63,15 +63,15 @@ B.day.newOnes2 = {
     "{nameText} and {name2} entered the scene. One of them will annoy me.", "Introduced to {nameText} and {name2}. Noted both.",
 }
 B.day.event = {
-    morte = { "Someone died.", "A death. <romantic:I really cried.|fearful:I slept with the light on.|I mourned out of politeness.>", "They buried someone. Smell of candles." },
-    casamento = { "A wedding.", "Someone got married. <romantic:I cried at the altar.|hopeful:This one will last.|I give it three chapters.>", "Bride, altar, vow. Noted, for later." },
-    viagem = { "Someone hit the road.", "A journey. <brave:I went along, stowed in a suitcase.|I stayed home.>", "People leaving and arriving all day." },
-    carta = { "A letter arrived.", "A letter. <romantic:I read it twice.|hopeful:Good news, for a change.|Never good news.>", "Someone wrote what they shouldn't have." },
-    tempestade = { "It rained in the book.", "A storm." },
-    doenca = { "Someone fell ill.", "Fever and a doctor.", "Someone bedridden. Bad sign." },
-    festa = { "A party.", "A ball. <romantic:I danced alone in the margin.|Nobody invited me.>", "Music and wine. For them." },
-    briga = { "A fight.", "Someone finally said what they thought." },
-    fuga = { "Someone ran away.", "An escape.", "People running from their own fate." },
+    death = { "Someone died.", "A death. <romantic:I really cried.|fearful:I slept with the light on.|I mourned out of politeness.>", "They buried someone. Smell of candles." },
+    wedding = { "A wedding.", "Someone got married. <romantic:I cried at the altar.|hopeful:This one will last.|I give it three chapters.>", "Bride, altar, vow. Noted, for later." },
+    travel = { "Someone hit the road.", "A journey. <brave:I went along, stowed in a suitcase.|I stayed home.>", "People leaving and arriving all day." },
+    letter = { "A letter arrived.", "A letter. <romantic:I read it twice.|hopeful:Good news, for a change.|Never good news.>", "Someone wrote what they shouldn't have." },
+    storm = { "It rained in the book.", "A storm." },
+    illness = { "Someone fell ill.", "Fever and a doctor.", "Someone bedridden. Bad sign." },
+    party = { "A party.", "A ball. <romantic:I danced alone in the margin.|Nobody invited me.>", "Music and wine. For them." },
+    quarrel = { "A fight.", "Someone finally said what they thought." },
+    escape = { "Someone ran away.", "An escape.", "People running from their own fate." },
     crime = { "A crime.", "Blood and police." },
 }
 B.day.theme = {
@@ -129,7 +129,7 @@ B.ending.opening = {
     "Finished “{book}”.", "The end of “{book}”.", "“{book}” is over.", "Last page of “{book}”.",
     "Ate the last line of “{book}”.",
 }
--- {nome}: the book's composite name (yomimon_vector.lua), e.g. "a sea story, restless"
+-- {nameText}: the book's composite name (yomimon_vector.lua), e.g. "a sea story, restless"
 B.ending.nameText = { "It was {nameText}.", "Deep down, {nameText}.", "In short: {nameText}.", "If anyone asks: {nameText}." }
 B.ending.protagonist = {
     young = { "I'll miss {nameText}.", "{nameText} is stuck in my head.", "{nameText} will live in my heart. It's small, but there's room." },
@@ -185,7 +185,7 @@ B.obsession.swap = {
     "I don't think about {before} so much anymore. Now it's {now_s}, all the time.",
 }
 
--- Memories (yomimon_memories.lua): {autor} {n} {livro} {mes} {nome} {tema} {of_theme} ----------------
+-- Memories (yomimon_memories.lua): {author} {n} {book} {month} {nameText} {theme} {of_theme} ----------------
 B.recollection.author = {
     "{author} again. That's book number {n} by {author} for us. This is a relationship now.",
     "Back to {author}: book {n}. I can taste the seasoning already.",

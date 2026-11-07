@@ -1,6 +1,6 @@
 --[[--
 Diary phrase bank (Portuguese). Gaps: {n} pages, {book}, {book2}, {nameText}, {name2},
-{fala}, {tema} ("o mar"), {of_theme} ("do mar"), {autor}, {anterior}, {outro}, {ordinal}.
+{speech}, {theme} ("o mar"), {of_theme} ("do mar"), {author}, {previous}, {other}, {ordinal}.
 Never describe the reader with a gendered adjective.
 ]]
 
@@ -24,7 +24,7 @@ B.day.normal = {
     "“{book}” rendeu {n} páginas hoje.",
     "{n} páginas. “{book}” continua no meu prato.",
 }
-B.day.banquete = {
+B.day.feast = {
     "{n} páginas de “{book}”. Banquete.",
     "Hoje teve festa: {n} páginas de “{book}”.",
     "{n} páginas de “{book}” de uma vez. Tô de barriga cheia.",
@@ -47,7 +47,7 @@ B.day.time_of_day = {
     small_hours = { "Quase tudo de madrugada.", "Lido depois da meia-noite, como os segredos.", "Mais uma madrugada em claro.<nocturnal: Adoro.|fearful: Com a luz acesa.|>",
                   "Lemos enquanto a casa dormia.<fearful: Ouvi cada estalo.|>" },
     morning = { "Tudo antes do almoço.", "Lido de manhã, com cheiro de café.<diurnal: Meu horário.|>", "Começamos cedo." },
-    noite = { "Lido tarde da noite.", "Quase tudo depois das dez.", "Noite adentro.<nocturnal: Do jeito que eu gosto.|>" },
+    night = { "Lido tarde da noite.", "Quase tudo depois das dez.", "Noite adentro.<nocturnal: Do jeito que eu gosto.|>" },
 }
 B.day.speech = {
     young = { "{nameText} disse “{speech}”. Repeti baixinho.", "{nameText} falou “{speech}”. Fiquei pensando nisso.",
@@ -65,15 +65,15 @@ B.day.newOnes2 = {
     "{nameText} e {name2} entraram em cena. Um dos dois vai me irritar.", "Me apresentaram {nameText} e {name2}. Anotei os dois.",
 }
 B.day.event = {
-    morte = { "Alguém morreu.", "Teve morte. <romantic:Chorei de verdade.|fearful:Dormi de luz acesa.|Fiquei de luto por educação.>", "Enterraram alguém. Cheiro de vela." },
-    casamento = { "Teve casamento.", "Alguém casou. <romantic:Chorei no altar.|hopeful:Desta vez vai durar.|Dou três capítulos.>", "Noiva, altar, promessa. Anotei pra cobrar." },
-    viagem = { "Alguém pegou a estrada.", "Teve viagem. <brave:Fui junto, de carona na mala.|Eu fiquei.>", "Gente partindo e chegando o dia todo." },
-    carta = { "Chegou uma carta.", "Teve carta. <romantic:Li duas vezes.|hopeful:Era boa notícia, pra variar.|Nunca é boa notícia.>", "Alguém escreveu o que não devia." },
-    tempestade = { "Choveu no livro.", "Teve tempestade." },
-    doenca = { "Alguém adoeceu.", "Teve febre e médico.", "Gente de cama. Mau sinal." },
-    festa = { "Teve festa.", "Teve baile. <romantic:Dancei na margem, sem par.|Ninguém me chamou.>", "Música e vinho. Para eles." },
-    briga = { "Teve briga.", "Alguém finalmente disse o que pensava." },
-    fuga = { "Alguém fugiu.", "Teve fuga.", "Gente correndo do próprio destino." },
+    death = { "Alguém morreu.", "Teve morte. <romantic:Chorei de verdade.|fearful:Dormi de luz acesa.|Fiquei de luto por educação.>", "Enterraram alguém. Cheiro de vela." },
+    wedding = { "Teve casamento.", "Alguém casou. <romantic:Chorei no altar.|hopeful:Desta vez vai durar.|Dou três capítulos.>", "Noiva, altar, promessa. Anotei pra cobrar." },
+    travel = { "Alguém pegou a estrada.", "Teve viagem. <brave:Fui junto, de carona na mala.|Eu fiquei.>", "Gente partindo e chegando o dia todo." },
+    letter = { "Chegou uma carta.", "Teve carta. <romantic:Li duas vezes.|hopeful:Era boa notícia, pra variar.|Nunca é boa notícia.>", "Alguém escreveu o que não devia." },
+    storm = { "Choveu no livro.", "Teve tempestade." },
+    illness = { "Alguém adoeceu.", "Teve febre e médico.", "Gente de cama. Mau sinal." },
+    party = { "Teve festa.", "Teve baile. <romantic:Dancei na margem, sem par.|Ninguém me chamou.>", "Música e vinho. Para eles." },
+    quarrel = { "Teve briga.", "Alguém finalmente disse o que pensava." },
+    escape = { "Alguém fugiu.", "Teve fuga.", "Gente correndo do próprio destino." },
     crime = { "Teve crime.", "Sangue e polícia." },
 }
 B.day.theme = {

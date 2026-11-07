@@ -8,10 +8,10 @@ reviews, which pass from life to life) and remembers:
   level C (stored, mute)  probable genre and aura of the protagonist go in the review; "nothing so gloomy (or
                           light) since X" is computed but does not speak (WEATHER_SPEECH = false): the weather average
                           of a whole book puts Hamlet, Romeo and Juliet and Frankenstein among the lightest
-                          of the corpus. See ferramentas/validacao/MEMORIA-VINCULO.md.
+                          of the corpus.
 
 Each memory becomes a diary entry, the first Home phrase (once) and a structured record in
-s.lembrancas, which the memory ruler checks against what really happened.
+s.memories, which the memory ruler checks against what really happened.
 
 Pure logic (no KOReader), testable outside it.
 ]]
@@ -39,7 +39,7 @@ local function fill(template, v)
 end
 local function bank() return require("yomimon_diary").bank().recollection or {} end
 
---- Records a memory: diary, Home (once) and s.lembrancas.
+--- Records a memory: diary, Home (once) and s.memories.
 local function remember(s, M, kind, book, now, data, v)
     local list = bank()[kind]
     if not list or #list == 0 then return nil end
@@ -131,21 +131,21 @@ local function weatherSince(s, M, Lv, book, now)
     if not cal then return end
     local dark = media <= cal.gloomy
     if not dark and media < cal.light then return end
-    local ant = finishedList(s, book)
+    local earlier = finishedList(s, book)
     local function so_much(r) if dark then return r.weather <= media else return r.weather >= media end end
     local target
-    for k = #ant, 1, -1 do if so_much(ant[k]) then target = k; break end end
+    for k = #earlier, 1, -1 do if so_much(earlier[k]) then target = k; break end end
     if target then
-        local no_meio = #ant - target
-        local days = ((Lv.beginning or now) - (ant[target].ending or now)) / 86400
-        if no_meio >= BOOKS_BETWEEN and days >= DAYS_SINCE then
-            local r = ant[target]
+        local between = #earlier - target
+        local days = ((Lv.beginning or now) - (earlier[target].ending or now)) / 86400
+        if between >= BOOKS_BETWEEN and days >= DAYS_SINCE then
+            local r = earlier[target]
             Lv.weather_since = { kind = dark and "gloomy_since" or "light_since", book = r.book }
             if L.WEATHER_SPEECH then
                 remember(s, M, Lv.weather_since.kind, book, now, { book = r.book }, { book = r.book, month = month(r.ending) })
             end
         end
-    elseif #ant >= RECORD_BASE then
+    elseif #earlier >= RECORD_BASE then
         Lv.weather_since = { kind = dark and "gloomiest" or "lighter" }
         if L.WEATHER_SPEECH then remember(s, M, Lv.weather_since.kind, book, now, {}, { book = book }) end
     end
@@ -161,22 +161,22 @@ function L.page(s, M, Lv, book, now)
 end
 
 --- End of a book (after the review is stored): records and theme series.
--- serie: how many books in a row before this one had the same dominant theme.
+-- series: how many books in a row before this one had the same dominant theme.
 function L.bookEnd(s, M, book, now, series)
     local cur = s.reviews and s.reviews[#s.reviews]
     if not cur or cur.book ~= book then return end
-    local ant = {}
-    for i = 1, #s.reviews - 1 do ant[#ant + 1] = s.reviews[i] end
+    local earlier = {}
+    for i = 1, #s.reviews - 1 do earlier[#earlier + 1] = s.reviews[i] end
     if cur.theme and (series or 0) >= 2 then
         remember(s, M, "theme_series", book, now, { theme = cur.theme, n = series + 1 },
             { theme = M.theme(cur.theme), of_theme = M.theme(cur.theme, "de"), n = series + 1 })
     end
-    if #ant >= RECORD_BASE then
-        local function ppd(r) return r.pages / math.max(1, r.days or 1) end
+    if #earlier >= RECORD_BASE then
+        local function pages_per_day(r) return r.pages / math.max(1, r.days or 1) end
         local long, fast = true, true
-        for _, r in ipairs(ant) do
+        for _, r in ipairs(earlier) do
             if r.pages >= cur.pages then long = false end
-            if ppd(r) * FAST_MARGIN >= ppd(cur) then fast = false end
+            if pages_per_day(r) * FAST_MARGIN >= pages_per_day(cur) then fast = false end
         end
         if long then remember(s, M, "longest_record", book, now, {}, { book = book, n = cur.pages }) end
         if fast then remember(s, M, "fastest_record", book, now, {}, { book = book }) end
@@ -186,22 +186,22 @@ end
 -- Level C (stored, mute) -----------------------------------------------------------------
 
 local GENRES = {
-    terror = { "medo", "noite", "morte", "loucura" }, romance = { "amor", "familia" },
-    aventura = { "mar", "viagem", "animais" }, science_fiction = { "ciencia" },
-    tragedia = { "vinganca", "politica", "morte" },
+    horror = { "fear", "night", "death", "madness" }, romance = { "love", "family" },
+    adventure = { "sea", "travel", "animals" }, science_fiction = { "science" },
+    tragedy = { "revenge", "politics", "death" },
 }
 local AURAS = {
-    gloomy = { "medo", "morte", "loucura", "noite" }, romantico = { "amor" }, adventurer = { "mar", "viagem", "guerra" },
-    powerful = { "politica", "dinheiro" }, intellectual = { "saber", "ciencia", "arte" }, familiar = { "familia" },
+    gloomy = { "fear", "death", "madness", "night" }, romantic = { "love" }, adventurer = { "sea", "travel", "war" },
+    powerful = { "politics", "money" }, intellectual = { "knowledge", "science", "art" }, familiar = { "family" },
 }
 local function best(themes, groups)
-    local tot = 0
-    for _, c in pairs(themes or {}) do tot = tot + c end
-    if tot <= 0 then return nil end
+    local sum = 0
+    for _, c in pairs(themes or {}) do sum = sum + c end
+    if sum <= 0 then return nil end
     local l = {}
     for g, ts in pairs(groups) do
         local v = 0
-        for _, t in ipairs(ts) do v = v + (themes[t] or 0) / tot end
+        for _, t in ipairs(ts) do v = v + (themes[t] or 0) / sum end
         l[#l + 1] = { g, v }
     end
     table.sort(l, function(a, b) return a[2] > b[2] end)

@@ -5,7 +5,7 @@ Yomimon's diary: what it writes about your reading, with concrete things.
   book, at what time, who it met, a character's line, the event and the subject of the day.
 - When starting a book: a varied opening (author, same author as before, abandoned book, re-read).
 - When finishing a book: a short review (protagonist, comparison with other books, series of
-  themes, the trait the book moved, grade) — and the full review goes to s.resenhas.
+  themes, the trait the book moved, grade) — and the full review goes to s.reviews.
 
 The phrases live in yomimon_locales/<code>/data/diary.lua. Pure logic, testable outside KOReader.
 ]]
@@ -46,7 +46,7 @@ end
 --- Last page of the story, by the table of contents. Going backwards, it skips the appendix titles; the story ends
 -- right before the first of them. Backwards because a chapter of the story may be called "Notas"
 -- (Brás Cubas, XLV). Only the top level of the table of contents counts: the notes may have subtitles ("Capítulo 1"…).
--- toc: { { titulo =, pagina =, nivel = }, … } in the book's order; total: pages of the file.
+-- toc: { { titleText =, page =, level = }, … } in the book's order; total: pages of the file.
 -- Returns nil when the table of contents does not help (empty, only appendices, or appendices before the middle of the file).
 function Diary.storyEnd(toc, total)
     if type(toc) ~= "table" or not total or total < 1 then return nil end
@@ -105,12 +105,12 @@ function Diary.rollDay(s, M, now)
         if textValue then M.note(s, s.day.last or now, textValue) end
         s.day = nil
     end
-    s.day = s.day or { data = today, pages = 0, books = {}, order = {}, hours = { small_hours = 0, morning = 0, noite = 0 },
+    s.day = s.day or { data = today, pages = 0, books = {}, order = {}, hours = { small_hours = 0, morning = 0, night = 0 },
                        themes = {}, weather = 0, events = {} }
 end
 
 --- Counts a page on today's date.
--- contar: false when the page was already counted before and is now only digested.
+-- count: false when the page was already counted before and is now only digested.
 function Diary.page(s, book, signal, speeches, now, count)
     local D = s.day
     if not D then return end
@@ -124,7 +124,7 @@ function Diary.page(s, book, signal, speeches, now, count)
         local h = tonumber(os.date("%H", now))
         if h < 5 then D.hours.small_hours = D.hours.small_hours + 1
         elseif h < 11 then D.hours.morning = D.hours.morning + 1
-        elseif h >= 22 then D.hours.noite = D.hours.noite + 1 end
+        elseif h >= 22 then D.hours.night = D.hours.night + 1 end
     end
     for t, c in pairs(signal.heavy_themes or signal.themes or {}) do D.themes[t] = (D.themes[t] or 0) + c end
     for ev, c in pairs(signal.events or {}) do D.events[ev] = (D.events[ev] or 0) + c end
@@ -169,7 +169,7 @@ function Diary.dayEntry(s, M, D)
         opening = draws(B.two_books)
     elseif D.pages <= 5 then opening = draws(B.thin)
     elseif D.pages < 30 then opening = draws(B.normal)
-    elseif D.pages < 80 then opening = draws(B.banquete)
+    elseif D.pages < 80 then opening = draws(B.feast)
     else opening = draws(B.huge_one) end
     local parts = { fill(opening, v) }
     -- time, when a period dominated the day
@@ -191,8 +191,8 @@ function Diary.dayEntry(s, M, D)
     end
     local ev, n_ev = biggestOf(D.events)
     if ev and n_ev >= 4 and B.event[ev] then detail(draws(B.event[ev]), 3) end
-    local theme, n_tema = biggestOf(D.themes)
-    if theme and n_tema >= 5 and M.theme then
+    local theme, n_theme = biggestOf(D.themes)
+    if theme and n_theme >= 5 and M.theme then
         detail(fill(draws(B.theme), { theme = M.theme(theme), of_theme = M.theme(theme, "de") }), 1)
     end
     local weather = D.weather / D.pages
@@ -231,7 +231,7 @@ end
 
 -- Start and end of a book --------------------------------------------------------
 
---- Entry of a new book. anterior: the book it had been eating before (or nil).
+--- Entry of a new book. previous: the book it had been eating before (or nil).
 function Diary.bookStart(s, M, book, where, previous)
     local B = Diary.bank().beginning
     local v = { book = book, author = where and where.author, previous = previous }
@@ -267,7 +267,7 @@ local function bookTrait(s, L)
     return best
 end
 
---- Closes a finished book: writes the short review in the diary and stores the full one in s.resenhas.
+--- Closes a finished book: writes the short review in the diary and stores the full one in s.reviews.
 function Diary.bookEnd(s, M, book, now)
     local L = s.books and s.books[book]
     if not L then return end
@@ -282,8 +282,8 @@ function Diary.bookEnd(s, M, book, now)
     local weather = (L.weather or 0) / math.max(1, L.pages)
     local days = L.days or 1
     -- grade: half by the pace you read at, half by the book's intensity (events and weather)
-    local ppd = L.pages / math.max(1, days)
-    local pace = ppd < 10 and 1 or ppd < 20 and 2 or ppd < 30 and 3 or ppd < 45 and 4 or 5
+    local pages_per_day = L.pages / math.max(1, days)
+    local pace = pages_per_day < 10 and 1 or pages_per_day < 20 and 2 or pages_per_day < 30 and 3 or pages_per_day < 45 and 4 or 5
     local n_events = 0
     for _, c in pairs(L.events or {}) do n_events = n_events + c end
     local intensity = n_events / math.max(1, L.pages) * 2 + math.abs(weather)
@@ -301,8 +301,8 @@ function Diary.bookEnd(s, M, book, now)
     end
 
     -- the book's compound name (book vector, yomimon_vector.lua): "a sea story, restless"
-    local okV, Vector = pcall(require, "yomimon_vector")
-    local nameText = okV and Vector.nameText(Vector.de(L)) or nil
+    local okVersion, Vector = pcall(require, "yomimon_vector")
+    local nameText = okVersion and Vector.nameText(Vector.de(L)) or nil
 
     local parts = { fill(draws(B.opening), { book = book }) }
     if nameText and B.nameText then parts[#parts + 1] = fill(draws(B.nameText), { nameText = nameText }) end
@@ -333,14 +333,14 @@ function Diary.bookEnd(s, M, book, now)
     }
     while #s.reviews > REVIEWS_MAX do table.remove(s.reviews, 1) end
     -- the book's words (step 5): finished, keeps only the most counted
-    if M.pruneVocab then M.pruneVocab(L, M.VOCAB_FIM) end
-    local okLem, Mem = pcall(require, "yomimon_memories")
-    if okLem then
+    if M.pruneVocab then M.pruneVocab(L, M.VOCAB_FINISHED) end
+    local okMemories, Memories = pcall(require, "yomimon_memories")
+    if okMemories then
         -- level C, stored and mute: probable genre and aura of the protagonist
         local r = s.reviews[#s.reviews]
-        r.gender = Mem.gender(L.themes)
-        r.aura = protagonist and L.aura and L.aura[protagonist] and Mem.aura(L.aura[protagonist]) or nil
-        Mem.bookEnd(s, M, book, now, series)
+        r.gender = Memories.gender(L.themes)
+        r.aura = protagonist and L.aura and L.aura[protagonist] and Memories.aura(L.aura[protagonist]) or nil
+        Memories.bookEnd(s, M, book, now, series)
     end
     -- names: only the final list of characters and places stays; the evidence leaves the saved state
     if M.freezeNames then M.freezeNames(L, book) end
@@ -360,7 +360,7 @@ function Diary.followBook(s, M, L, book, where, now)
         M.note(s, now, Diary.reread(book))
     end
     L.progress = p
-    -- end: the last page of the story (onde.story_end, by the table of contents, in main.lua); without it, 98% of the file
+    -- end: the last page of the story (where.story_end, by the table of contents, in main.lua); without it, 98% of the file
     if p >= (where.story_end or BOOK_END) and not L.finished then
         L.finished, L.rereading_now = true, nil
         Diary.bookEnd(s, M, book, now)
@@ -374,7 +374,7 @@ end
 function Diary.koreaderStatus(s, M, book, status, now)
     local L = book and s.books and s.books[book]
     if not L then return end
-    status = type(status) == "string" and status or "nenhum"
+    status = type(status) == "string" and status or "none"
     local before = L.koreader_status
     L.koreader_status = status
     if status == "complete" and before and before ~= "complete" and not L.finished then

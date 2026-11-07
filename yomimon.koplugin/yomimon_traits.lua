@@ -2,11 +2,11 @@
 Yomimon's personality traits: they move slowly with what YOU read.
 
 Five axes, from -100 to 100:
-  humor    amarga  ↔ otimista   (tragedies, deaths ↔ love, parties, weddings)
-  coragem  medrosa ↔ corajosa   (horror, crimes ↔ sea, travel, adventures)
-  coracao  cínica  ↔ romântica  (money, politics, revenge ↔ love, weddings, letters)
-  gosto    popular ↔ erudita    (crimes, parties ↔ philosophy, art, science, faith)
-  relogio  diurna  ↔ noturna    (the time you read)
+  mood    bitter  ↔ hopeful   (tragedies, deaths ↔ love, parties, weddings)
+  courage  fearful ↔ brave   (horror, crimes ↔ sea, travel, adventures)
+  heart  cínica  ↔ romântica  (money, politics, revenge ↔ love, weddings, letters)
+  taste    popular ↔ erudite    (crimes, parties ↔ philosophy, art, science, faith)
+  clock  diurnal  ↔ nocturnal    (the time you read)
 
 Only pages really eaten move the traits (never what it knows of the book ahead).
 Each page pushes by the DIFFERENCE from an average page (yomimon_base_traits.lua): family and love in an old
@@ -32,7 +32,7 @@ Traits.LIST = {
     { id = "taste",   neg = "popular", pos = "erudite" },
     { id = "clock", neg = "diurnal",  pos = "nocturnal" },
 }
-Traits.PASSO = 0.5          -- how much a page can move a trait
+Traits.STEP = 0.5          -- how much a page can move a trait
 Traits.DECAY = 0.998   -- on each page, everything returns a little to the middle
 Traits.STRIKING = 25        -- from here up the trait shows in the phrases and in the diary
 Traits.STRONG = 60
@@ -47,28 +47,28 @@ local LABEL = {
 -- What each page signal pushes (positive = the axis' "pos" pole).
 local WEIGHTS = {
     mood = {
-        themes = { morte = -1, guerra = -1, solidao = -1, vinganca = -1, medo = -0.5, loucura = -1, dinheiro = -0.5,
-                  amor = 1, natureza = 0.5, comida = 1, infancia = 0.5, arte = 0.5, viagem = 0.5 },
-        events = { morte = -2, doenca = -1, crime = -1, briga = -0.5, festa = 1.5, casamento = 1.5 },
-        -- (27/10/2026, PLANO-VOZ.md step 6: madness -0.5 → -1 and money -0.5, so tragedy leaves it bitter
+        themes = { death = -1, war = -1, solitude = -1, revenge = -1, fear = -0.5, madness = -1, money = -0.5,
+                  love = 1, nature = 0.5, food = 1, childhood = 0.5, art = 0.5, travel = 0.5 },
+        events = { death = -2, illness = -1, crime = -1, quarrel = -0.5, party = 1.5, wedding = 1.5 },
+        -- (27/10/2026, madness -0.5 → -1 and money -0.5, so tragedy leaves it bitter
         -- and not just fearful like horror; Crime and Punishment, Hamlet and Macbeth are madness, guilt and money)
         -- (without weather: the old list pulled horror towards optimistic; the dictionary orders short passages well,
         -- but leaves Shakespeare and Victorian prose "light" — Hamlet and Romeo were less bitter with it.
-        -- Out since 25/10/2026; see ferramentas/validacao/MEMORIA-VINCULO.md)
+        -- Out since 25/10/2026)
     },
     courage = {
-        themes = { medo = -1.5, loucura = -0.5, noite = -0.3, viagem = 1, mar = 1, liberdade = 1, guerra = 0.5 },
-        events = { fuga = -0.5, tempestade = 0.5, viagem = 1 },
+        themes = { fear = -1.5, madness = -0.5, night = -0.3, travel = 1, sea = 1, freedom = 1, war = 0.5 },
+        events = { escape = -0.5, storm = 0.5, travel = 1 },
         -- (crime left on 27/10/2026: crime and investigation, from Sherlock to Crime and Punishment, are not stories of
         -- fear; crime still leaves it bitter and a little cynical)
     },
     heart = {
-        themes = { amor = 1.5, arte = 0.5, familia = 0.5, dinheiro = -1, politica = -1, vinganca = -1 },
-        events = { casamento = 1.5, carta = 0.5, briga = -0.5, crime = -0.5 },
+        themes = { love = 1.5, art = 0.5, family = 0.5, money = -1, politics = -1, revenge = -1 },
+        events = { wedding = 1.5, letter = 0.5, quarrel = -0.5, crime = -0.5 },
     },
     taste = {
-        themes = { saber = 1, arte = 1, fe = 0.5, ciencia = 0.5 },
-        events = { crime = -0.5, festa = -0.3 },
+        themes = { knowledge = 1, art = 1, faith = 0.5, science = 0.5 },
+        events = { crime = -0.5, party = -0.3 },
     },
 }
 
@@ -78,8 +78,8 @@ local function limitTo(v, a) return math.max(-a, math.min(a, v)) end
 
 -- Average push of a page, by language: what every book has does not shape it.
 Traits.CENTERED = { "mood", "courage", "heart", "taste" }
-local okB, BASE = pcall(require, "yomimon_base_traits")
-Traits.BASE = okB and type(BASE) == "table" and BASE or nil
+local okBase, BASE = pcall(require, "yomimon_base_traits")
+Traits.BASE = okBase and type(BASE) == "table" and BASE or nil
 
 local bank
 --- Phrases and diary notes of the traits, in the current language.
@@ -105,8 +105,8 @@ local function levelWithSlack(v, current)
     return target
 end
 
---- How much a page pushes each axis (from -1 to 1). hora: the local time of reading.
--- bruto: without discounting the average page (to compute the average and for diagnosis).
+--- How much a page pushes each axis (from -1 to 1). hour: the local time of reading.
+-- raw: without discounting the average page (to compute the average and for diagnosis).
 function Traits.push(signal, hour, raw)
     local out = {}
     for id, P in pairs(WEIGHTS) do
@@ -134,8 +134,8 @@ function Traits.push(signal, hour, raw)
     return out, absent
 end
 
---- Average push of a page, by language, over a corpus (lines of livros30.txt; `excluded`: books to
--- ignore). Used by ferramentas/validacao/calcular_base_tracos.lua and by the personality ruler.
+--- Average push of a page, by language, over a corpus (lines of the corpus file; `excluded`: books to
+-- ignore). Used by the personality ruler.
 function Traits.pagesAverage(M, lines, excluded)
     local sum, n, book = { en = {}, pt = {} }, { en = 0, pt = 0 }, nil
     for line in lines do
@@ -181,7 +181,7 @@ function Traits.digest(s, signal, now, book)
     local notes = {}
     for _, tr in ipairs(Traits.LIST) do
         local current = (s.traits[tr.id] or 0) * Traits.DECAY
-        local v = limitTo(current + (tie[tr.id] or 0) * Traits.PASSO, 100)
+        local v = limitTo(current + (tie[tr.id] or 0) * Traits.STEP, 100)
         -- page with nothing for this axis: the average discount only undoes excess (pulls towards neutral),
         -- never leads to the opposite pole
         if absent and absent[tr.id] then
@@ -209,7 +209,7 @@ function Traits.digest(s, signal, now, book)
     return notes
 end
 
---- Striking poles, from strongest to weakest: { {polo, valor}, ... }.
+--- Striking poles, from strongest to weakest: { {pole, val}, ... }.
 function Traits.strikings(traits)
     local list = {}
     for _, tr in ipairs(Traits.LIST) do
@@ -236,7 +236,7 @@ function Traits.labels(traits, max)
 end
 
 --- A phrase in the way it ended up, or nil. The stronger the trait, the more it shows
--- (at most 4 in every 10 phrases). temperamento: "jovem" or "velha".
+-- (at most 4 in every 10 phrases). temperament: "young" or "old".
 function Traits.speech(s, temperament, draw)
     draw = draw or math.random
     local strongOnes = Traits.strikings(s.traits)

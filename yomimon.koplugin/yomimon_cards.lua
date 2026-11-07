@@ -2,9 +2,9 @@
 Card box: phrases written by you for the right moments (yomimon_locales/<code>/data/cards.lua).
 
 When a chapter talks about a subject (yomimon_memory.lua, M.chapterCard), the first card that fits
-is stored in s.pending_card. It becomes the next Home phrase for up to 24 hours (State.fala). If it does
+is stored in s.pending_card. It becomes the next Home phrase for up to 24 hours (State.speech). If it does
 not fit in the Home's 2 lines, it waits for the Yomimon screen (State.speechThatFits marks `did_not_fit`). When it says the
-phrase, the card records what it has to record (s.gravado) and, if it is one-time, enters s.said_cards.
+phrase, the card records what it has to record (s.stored) and, if it is one-time, enters s.said_cards.
 Both live its life: a fresh start begins without them.
 ]]
 
@@ -37,9 +37,9 @@ local function serve(s, c, subjects, data)
     return true
 end
 
---- A chapter talked about `subjects` ({ pressagio = true, … }): stores the first card that fits.
--- dados: { personagem = name of who appears most in the chapter (or nil), fase = "jovem"… }. A card with
--- {personagem} without a character does not fit. While a stored card has not been said, no other enters.
+--- A chapter talked about `subjects` ({ omen = true, … }): stores the first card that fits.
+-- data: { character = name of who appears most in the chapter (or nil), stage = "young"… }. A card with
+-- {character} without a character does not fit. While a stored card has not been said, no other enters.
 -- Returns true if it stored one.
 function Cards.chapter(s, subjects, data, now, book)
     local p = s.pending_card
@@ -51,8 +51,8 @@ function Cards.chapter(s, subjects, data, now, book)
                 textValue = data.character and textValue:gsub("{character}", (data.character:gsub("%%", "%%%%"))) or nil
             end
             if textValue then
-                local okV, Voice = pcall(require, "yomimon_voice")
-                if okV then textValue = (Voice.resolver(textValue, s)) end
+                local okVersion, Voice = pcall(require, "yomimon_voice")
+                if okVersion then textValue = (Voice.resolver(textValue, s)) end
                 s.pending_card = { id = c.id, textValue = textValue, t = now, book = book, records = c.records,
                                       once = c.once or nil }
                 return true

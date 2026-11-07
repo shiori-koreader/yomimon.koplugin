@@ -47,10 +47,10 @@ end
 --- Lines of the sprite already stored, or nil.
 function Download.loadFile(dex)
     if loaded[dex] then return loaded[dex] end
-    local fileh = io.open(path(dex), "rb")
-    if not fileh then return nil end
-    local lines = Sprite.readFile(fileh:read("*a"))
-    fileh:close()
+    local file_handle = io.open(path(dex), "rb")
+    if not file_handle then return nil end
+    local lines = Sprite.readFile(file_handle:read("*a"))
+    file_handle:close()
     loaded[dex] = lines
     return lines
 end
@@ -92,10 +92,10 @@ end
 
 --- Pokédex description in English (PokeAPI has no Portuguese), already stored, or nil.
 function Download.description(dex)
-    local fileh = io.open(descriptionPath(dex), "rb")
-    if not fileh then return nil end
-    local textValue = fileh:read("*a")
-    fileh:close()
+    local file_handle = io.open(descriptionPath(dex), "rb")
+    if not file_handle then return nil end
+    local textValue = file_handle:read("*a")
+    file_handle:close()
     return textValue ~= "" and textValue or nil
 end
 
@@ -116,13 +116,13 @@ function Download.downloadDescription(dex)
     if Download.description(dex) then return true end
     local ok, data = pcall(fetch, dex, SPECIES_URL)
     if not ok or not data then return nil end
-    local okd, textValue = pcall(Download.extractDescription, data)
-    if not okd or not textValue or textValue == "" then return nil end
+    local okText, textValue = pcall(Download.extractDescription, data)
+    if not okText or not textValue or textValue == "" then return nil end
     require("util").makePath(Download.folder())
-    local fileh = io.open(descriptionPath(dex), "wb")
-    if not fileh then return nil end
-    fileh:write(textValue)
-    fileh:close()
+    local file_handle = io.open(descriptionPath(dex), "wb")
+    if not file_handle then return nil end
+    file_handle:write(textValue)
+    file_handle:close()
     return true
 end
 
@@ -135,17 +135,17 @@ local function downloadSprite(dex)
         logger.warn("Yomimon: could not download the sprite", dex, err)
         return nil, err
     end
-    local okd, lines, errd = pcall(decode, data)
-    if not okd then lines, errd = nil, lines end
+    local okText, lines, errd = pcall(decode, data)
+    if not okText then lines, errd = nil, lines end
     if not lines then
         logger.warn("Yomimon: could not convert the sprite", dex, errd)
         return nil, errd
     end
     require("util").makePath(Download.folder())
-    local fileh, errorText = io.open(path(dex), "wb")
-    if not fileh then return nil, errorText end
-    fileh:write(Sprite.store(lines))
-    fileh:close()
+    local file_handle, errorText = io.open(path(dex), "wb")
+    if not file_handle then return nil, errorText end
+    file_handle:write(Sprite.store(lines))
+    file_handle:close()
     loaded[dex] = lines
     return true
 end

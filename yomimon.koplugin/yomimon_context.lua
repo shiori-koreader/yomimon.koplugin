@@ -2,8 +2,8 @@
 Phrases with data from your reading: time, pages today, record, streak of days,
 non-stop session, days away and what part of the book you are in.
 
-Each trigger looks at the state (filled by State.comer) and, if it applies, offers phrases
-with gaps: {hora} ("2h13" / "2:13 a.m."), {n} (pages or days), {livro}, {pct}.
+Each trigger looks at the state (filled by State.eat) and, if it applies, offers phrases
+with gaps: {hour} ("2h13" / "2:13 a.m."), {n} (pages or days), {book}, {pct}.
 "Strong" triggers (small hours, record, marathon, vanishing) usually beat the other phrases.
 
 Pure logic (no KOReader), testable outside it.
@@ -16,7 +16,7 @@ local Context = {}
 
 local READING_NOW = 30 * 60   -- read in the last 30 min: it is reading now
 
--- Phrases by trigger and temperament ("jovem" = ninfa and jovem; "velha" = adulta and anciã).
+-- Phrases by trigger and temperament ("young" = nymph and young; "old" = adult and elder).
 local SPEECHES = Language.content("context")
 
 Language.append(SPEECHES, Language.extra("context"))  -- new batches of phrases
@@ -26,7 +26,7 @@ function Context.hour(now)
     return Language.format().clock(os.date("*t", now))
 end
 
---- Triggers that apply now, each { nome, n, forte }, the strong ones first.
+--- Triggers that apply now, each { nameText, n, strong }, the strong ones first.
 function Context.triggers(s, now)
     local list = {}
     local function add(nameText, n, strong) list[#list + 1] = { nameText = nameText, n = n, strong = strong or false } end
@@ -59,7 +59,7 @@ function Context.triggers(s, now)
 end
 
 --- A phrase with reading data, or nil. Also returns whether the trigger is strong.
--- temperamento: "jovem" or "velha". sorteio(n) returns an integer from 1 to n.
+-- temperament: "young" or "old". draw(n) returns an integer from 1 to n.
 function Context.speech(s, now, temperament, draw)
     draw = draw or math.random
     local list = Context.triggers(s, now)
@@ -71,7 +71,7 @@ function Context.speech(s, now, temperament, draw)
         hour = Context.hour(now), n = g.n and tostring(g.n),
         book = s.last_book, pct = g.n and (g.n .. "%"),
     }
-    -- domain words ({gosto}, {cheiro}…) are left to the voice resolver (yomimon_voice.lua)
+    -- domain words ({taste}, {smell}…) are left to the voice resolver (yomimon_voice.lua)
     local textValue = Voice.pick(bank, s, draw):gsub("{(%a+)}", function(b)
         if values[b] then return values[b] end
         if Voice.SLOTS[b] then return nil end

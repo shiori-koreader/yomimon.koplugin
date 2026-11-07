@@ -3,8 +3,8 @@ The 16 literary influences (since 28/10/2026). A single structure for all: each 
 over what the book vector already measures (yomimon_vector.lua). Nothing here detects anything new.
 
 Ingredients of the recipe (each becomes a number from 0 to 1 for the current book):
-  <tema>        one of the 24 themes, how much the book has ABOVE the average page ("medo", "amor", "ciencia"…)
-  ev_<evento>   happenings per page ("ev_crime", "ev_casamento"…)
+  <theme>        one of the 24 themes, how much the book has ABOVE the average page ("fear", "love", "science"…)
+  ev_<event>   happenings per page ("ev_crime", "ev_wedding"…)
   _gloomy      tone well below the average book      _light        tone well above
   _long_sentence  sentences much longer than average    _short_sentence sentences much shorter
   _theatre       the book is a play                    _first_person    narrated by an "I"
@@ -17,38 +17,38 @@ are weak on purpose (they add up to 0.5 to 0.85) and use only indirect hints.
 
 return {
     -- narrative
-    { id = "epica", nameText = "fantasia épica", group = "narrativa",
-      recipe = { guerra = 0.5, vinganca = 0.2, viagem = 0.15, fe = 0.15 } },
-    { id = "misterio", nameText = "mistério e investigação", group = "narrativa",
-      recipe = { ev_crime = 0.5, cidade = 0.15, noite = 0.15, medo = 0.1, morte = 0.1 } },
-    { id = "horror", nameText = "horror e gótico", group = "narrativa",
-      recipe = { medo = 0.4, noite = 0.25, loucura = 0.15, morte = 0.1, _gloomy = 0.1 } },
-    { id = "romance", nameText = "romance e drama afetivo", group = "narrativa",
-      recipe = { amor = 0.5, ev_casamento = 0.25, ev_carta = 0.15, familia = 0.1 } },
-    { id = "aventura", nameText = "aventura e exploração", group = "narrativa",
-      recipe = { viagem = 0.35, mar = 0.3, natureza = 0.15, ev_viagem = 0.1, ev_fuga = 0.1 } },
-    { id = "ficcao", nameText = "ficção científica e distopia", group = "narrativa",
-      recipe = { ciencia = 0.55, tempo = 0.15, politica = 0.1, cidade = 0.1, saber = 0.1 } },
-    { id = "magico", nameText = "realismo mágico e fantástico", group = "narrativa",
-      recipe = { infancia = 0.1, familia = 0.1, tempo = 0.1, fe = 0.1, natureza = 0.1 } },
-    { id = "satira", nameText = "sátira e comédia", group = "narrativa",
-      recipe = { _light = 0.25, politica = 0.25, dinheiro = 0.15, cidade = 0.1, ev_festa = 0.1 } },
+    { id = "epic", nameText = "epic fantasy", group = "narrative",
+      recipe = { war = 0.5, revenge = 0.2, travel = 0.15, faith = 0.15 } },
+    { id = "mystery", nameText = "mystery and investigation", group = "narrative",
+      recipe = { ev_crime = 0.5, city = 0.15, night = 0.15, fear = 0.1, death = 0.1 } },
+    { id = "horror", nameText = "horror and gothic", group = "narrative",
+      recipe = { fear = 0.4, night = 0.25, madness = 0.15, death = 0.1, _gloomy = 0.1 } },
+    { id = "romance", nameText = "romance and emotional drama", group = "narrative",
+      recipe = { love = 0.5, ev_wedding = 0.25, ev_letter = 0.15, family = 0.1 } },
+    { id = "adventure", nameText = "adventure and exploration", group = "narrative",
+      recipe = { travel = 0.35, sea = 0.3, nature = 0.15, ev_travel = 0.1, ev_escape = 0.1 } },
+    { id = "science_fiction", nameText = "science fiction and dystopia", group = "narrative",
+      recipe = { science = 0.55, time = 0.15, politics = 0.1, city = 0.1, knowledge = 0.1 } },
+    { id = "magical", nameText = "magical realism and the fantastic", group = "narrative",
+      recipe = { childhood = 0.1, family = 0.1, time = 0.1, faith = 0.1, nature = 0.1 } },
+    { id = "satire", nameText = "satire and comedy", group = "narrative",
+      recipe = { _light = 0.25, politics = 0.25, money = 0.15, city = 0.1, ev_party = 0.1 } },
     -- stylistic and dramatic
-    { id = "poesia", nameText = "poesia e lirismo", group = "estilistica",
-      recipe = { arte = 0.35, natureza = 0.2, _short_sentence = 0.15, noite = 0.1 } },
-    { id = "tragedia", nameText = "tragédia", group = "estilistica",
-      recipe = { morte = 0.25, ev_morte = 0.2, _theatre = 0.2, vinganca = 0.15, _gloomy = 0.1, loucura = 0.1 } },
-    { id = "social", nameText = "realismo social", group = "estilistica",
-      recipe = { dinheiro = 0.35, cidade = 0.25, politica = 0.15, comida = 0.1, _gloomy = 0.15 } },
-    { id = "existencial", nameText = "existencialismo e absurdo", group = "estilistica",
-      recipe = { solidao = 0.3, liberdade = 0.25, _gloomy = 0.15, morte = 0.1, loucura = 0.1, _first_person = 0.1 } },
+    { id = "poetry", nameText = "poetry and lyricism", group = "stylistic",
+      recipe = { art = 0.35, nature = 0.2, _short_sentence = 0.15, night = 0.1 } },
+    { id = "tragedy", nameText = "tragedy", group = "stylistic",
+      recipe = { death = 0.25, ev_death = 0.2, _theatre = 0.2, revenge = 0.15, _gloomy = 0.1, madness = 0.1 } },
+    { id = "social", nameText = "social realism", group = "stylistic",
+      recipe = { money = 0.35, city = 0.25, politics = 0.15, food = 0.1, _gloomy = 0.15 } },
+    { id = "existential", nameText = "existentialism and the absurd", group = "stylistic",
+      recipe = { solitude = 0.3, freedom = 0.25, _gloomy = 0.15, death = 0.1, madness = 0.1, _first_person = 0.1 } },
     -- interpretative
-    { id = "filosofia", nameText = "filosofia e metafísica", group = "interpretativa",
-      recipe = { saber = 0.4, fe = 0.2, liberdade = 0.15, tempo = 0.15, ciencia = 0.1 } },
-    { id = "niilismo", nameText = "niilismo e ceticismo", group = "interpretativa",
-      recipe = { _gloomy = 0.25, morte = 0.15, solidao = 0.1 } },
-    { id = "mito", nameText = "mito e folclore", group = "interpretativa",
-      recipe = { fe = 0.25, animais = 0.2, natureza = 0.2, infancia = 0.1, noite = 0.05 } },
-    { id = "psicologia", nameText = "psicologia e introspecção", group = "interpretativa",
-      recipe = { loucura = 0.3, _first_person = 0.15, solidao = 0.15, medo = 0.1, familia = 0.1, _long_sentence = 0.1 } },
+    { id = "philosophy", nameText = "philosophy and metaphysics", group = "interpretive",
+      recipe = { knowledge = 0.4, faith = 0.2, freedom = 0.15, time = 0.15, science = 0.1 } },
+    { id = "nihilism", nameText = "nihilism and skepticism", group = "interpretive",
+      recipe = { _gloomy = 0.25, death = 0.15, solitude = 0.1 } },
+    { id = "myth", nameText = "myth and folklore", group = "interpretive",
+      recipe = { faith = 0.25, animals = 0.2, nature = 0.2, childhood = 0.1, night = 0.05 } },
+    { id = "psychology", nameText = "psychology and introspection", group = "interpretive",
+      recipe = { madness = 0.3, _first_person = 0.15, solitude = 0.15, fear = 0.1, family = 0.1, _long_sentence = 0.1 } },
 }

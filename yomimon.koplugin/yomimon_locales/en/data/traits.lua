@@ -1,6 +1,6 @@
 --[[--
 Trait phrase bank (English). Same structure as the Portuguese one; adapted, not translated
-palavra por palavra.
+word por word.
 ]]
 
 local B = { speeches = {}, diary = {} }

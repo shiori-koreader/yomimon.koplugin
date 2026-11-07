@@ -51,14 +51,14 @@ end
 
 -- Card shape by aspect ratio (the same limits as Bookshelf).
 local function formOf(w, h)
-    if not h or h <= 0 then return "quadrado" end
+    if not h or h <= 0 then return "square" end
     local r = w / h
-    if r >= 1.6 then return "largo" end
-    if r <= 0.7 then return "alto" end
-    return "quadrado"
+    if r >= 1.6 then return "wide" end
+    if r <= 0.7 then return "tall" end
+    return "square"
 end
 
-local FORMS = { wide = "largo", tall = "alto", square = "quadrado" }
+local FORMS = { wide = "wide", tall = "tall", square = "square" }
 
 -- Balloon text ------------------------------------------------------------------
 
@@ -67,8 +67,8 @@ local CHANGE_SECONDS = 20 * 60
 local ATTEMPTS = 12
 local cache = {}
 
-local function font(tam_px)
-    return Font:getFace("cfont", tam_px / (Screen:scaleBySize(1000) / 1000))
+local function font(size_px)
+    return Font:getFace("cfont", size_px / (Screen:scaleBySize(1000) / 1000))
 end
 
 local function countLines(textValue, face, widthPx)
@@ -129,17 +129,17 @@ end
 
 -- Pixel balloon -------------------------------------------------------------------
 
--- The same balloon as the Yomimon screen (YomimonScreen:balao, Figma 28:5911): border of 3, pixel shadow on the right and
+-- The same balloon as the Yomimon screen (YomimonScreen:balloon, Figma 28:5911): border of 3, pixel shadow on the right and
 -- below, tail in the middle at the bottom. The measures are Figma's, in points; the balloon's "pixel" (u) is 3
 -- points. bw and bh are the width and height of the balloon without the shadow and the tail.
 local function paintBalloon(bb, bx, by, bw, bh, u)
     local BLACK, WHITE = Blitbuffer.COLOR_BLACK, Blitbuffer.COLOR_WHITE
     local k = u / 3
     local W, H = bw / k, bh / k
-    local function r(rx, ry, rw, rh, cor)
+    local function r(rx, ry, rw, rh, color)
         local x0, y0 = bx + math.floor(rx * k + 0.5), by + math.floor(ry * k + 0.5)
         local x1, y1 = bx + math.floor((rx + rw) * k + 0.5), by + math.floor((ry + rh) * k + 0.5)
-        bb:paintRect(x0, y0, x1 - x0, y1 - y0, cor)
+        bb:paintRect(x0, y0, x1 - x0, y1 - y0, color)
     end
     local t = math.floor(W / 2) - 7          -- start of the tail
     r(3, 3, W - 6, H - 3, WHITE)            -- background
@@ -223,9 +223,9 @@ local function paintDrawing(bb, nameText, x, y, scale)
             local k = i
             while k < n and line:sub(k + 1, k + 1) == tone do k = k + 1 end
             if tone == "3" and j >= shadow_since then tone = SHADOW_TONE end
-            local cor = TONES[tone]
-            if cor then
-                bb:paintRect(x + (i - 1) * scale, y + (j - 1) * scale, (k - i + 1) * scale, scale, cor)
+            local color = TONES[tone]
+            if color then
+                bb:paintRect(x + (i - 1) * scale, y + (j - 1) * scale, (k - i + 1) * scale, scale, color)
             end
             i = k + 1
         end
@@ -255,7 +255,7 @@ local Card = Widget:extend{
     plugin = nil,
     widthPx = 0,
     heightPx = 0,
-    form = "largo",
+    form = "wide",
     shelf = false,    -- standing on the shelf, among the books
     covers = false,      -- on the covers shelf: at mid height, like the covers, instead of standing
     drawing_only = false, -- in the list of modules to add: only Yomimon, without a phrase
@@ -288,7 +288,7 @@ function Card:paintTo(bb, x, y)
     -- card; on the shelf, where the shelf height is large, already from 56 "pixels" of width, so
     -- Yomimon does not take the whole shelf. Below 70, the font is the smallest of the Simple UI card.
     local balloon
-    local wants_balloon = self.form == "largo" or (self.shelf and w >= 56 * u)
+    local wants_balloon = self.form == "wide" or (self.shelf and w >= 56 * u)
     if plugin and not self.drawing_only and wants_balloon then
         local pad_x, pad_y = 4 * u, 3 * u
         local bw = math.min(w - 4 * u, 90 * u)
@@ -320,8 +320,8 @@ function Card:paintTo(bb, x, y)
     end
     local scale = math.max(1, scaleFor(h - fallback))
     local total = above + box.h * scale
-    local em_pe = self.shelf and not self.covers
-    local top = em_pe and (y + h - total) or (y + math.floor((h - total) / 2))
+    local standing = self.shelf and not self.covers
+    local top = standing and (y + h - total) or (y + math.floor((h - total) / 2))
     if self.lookupKey then
         drawn[self.lookupKey] = { sprite = Drawing.resolver(sprite), speech = balloon ~= nil, mark = cache.mark, t = cache.t }
     end

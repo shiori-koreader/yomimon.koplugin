@@ -8,8 +8,11 @@
 - **Progress from 1.0.x is not carried over**: the saved state uses new field names, so Yomimon starts fresh
   (the old `settings/yomimon.lua` is simply ignored). Sprites already downloaded are kept. The Simple UI home card
   and quick-menu button and any gesture bound to Yomimon have to be set up again.
-- What stays Portuguese on purpose: the theme, event, subject and influence ids (`mar`, `morte`, `festa`,
-  `misterio`...), because they are the same words the book analysis matches in Portuguese text.
+- The theme, event, subject, influence and genre ids (`sea`, `death`, `party`, `mystery`...) are English too. They
+  are language-neutral keys: the Portuguese and English word lists sit under the same id.
+- Fixed: the sleep screen showed "Barriga" and "Humor" in every language; they now follow the chosen language. The
+  rule that lowercases a phrase after a connective ("but", "mas"...) moved from the code into each language's
+  `locale.lua` (`lowercase_after`).
 - Checked against the 1.0.2 code: the same 7,200 phrases per language, a 160-page reading session (diary,
   reviews, milestones) and the loading of every module.
 

@@ -2,19 +2,19 @@
 Literary influences (since 28/10/2026): readings slowly change the way Yomimon thinks and speaks.
 
 Three levels, all from 0 to 100 per influence (yomimon_data/influences.lua):
-  contexto   the current book, by its vector (yomimon_vector.lua); redone every 5 pages read
-  recente    what you have been reading: on each page really read, it moves 1/300 of the way to the context
-  acumulada  what stayed: it moves 1/2000 of the way. A 300-page book that is 70 in an influence leaves
+  context   the current book, by its vector (yomimon_vector.lua); redone every 5 pages read
+  recent    what you have been reading: on each page really read, it moves 1/300 of the way to the context
+  accumulated  what stayed: it moves 1/2000 of the way. A 300-page book that is 70 in an influence leaves
              the recent near 44 and the accumulated near 10. No single book turns its head.
-Only a page really read and never read before counts (the same door as the traits: M.digerir with text). Before
+Only a page really read and never read before counts (the same door as the traits: M.digest with text). Before
 20 pages the book has no vector, and nothing changes.
 
-In speech (State.fala → Influences.fala), the mix weighs 45% the context, 30% the recent and 25% the accumulated. The
+In speech (State.speech → Influences.speech), the mix weighs 45% the context, 30% the recent and 25% the accumulated. The
 strongest influence picks the phrase; the second, if strong enough, enters the same phrase through a
-"lens" (a name with an article, in a {lente} gap) or through a "fecho" (a whole short phrase at the end). Without a
+"lens" (a name with an article, in a {lens} gap) or through a "closing" (a whole short phrase at the end). Without a
 strong influence, the base personality comes out, sometimes seasoned by the strongest there is. Its stage
-(ninfa, jovem, adulta, anciã) chooses among the phrases marked with `stage`; the current stage's weighs more.
-Stored state: s.influencias = { acumulada, recente, livro, contexto, context_at, tema, paginas }.
+(nymph, young, adult, elder) chooses among the phrases marked with `stage`; the current stage's weighs more.
+Stored state: s.influences = { accumulated, recent, book, context, context_at, theme, pages }.
 Pure logic (no KOReader), testable outside it. No network, no AI.
 ]]
 
@@ -31,13 +31,13 @@ Infl.SECOND = 0.6       -- the second enters if it has at least 60% of the first
 Infl.PER_POINTS = 4      -- chance of an influence phrase: 1 in 20 for each 4 points of the strongest, up to 4 in 20
 Infl.MAX_CHANCE = 4      -- (it was 6 in 10; with 70 phrases per influence and the EPUB tags, a strong genre took 4 phrases in 10)
 Infl.BASE = 3            -- chance of the base personality, when the influence did not speak: 3 in 20 (it was 3 in 10)
-Infl.MAX_SPEECH = 150      -- with the fecho, the phrase does not go past this
-Infl.CLOSING_UNTIL = 110     -- the fecho only enters a short phrase (up to 110 letters and 2 sentences): one quip per phrase
+Infl.MAX_SPEECH = 150      -- with the closing, the phrase does not go past this
+Infl.CLOSING_UNTIL = 110     -- the closing only enters a short phrase (up to 110 letters and 2 sentences): one quip per phrase
 Infl.SHORT_UNTIL = 52      -- on the Home, a phrase without a short version only enters if it has up to this many letters
 Infl.TAG = 40       -- in the book profile, the genre the EPUB tag indicates is worth at least this
 
-local okL, LIST = pcall(require, "yomimon_data.influences")
-Infl.LIST = okL and type(LIST) == "table" and LIST or {}
+local okList, LIST = pcall(require, "yomimon_data.influences")
+Infl.LIST = okList and type(LIST) == "table" and LIST or {}
 Infl.BY_ID = {}
 for _, I in ipairs(Infl.LIST) do Infl.BY_ID[I.id] = I end
 
@@ -78,8 +78,8 @@ function Infl.profileOf(v, events_per_page)
     return profile, theme
 end
 
-local okG, GENRES = pcall(require, "yomimon_data.genres")
-GENRES = okG and type(GENRES) == "table" and GENRES or {}
+local okGenres, GENRES = pcall(require, "yomimon_data.genres")
+GENRES = okGenres and type(GENRES) == "table" and GENRES or {}
 local FOLD = { ["á"] = "a", ["à"] = "a", ["â"] = "a", ["ã"] = "a", ["é"] = "e", ["ê"] = "e", ["í"] = "i",
     ["ó"] = "o", ["ô"] = "o", ["õ"] = "o", ["ú"] = "u", ["ü"] = "u", ["ç"] = "c", ["Á"] = "a", ["À"] = "a",
     ["Â"] = "a", ["Ã"] = "a", ["É"] = "e", ["Ê"] = "e", ["Í"] = "i", ["Ó"] = "o", ["Ô"] = "o", ["Õ"] = "o",
@@ -101,10 +101,10 @@ end
 
 --- Book profile (like Infl.profileOf) or nil if it is still early. The genre the EPUB tags indicate
 -- is worth at least Infl.TAG: the tag is only a map (it says which genre the book is); what moves Yomimon
--- is still each page read, in Infl.digerir.
+-- is still each page read, in Infl.digest.
 function Infl.profile(L)
-    local okV, Vector = pcall(require, "yomimon_vector")
-    local v = okV and L and Vector.de(L)
+    local okVersion, Vector = pcall(require, "yomimon_vector")
+    local v = okVersion and L and Vector.de(L)
     if not v then return nil end
     local ev = {}
     for k, c in pairs(L.events or {}) do ev[k] = c / v.pages end
@@ -144,13 +144,13 @@ function Infl.mixture(s)
     local I = type(s.influences) == "table" and s.influences or {}
     local ctx = (I.book == s.last_book and type(I.context) == "table") and I.context or {}
     local rec = type(I.recent) == "table" and I.recent or {}
-    local acu = type(I.accumulated) == "table" and I.accumulated or {}
+    local accum = type(I.accumulated) == "table" and I.accumulated or {}
     local P = Infl.WEIGHTS
     local m = {}
     for _, inf in ipairs(Infl.LIST) do
         local id = inf.id
         m[id] = P.context * (tonumber(ctx[id]) or 0) + P.recent * (tonumber(rec[id]) or 0)
-            + P.accumulated * (tonumber(acu[id]) or 0)
+            + P.accumulated * (tonumber(accum[id]) or 0)
     end
     return m
 end
@@ -170,10 +170,10 @@ end
 
 -- Speech ------------------------------------------------------------------------------------------
 
---- Kind of a bank phrase: "modelo" (has gaps) or "fixa".
+--- Kind of a bank phrase: "template" (has gaps) or "fixed".
 function Infl.kind(sentence)
     local t = type(sentence) == "table" and sentence[1] or sentence
-    return (type(t) == "string" and t:find("{", 1, true)) and "template" or "fixa"
+    return (type(t) == "string" and t:find("{", 1, true)) and "template" or "fixed"
 end
 
 -- the standout happening of the 3 most recent chapters of the current book, or nil
@@ -192,12 +192,12 @@ end
 
 -- values of the gaps that exist now; a gap without data leaves the phrase out
 local function blanks(s, data, B)
-    local okM, Memory = pcall(require, "yomimon_memory")
+    local okMemory, Memory = pcall(require, "yomimon_memory")
     local I = type(s.influences) == "table" and s.influences or {}
     local v = { book = s.last_book, character = data and data.character, word = data and data.word }
     local theme = I.book == s.last_book and I.theme or nil
-    if theme and okM then v.theme, v.of_theme = Memory.theme(theme), Memory.theme(theme, "de") end
-    local ev = recentEvent(s, okM and Memory)
+    if theme and okMemory then v.theme, v.of_theme = Memory.theme(theme), Memory.theme(theme, "de") end
+    local ev = recentEvent(s, okMemory and Memory)
     if ev and B.events then v.event = B.events[ev] end
     local L = s.last_book and s.books and s.books[s.last_book]
     if L and type(L.author) == "string" and L.author:find("%S") then v.author = L.author end
@@ -268,7 +268,7 @@ function Infl.fill(textValue, values, lens)
     return (out:gsub("^%l", string.upper))
 end
 
---- Joins a fecho at the end of a phrase (both are whole phrases), or nil if it does not fit. A long phrase or
+--- Joins a closing at the end of a phrase (both are whole phrases), or nil if it does not fit. A long phrase or
 -- one of 3+ sentences already has its quip and stays as it is.
 function Infl.join(textValue, closing)
     if not (closing and textValue:find("[%.!%?…]$")) then return nil end
@@ -279,23 +279,23 @@ function Infl.join(textValue, closing)
     return alongside
 end
 
---- A phrase from an influence or from the base personality, or nil (then the rest of State.fala decides).
--- dados: those of Estado (personagem, palavra…); situ: { triste, feliz, fome, cheia, noite, muda = true/false,
--- fase = "ninfa" | "jovem" | "adulta" | "ancia", tela = "home" | "traca" | nil };
--- dita(chave): true if the phrase was said a moment ago (it stays out). Returns the text and the key of the no-repeat
+--- A phrase from an influence or from the base personality, or nil (then the rest of State.speech decides).
+-- data: those of State (character, word…); sit: { sad, happy, hunger, full, night, formChange = true/false,
+-- stage = "nymph" | "young" | "adult" | "elder", screen = "home" | "yomimon" | nil };
+-- said_f(lookupKey): true if the phrase was said a moment ago (it stays out). Returns the text and the key of the no-repeat
 -- rule (the bank phrase, before filling; the short version uses the same key). On the Home the short
--- version comes out (`short`), without a fecho.
+-- version comes out (`short`), without a closing.
 function Infl.speech(s, data, draw, sit, said_f)
     local B = Infl.bank()
     if not B then return nil end
     draw = draw or math.random
-    local dom = Infl.dominants(s)
-    local d1, d2 = dom[1], dom[2]
+    local dominant = Infl.dominants(s)
+    local d1, d2 = dominant[1], dominant[2]
     local k = d1 and math.min(Infl.MAX_CHANCE, math.floor(d1[2] / Infl.PER_POINTS)) or 0
     local r = draw(20)
     local list, lens_of, closing_of, closing_chance
     if d1 and r <= k then
-        -- the strongest picks; the second lends the lens or the fecho
+        -- the strongest picks; the second lends the lens or the closing
         list = B.influences[d1[1]] and B.influences[d1[1]].sentences
         lens_of, closing_of, closing_chance = d2 and d2[1] or d1[1], d2 and d2[1], 2
     elseif r > 20 - Infl.BASE then

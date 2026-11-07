@@ -69,8 +69,8 @@ function Yomimon:init()
     self.pages_without_image = 0
     -- dev mode: with the file koreader/yomimon/force_failure, page digestion fails on purpose (never in the community
     -- version)
-    local okV, Version = pcall(require, "yomimon_version")
-    local public = okV and type(Version) == "table" and Version.public
+    local okVersion, Version = pcall(require, "yomimon_version")
+    local public = okVersion and type(Version) == "table" and Version.public
     self.test_failure = not public and lfs.attributes(self.folder .. "/force_failure", "mode") == "file"
     self.ui.menu:registerToMainMenu(self)
     self:onDispatcherRegisterActions()
@@ -231,8 +231,8 @@ function Yomimon:simpleUICard(turn_on)
         G_reader_settings:saveSetting("yomimon_critter", turn_on and true or nil)
         if turn_on then pcall(function() require("yomimon_simpleui").syncCritter(self, true) end) end
     end
-    local okr, v = pcall(SUISettings.readSetting, SUISettings, lookupKey)
-    if not okr or v == nil then return true end
+    local okRead, v = pcall(SUISettings.readSetting, SUISettings, lookupKey)
+    if not okRead or v == nil then return true end
     return v == true
 end
 
@@ -251,8 +251,8 @@ end
 function Yomimon:countCurrentPage()
     local p, since = self.page, self.page_since
     if not p or not since then return end
-    local tempo = os.time() - since
-    if tempo < Counting.minimumSeconds(G_reader_settings:readSetting("statistics")) then return end
+    local elapsed = os.time() - since
+    if elapsed < Counting.minimumSeconds(G_reader_settings:readSetting("statistics")) then return end
     local where = self:whereAmI(p)
     local book = where.book or "?"
     local total = self.ui.document and self.ui.document:getPageCount()
@@ -261,10 +261,10 @@ function Yomimon:countCurrentPage()
     local real_ones = textValue and State.countLetters(textValue) or ESTIMATED_LETTERS
     -- shapes Yomimon on the first pass that is real reading (it may come after flipping through)
     local read_f = not Counting.alreadyRead(self.state, book, p)
-        and Counting.reallyRead(self.state, tempo, real_ones, where.chapter, textValue)
+        and Counting.reallyRead(self.state, elapsed, real_ones, where.chapter, textValue)
     if not new and not read_f then return end
     if read_f then Counting.markRead(self.state, book, p) end
-    local letters = new and math.min(real_ones, tempo * LETTERS_PER_SECOND) or 0
+    local letters = new and math.min(real_ones, elapsed * LETTERS_PER_SECOND) or 0
     self:feed(letters, State.longestWord(textValue), where, read_f and textValue or nil, new)
 end
 
@@ -348,7 +348,7 @@ function Yomimon:pageText(p)
     if not ok then logger.dbg("Yomimon: no text for the page", p, textValue) end
 end
 
--- contar: false when the page was already counted and is now only being digested (not counted again).
+-- count: false when the page was already counted and is now only being digested (not counted again).
 function Yomimon:feed(letters, word, where, textValue, count)
     if self.test_failure then error("injected test failure (dev mode: koreader/yomimon/force_failure)") end
     if self.state.dev_simulation then return end  -- demo simulation: frozen, real reading does not enter
@@ -436,13 +436,13 @@ function Yomimon:save(with_image)
     if with_image then self:generateImage() end
 end
 
--- escolher = true only when the Kindle goes to sleep (onSleep): in the other redraws, which nobody sees, the
+-- pick = true only when the Kindle goes to sleep (onSleep): in the other redraws, which nobody sees, the
 -- phrase is the last one chosen and nothing is spent (State.restSpeech).
 function Yomimon:generateImage(force, pick)
     if not force and not self:sleepScreenActive() then return end
     if lfs.attributes(self.folder, "mode") ~= "directory" then lfs.mkdir(self.folder) end
     local ok, err = Drawing.writeRecord(YomimonScreen.generateSleepScreen, self.state, self.image, os.time(), pick)
-    if not ok then logger.warn("Yomimon: falha ao gerar a tela de descanso:", err) end
+    if not ok then logger.warn("Yomimon: failed to generate the sleep screen:", err) end
     self.pages_without_image = 0
 end
 
@@ -486,19 +486,19 @@ end
 --- Turns Yomimon on or off as the sleep screen, keeping the previous setting.
 function Yomimon:toggleSleepScreen()
     if self:sleepScreenActive() then
-        local ant = self.db:readSetting("tela_anterior") or {}
-        G_reader_settings:saveSetting("screensaver_type", ant.kind or "disable")
-        if ant.folder then
-            G_reader_settings:saveSetting("screensaver_dir", ant.folder)
+        local saved = self.db:readSetting("previous_screen") or {}
+        G_reader_settings:saveSetting("screensaver_type", saved.kind or "disable")
+        if saved.folder then
+            G_reader_settings:saveSetting("screensaver_dir", saved.folder)
         else
             G_reader_settings:delSetting("screensaver_dir")
         end
-        if ant.message ~= nil then
-            G_reader_settings:saveSetting("screensaver_show_message", ant.message)
+        if saved.message ~= nil then
+            G_reader_settings:saveSetting("screensaver_show_message", saved.message)
         end
-        self.db:delSetting("tela_anterior")
+        self.db:delSetting("previous_screen")
     else
-        self.db:saveSetting("tela_anterior", {
+        self.db:saveSetting("previous_screen", {
             kind = G_reader_settings:readSetting("screensaver_type"),
             folder = G_reader_settings:readSetting("screensaver_dir"),
             message = G_reader_settings:readSetting("screensaver_show_message"),

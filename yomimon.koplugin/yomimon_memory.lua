@@ -18,85 +18,85 @@ local M = {}
 
 -- Themes and the words that feed them (Portuguese and English, lowercase).
 M.THEMES = {
-    morte = { "morte", "morrer", "morreu", "morto", "morta", "mortos", "túmulo", "enterro", "cadáver", "luto", "funeral",
+    death = { "morte", "morrer", "morreu", "morto", "morta", "mortos", "túmulo", "enterro", "cadáver", "luto", "funeral",
               "death", "dead", "die", "died", "grave", "funeral", "corpse",
               "morrera", "buried" },
-    amor = { "amor", "amar", "amava", "amo", "beijo", "beijou", "paixão", "coração", "amante", "querida", "querido",
+    love = { "amor", "amar", "amava", "amo", "beijo", "beijou", "paixão", "coração", "amante", "querida", "querido",
              "love", "loved", "kiss", "heart", "darling", "beloved",
              "amores", "noiva", "noivo", "noivas", "afeição", "afeições", "ternura", "beijar", "beijos", "beijava", "adorar", "adorava", "adoro" },
-    guerra = { "guerra", "batalha", "soldado", "soldados", "exército", "inimigo", "arma", "armas", "tiro", "sangue",
+    war = { "guerra", "batalha", "soldado", "soldados", "exército", "inimigo", "arma", "armas", "tiro", "sangue",
                "war", "battle", "soldier", "army", "enemy", "gun", "blood",
                "guerreiro", "guerreiros" },
-    mar = { "mar", "navio", "onda", "ondas", "praia", "barco", "marinheiro", "oceano", "porto", "naufrágio",
+    sea = { "mar", "navio", "onda", "ondas", "praia", "barco", "marinheiro", "oceano", "porto", "naufrágio",
             "sea", "ship", "wave", "waves", "boat", "sailor", "ocean", "shore" },
-    fe = { "deus", "deuses", "alma", "fé", "igreja", "oração", "rezar", "pecado", "céu", "inferno", "diabo",
+    faith = { "deus", "deuses", "alma", "fé", "igreja", "oração", "rezar", "pecado", "céu", "inferno", "diabo",
            "god", "soul", "faith", "church", "prayer", "sin", "heaven", "hell",
            "sagrado", "sagrada" },
-    dinheiro = { "dinheiro", "ouro", "rico", "rica", "pobre", "dívida", "banco", "preço", "herança", "fortuna",
+    money = { "dinheiro", "ouro", "rico", "rica", "pobre", "dívida", "banco", "preço", "herança", "fortuna",
                  "money", "gold", "rich", "poor", "debt", "bank", "price", "fortune",
                  "réis", "dote", "riqueza", "riquezas", "credor", "credores", "pounds", "salary" },
-    loucura = { "louco", "louca", "loucura", "delírio", "sonho", "sonhos", "pesadelo", "febre", "alucinação",
+    madness = { "louco", "louca", "loucura", "delírio", "sonho", "sonhos", "pesadelo", "febre", "alucinação",
                 "mad", "madness", "insane", "dream", "dreams", "nightmare", "fever" },
-    tempo = { "tempo", "relógio", "anos", "memória", "lembrança", "passado", "saudade", "velho", "velha",
+    time = { "tempo", "relógio", "anos", "memória", "lembrança", "passado", "saudade", "velho", "velha",
               "time", "clock", "years", "memory", "past", "old" },
-    cidade = { "cidade", "rua", "ruas", "praça", "bonde", "café", "multidão", "esquina",
+    city = { "cidade", "rua", "ruas", "praça", "bonde", "café", "multidão", "esquina",
                "city", "street", "streets", "square", "crowd", "corner" },
-    natureza = { "árvore", "árvores", "floresta", "rio", "chuva", "vento", "flor", "flores", "campo", "pássaro",
+    nature = { "árvore", "árvores", "floresta", "rio", "chuva", "vento", "flor", "flores", "campo", "pássaro",
                  "tree", "trees", "forest", "river", "rain", "wind", "flower", "field", "bird",
                  "folhas", "hill", "hills" },
-    comida = { "comida", "comer", "comeu", "pão", "vinho", "jantar", "almoço", "banquete", "fome", "cozinha", "sopa",
+    food = { "comida", "comer", "comeu", "pão", "vinho", "jantar", "almoço", "banquete", "fome", "cozinha", "sopa",
                "carne", "fruta", "açúcar", "food", "bread", "wine", "dinner", "supper", "kitchen", "soup", "meat" },
-    familia = { "família", "mãe", "pai", "irmão", "irmã", "filho", "filha", "avó", "avô", "herdeiro", "parentes",
+    family = { "família", "mãe", "pai", "irmão", "irmã", "filho", "filha", "avó", "avô", "herdeiro", "parentes",
                 "family", "mother", "father", "brother", "sister", "son", "daughter", "heir",
                 "marido", "maridos", "prima", "primo", "primas", "primos", "mamãe", "papai", "wife", "wives", "daughters", "parents", "cousin", "cousins", "relations" },
-    infancia = { "infância", "criança", "crianças", "menino", "menina", "brincar", "brinquedo", "escola", "inocência",
+    childhood = { "infância", "criança", "crianças", "menino", "menina", "brincar", "brinquedo", "escola", "inocência",
                  "childhood", "child", "children", "boy", "girl", "toy", "school", "innocence",
                  "baby", "babies" },
-    politica = { "rei", "rainha", "império", "governo", "revolução", "povo", "lei", "leis", "trono", "príncipe",
+    politics = { "rei", "rainha", "império", "governo", "revolução", "povo", "lei", "leis", "trono", "príncipe",
                  "ministro", "king", "queen", "empire", "government", "revolution", "law", "throne", "prince",
                  "partido", "partidos", "política", "político" },
-    ciencia = { "ciência", "experimento", "laboratório", "química", "máquina", "invenção", "eletricidade", "cientista",
+    science = { "ciência", "experimento", "laboratório", "química", "máquina", "invenção", "eletricidade", "cientista",
                 "anatomia", "science", "experiment", "laboratory", "chemistry", "machine", "invention", "electricity" },
-    solidao = { "solidão", "sozinho", "sozinha", "isolado", "isolada", "silêncio", "abandono", "exílio", "ausência",
+    solitude = { "solidão", "sozinho", "sozinha", "isolado", "isolada", "silêncio", "abandono", "exílio", "ausência",
                 "lonely", "alone", "solitude", "silence", "abandoned", "exile", "absence",
                 "abandonado", "abandonada", "desamparo" },
-    arte = { "arte", "pintura", "poema", "poesia", "artista", "quadro", "teatro", "canção", "verso", "versos", "pintor",
+    art = { "arte", "pintura", "poema", "poesia", "artista", "quadro", "teatro", "canção", "verso", "versos", "pintor",
              "art", "painting", "poem", "poetry", "artist", "theatre", "song", "verse", "painter",
              "music" },
-    animais = { "cavalo", "cão", "cachorro", "gato", "lobo", "cobra", "baleia", "rato", "pássaros", "bicho",
+    animals = { "cavalo", "cão", "cachorro", "gato", "lobo", "cobra", "baleia", "rato", "pássaros", "bicho",
                 "horse", "dog", "cat", "wolf", "snake", "whale", "rat", "insect", "beast" },
-    noite = { "noite", "lua", "escuridão", "estrelas", "madrugada", "vela", "lampião", "crepúsculo",
+    night = { "noite", "lua", "escuridão", "estrelas", "madrugada", "vela", "lampião", "crepúsculo",
               "night", "moon", "darkness", "stars", "midnight", "candle", "dusk" },
-    viagem = { "viagem", "caminho", "trem", "viajante", "horizonte", "jornada", "bagagem", "mapa", "estrangeiro",
+    travel = { "viagem", "caminho", "trem", "viajante", "horizonte", "jornada", "bagagem", "mapa", "estrangeiro",
                "travel", "path", "train", "traveller", "horizon", "luggage", "map", "foreign",
                "partiu", "caminhava", "caminhar" },
-    vinganca = { "vingança", "vingar", "ódio", "traição", "traiu", "rancor", "culpa", "castigo", "inimizade",
+    revenge = { "vingança", "vingar", "ódio", "traição", "traiu", "rancor", "culpa", "castigo", "inimizade",
                  "revenge", "avenge", "hatred", "betrayal", "betrayed", "grudge", "guilt", "punishment" },
-    liberdade = { "liberdade", "livre", "livres", "prisão", "preso", "presa", "escravo", "escravidão", "correntes", "cativeiro",
+    freedom = { "liberdade", "livre", "livres", "prisão", "preso", "presa", "escravo", "escravidão", "correntes", "cativeiro",
                   "freedom", "free", "prison", "prisoner", "slave", "slavery", "chains", "captivity" },
-    saber = { "livro", "livros", "ler", "leitura", "biblioteca", "saber", "verdade", "conhecimento", "filosofia", "estudo",
+    knowledge = { "livro", "livros", "ler", "leitura", "biblioteca", "saber", "verdade", "conhecimento", "filosofia", "estudo",
               "book", "books", "reading", "library", "knowledge", "truth", "philosophy", "study" },
-    medo = { "medo", "terror", "pavor", "monstro", "fantasma", "assombrado", "grito", "arrepio", "assombração",
+    fear = { "medo", "terror", "pavor", "monstro", "fantasma", "assombrado", "grito", "arrepio", "assombração",
              "fear", "terror", "monster", "ghost", "haunted", "scream", "dread",
              "scared", "dreaded" },
 }
 
 -- Gender of each theme, to get "no mar", "pela morte", "de Deus" right…
 local THEME_INFO = {
-    morte = { "a", "morte" }, amor = { "o", "amor" }, guerra = { "a", "guerra" }, mar = { "o", "mar" },
-    fe = { nil, "Deus" }, dinheiro = { "o", "dinheiro" }, loucura = { "a", "loucura" }, tempo = { "o", "tempo" },
-    cidade = { "a", "cidade" }, natureza = { "o", "mato" },
-    comida = { "a", "comida" }, familia = { "a", "família" }, infancia = { "a", "infância" },
-    politica = { "a", "política" }, ciencia = { "a", "ciência" }, solidao = { "a", "solidão" }, arte = { "a", "arte" },
-    animais = { "os", "bichos" }, noite = { "a", "noite" }, viagem = { "a", "viagem" }, vinganca = { "a", "vingança" },
-    liberdade = { "a", "liberdade" }, saber = { "o", "saber" }, medo = { "o", "medo" },
+    death = { "a", "morte" }, love = { "o", "amor" }, war = { "a", "guerra" }, sea = { "o", "mar" },
+    faith = { nil, "Deus" }, money = { "o", "dinheiro" }, madness = { "a", "loucura" }, time = { "o", "tempo" },
+    city = { "a", "cidade" }, nature = { "o", "mato" },
+    food = { "a", "comida" }, family = { "a", "família" }, childhood = { "a", "infância" },
+    politics = { "a", "política" }, science = { "a", "ciência" }, solitude = { "a", "solidão" }, art = { "a", "arte" },
+    animals = { "os", "bichos" }, night = { "a", "noite" }, travel = { "a", "viagem" }, revenge = { "a", "vingança" },
+    freedom = { "a", "liberdade" }, knowledge = { "o", "saber" }, fear = { "o", "medo" },
 }
 local CONTRACTION = {
     em = { o = "no", a = "na", os = "nos", as = "nas" }, de = { o = "do", a = "da", os = "dos", as = "das" },
     por = { o = "pelo", a = "pela", os = "pelos", as = "pelas" }, a = { o = "ao", a = "à", os = "aos", as = "às" },
 }
 
---- Theme name with article and contracted preposition: M.tema("mar", "em") → "no mar".
+--- Theme name with article and contracted preposition: M.theme("mar", "em") → "no mar".
 function M.theme(t, prep)
     local info = THEME_INFO[t]
     if not info then return t end
@@ -110,10 +110,10 @@ M.THEME_NAMES = {}
 for t in pairs(THEME_INFO) do M.THEME_NAMES[t] = M.theme(t) end
 
 -- Pairs that, together, leave it divided.
-local OPPOSITES = { amor = "guerra", guerra = "amor", fe = "loucura", loucura = "fe", cidade = "natureza",
-                  natureza = "cidade", dinheiro = "fe", familia = "solidao", solidao = "familia",
-                  liberdade = "politica", politica = "liberdade", infancia = "morte", ciencia = "fe",
-                  vinganca = "amor", arte = "dinheiro", saber = "medo", medo = "saber" }
+local OPPOSITES = { love = "war", war = "love", faith = "madness", madness = "faith", city = "nature",
+                  nature = "city", money = "faith", family = "solitude", solitude = "family",
+                  freedom = "politics", politics = "freedom", childhood = "death", science = "faith",
+                  revenge = "love", art = "money", knowledge = "fear", fear = "knowledge" }
 
 -- Words too common to make a theme by themselves ("old", "time", "night", "mother"):
 -- they only count with another word of the same theme on the page (or repeated 3+ times).
@@ -135,23 +135,23 @@ end
 
 -- Events: groups of words that indicate something happening on the page.
 M.EVENTS = {
-    morte = { "morreu", "morrera", "morto", "morta", "enterro", "enterraram", "caixão", "luto", "velório", "funeral",
+    death = { "morreu", "morrera", "morto", "morta", "enterro", "enterraram", "caixão", "luto", "velório", "funeral",
               "cadáver", "faleceu", "died", "dead", "coffin", "buried", "corpse",
               "death" },
-    casamento = { "casamento", "casaram", "casou", "noiva", "noivo", "altar", "núpcias", "aliança",
+    wedding = { "casamento", "casaram", "casou", "noiva", "noivo", "altar", "núpcias", "aliança",
                   "wedding", "married", "bride", "groom",
                   "matrimônio", "marriage" },
-    viagem = { "partiu", "partida", "viagem", "viajou", "estrada", "carruagem", "chegou", "chegada", "embarcou",
+    travel = { "partiu", "partida", "viagem", "viajou", "estrada", "carruagem", "chegou", "chegada", "embarcou",
                "journey", "departed", "voyage", "road", "carriage", "arrived",
                "partiram", "partir", "drove" },
-    carta = { "carta", "cartas", "escreveu", "envelope", "bilhete", "correio", "letter", "letters", "wrote",
+    letter = { "carta", "cartas", "escreveu", "envelope", "bilhete", "correio", "letter", "letters", "wrote",
               "seal" },
-    tempestade = { "tempestade", "trovão", "relâmpago", "relâmpagos", "ventania", "temporal", "storm", "thunder", "lightning", "gale",
+    storm = { "tempestade", "trovão", "relâmpago", "relâmpagos", "ventania", "temporal", "storm", "thunder", "lightning", "gale",
                    "trovoada" },
-    doenca = { "doença", "doente", "febre", "médico", "tosse", "enfermo", "leito", "illness", "sick", "fever", "doctor", "cough" },
-    festa = { "festa", "baile", "dança", "dançaram", "banquete", "música", "party", "ball", "dance", "feast", "music" },
-    briga = { "briga", "brigaram", "discussão", "gritou", "insulto", "insultou", "quarrel", "argued", "shouted", "insult" },
-    fuga = { "fugiu", "fuga", "escapou", "escondeu", "perseguição", "fled", "escape", "escaped", "hid", "chase",
+    illness = { "doença", "doente", "febre", "médico", "tosse", "enfermo", "leito", "illness", "sick", "fever", "doctor", "cough" },
+    party = { "festa", "baile", "dança", "dançaram", "banquete", "música", "party", "ball", "dance", "feast", "music" },
+    quarrel = { "briga", "brigaram", "discussão", "gritou", "insulto", "insultou", "quarrel", "argued", "shouted", "insult" },
+    escape = { "fugiu", "fuga", "escapou", "escondeu", "perseguição", "fled", "escape", "escaped", "hid", "chase",
              "fugir", "fugiram" },
     crime = { "crime", "assassinato", "matou", "assassino", "roubo", "polícia", "murder", "killed", "murderer", "theft", "police" },
 }
@@ -163,8 +163,8 @@ end
 -- Chapter subjects, for the cards (yomimon_data/topics.lua): counted like the events. A single word
 -- also matches its plural (-s, -es); a multi-word expression counts as a sequence, unless it contains
 -- a word of the list itself ("great-grandfather" already counts as "grandfather").
-local okAs, SUBJECTS = pcall(require, "yomimon_data.topics")
-M.SUBJECTS = okAs and type(SUBJECTS) == "table" and SUBJECTS or {}
+local okSubjects, SUBJECTS = pcall(require, "yomimon_data.topics")
+M.SUBJECTS = okSubjects and type(SUBJECTS) == "table" and SUBJECTS or {}
 local subject_index, subject_sentences = {}, {}
 for as, words in pairs(M.SUBJECTS) do
     local loose = {}
@@ -183,7 +183,7 @@ for as, words in pairs(M.SUBJECTS) do
     end
 end
 table.sort(subject_sentences, function(a, b) return a.nameText < b.nameText end)
--- counts the expressions in the word sequence ws (1..n): calls achou(subject, expression) for each one
+-- counts the expressions in the word sequence ws (1..n): calls found_it(subject, expression) for each one
 local function subjectSentences(ws, n, found_it)
     for _, f in ipairs(subject_sentences) do
         local k = #f.seq
@@ -235,7 +235,7 @@ for p in pairs(GENERICS) do GENERICS_MOD[modernSpelling(p)] = true end
 local function generic(w) return GENERICS[w] or GENERICS_MOD[modernSpelling(w)] or false end
 M.modernSpelling = modernSpelling  -- used by the dictionaries and the tools
 
--- The book's own words (PLANO-VOZ.md, step 5) --------------------------------------------------
+-- The book's own words --------------------------------------------------
 -- Candidates: lowercase (a proper name never enters), 5 letters or more, letters only, outside the
 -- language's common words (yomimon_common_words.lua, generated from the corpus) and outside adverbs and
 -- offensive words the classics use. In Portuguese, the comparison with the common ones uses modern spelling.
@@ -253,8 +253,8 @@ for p in ([[the a an this that these those his her my your their our its some no
             o a os as um uma uns umas do da dos das no na nos nas ao aos pelo pela pelos pelas seu sua seus suas
             meu minha meus minhas teu tua este esta estes estas esse essa esses essas aquele aquela aqueles aquelas
             num numa dum duma]]):gmatch("%S+") do DETERMINERS[p] = true end
-M.VOCAB_MAX, M.VOCAB_PODA = 150, 100   -- per book: past 150 words, the 100 most counted stay
-M.VOCAB_FIM = 20                       -- a finished book keeps only the 20 most counted
+M.VOCAB_MAX, M.VOCAB_PRUNED = 150, 100   -- per book: past 150 words, the 100 most counted stay
+M.VOCAB_FINISHED = 20                       -- a finished book keeps only the 20 most counted
 M.STRIKING_MIN = 3                     -- times in the book for the word to be striking
 
 --- Can the word be striking? (w as it is in the text; pt = Portuguese page)
@@ -292,11 +292,11 @@ end
 -- weather is that score centred on the language's median and divided by the corpus' central half-range
 -- (yomimon_weather_calibration.lua): a typical page ~0, the 30% gloomiest or lightest go past ±1.
 -- Without the dictionaries, it falls back to the short word list (WEATHER).
-local okEn, LEX_EN = pcall(require, "yomimon_lexicon_en")
-local okPt, LEX_PT = pcall(require, "yomimon_lexicon_pt")
-local okC, WEATHER_CAL = pcall(require, "yomimon_weather_calibration")
-local LEXICON = { en = okEn and LEX_EN or nil, pt = okPt and LEX_PT or nil }
-M.WEATHER_CALIBRATION = okC and WEATHER_CAL or nil
+local okEnglish, LEX_EN = pcall(require, "yomimon_lexicon_en")
+local okPortuguese, LEX_PT = pcall(require, "yomimon_lexicon_pt")
+local okCalibration, WEATHER_CAL = pcall(require, "yomimon_weather_calibration")
+local LEXICON = { en = okEnglish and LEX_EN or nil, pt = okPortuguese and LEX_PT or nil }
+M.WEATHER_CALIBRATION = okCalibration and WEATHER_CAL or nil
 local NEGATION = {}
 for w in ("no not never none nobody nothing neither nor nowhere cannot without não nunca jamais nem nada nenhum nenhuma ninguém sem"):gmatch("%S+") do
     NEGATION[w] = true
@@ -336,8 +336,8 @@ end
 -- Specificity weight (yomimon_topic_weights.lua): a theme that appears in almost every book ("family",
 -- "time") adds less to the memory of the book, chapter, day and its own; a rare theme adds more.
 -- Per-page detection does not change.
-local okP, WEIGHTS = pcall(require, "yomimon_topic_weights")
-M.WEIGHTS = okP and type(WEIGHTS) == "table" and WEIGHTS or {}
+local okWeights, WEIGHTS = pcall(require, "yomimon_topic_weights")
+M.WEIGHTS = okWeights and type(WEIGHTS) == "table" and WEIGHTS or {}
 function M.themeWeight(t, pt) return (M.WEIGHTS[pt and "pt" or "en"] or {})[t] or 1 end
 
 -- for the validation tool to show what triggered each theme
@@ -442,8 +442,8 @@ end
 
 -- Known cities (GeoNames, CC-BY 4.0; 50 thousand+ inhabitants): such a name only becomes a character with proof
 -- (speech, title, person verb). It never excludes alone: Elizabeth, Charlotte, Paris and Hamilton are cities.
-local okCid, CITIES = pcall(require, "yomimon_cities")
-CITIES = okCid and type(CITIES) == "table" and CITIES or {}
+local okCities, CITIES = pcall(require, "yomimon_cities")
+CITIES = okCities and type(CITIES) == "table" and CITIES or {}
 
 -- Words that, right after a name, make it a place ("Baker Street", "Rua do Ouvidor").
 local AFTER_PLACE = {}
@@ -539,9 +539,9 @@ function M.ambivalent(s)
 end
 
 --- Characters of a book, most cited first (only those who appear at least 3 times). Each one:
--- { nome, vezes, falas, capitulos, protagonista, formas (all names of the person) }.
--- Since 27/10/2026, from the evidence in L.nomes (charactersNew); a finished book keeps only the final list.
--- Books read before that (without L.nomes) follow the old rule, below.
+-- { nameText, times, speeches, chapters, protagonist, forms (all names of the person) }.
+-- Since 27/10/2026, from the evidence in L.names (charactersNew); a finished book keeps only the final list.
+-- Books read before that (without L.names) follow the old rule, below.
 function M.charactersInfo(s, book)
     local L = book and s.books and s.books[book]
     if not L then return {} end
@@ -549,7 +549,7 @@ function M.charactersInfo(s, book)
     if L.names then return (M._charactersNew(L, book)) end
     -- old rule: "Sherlock Holmes": the first and last name become a single person (the most cited form)
     local nickname = {}
-    for b, a in pairs(L.sobrenome or {}) do
+    for b, a in pairs(L.surname or {}) do
         if (L.chars[a] or 0) >= (L.chars[b] or 0) then nickname[b] = a else nickname[a] = b end
     end
     local total = {}
@@ -567,7 +567,7 @@ function M.charactersInfo(s, book)
     local list = {}
     for nameText, c in pairs(total) do
         local proof = ((L.proof or {})[nameText] or 0) + ((L.spoke or {})[nameText] or 0)
-        local pages = (L.pgs or {})[nameText] or 0
+        local pages = (L.pages_seen or {})[nameText] or 0
         -- suspected of not being a person (known city, or usually comes with an article: "the Nautilus",
         -- "os Tupinambás"): only with proof, never just for appearing a lot
         local suspect = CITIES[nameText] or ((L.thing or {})[nameText] or 0) * 2 >= c
@@ -625,8 +625,7 @@ local function accumulate(t, k, v) t[k] = (t[k] or 0) + (v or 1) end
 -- Names with evidence (since 27/10/2026) --------------------------------------------------------
 -- Each page notes the names (also multi-word ones: "Petra Cotes", "Paulo Afonso") and the clues
 -- that came with each one, by rule. Who is a person, who is a place and who is the same person is only decided
--- at query time, with the evidence of the whole book (charactersNew). Prototype and measurements:
--- ferramentas/experimentos/personagens/.
+-- at query time, with the evidence of the whole book (charactersNew).
 
 local function lowercased(w)
     return (w:lower():gsub("\195([\128-\158])", function(c) return "\195" .. string.char(c:byte() + 32) end))
@@ -665,7 +664,7 @@ local PLACE_BEFORE = {}  -- "cidade de Recife", "rua do Ouvidor", "estado de Ser
 for p in ([[estado cidade vila povoado município rio serra rua praça largo bairro sertão capital porto ilha lagoa morro
     travessa avenida aldeia arraial chapada ribeirão enseada baía praia cabo forte river mount lake cape fort port isle
     island valley bay gulf county]]):gmatch("%S+") do PLACE_BEFORE[p] = true end
-local SANTO = { ["são"] = true, santo = true, santa = true, san = true }
+local SAINT = { ["são"] = true, santo = true, santa = true, san = true }
 local BR_STATES = {}
 for p in ([[Acre Alagoas Amapá Amazonas Bahia Ceará Goiás Maranhão Pará Paraíba Paraná Pernambuco Piauí Rondônia Roraima
     Sergipe Tocantins]]):gmatch("%S+") do BR_STATES[p] = true end
@@ -677,7 +676,7 @@ for p in ("de da do em para com por in at of to from with by"):gmatch("%S+") do 
 
 -- Weight of each rule: for being a person, for being a place, and against being a name (common word, quotation)
 local PERSON_WEIGHT = { titleText = 2, speech = 2, verb = 1, vocative = 1.5, apposition = 1.5 }
-local PLACE_WEIGHT = { place = 2, route = 2, santo = 1, em = 0.5 }
+local PLACE_WEIGHT = { place = 2, route = 2, saint = 1, locative = 0.5 }
 local NAME_FORMS_MAX = 150     -- forms kept per book while reading (those seen once go first)
 local MIN_MENTIONS = 3
 
@@ -693,8 +692,8 @@ local function candidateName(tk)
         and TITLE_GENDER[lowercased(w)] == nil and not ABBREVIATION[w]  -- "St." of St. John is not a name
 end
 
---- Names on a page, with the clues of each one (toks: the words of M.sinais).
--- Returns { [forma] = { n, ini, meio, ev = { regra = vezes }, gen = { m, f } } } and the sentences with
+--- Names on a page, with the clues of each one (toks: the words of M.signals).
+-- Returns { [form] = { n, ini, middle, ev = { rule = times }, gen = { m, f } } } and the sentences with
 -- names where one is the start of another ("Macabéa, a minha querida Maca"), so as not to join two people.
 local function pageNames(toks, dialogue)
     local names, joined = {}, {}
@@ -705,12 +704,12 @@ local function pageNames(toks, dialogue)
         if tk.beginning then sentence = sentence + 1 end
         if candidateName(tk) then
             local j = i
-            while j - i < 5 and not toks[j].pont do  -- joins "Petra Cotes", "Olímpico de Jesus Moreira Chaves"
+            while j - i < 5 and not toks[j].punct do  -- joins "Petra Cotes", "Olímpico de Jesus Moreira Chaves"
                 local k = j + 1
-                while k <= #toks and NAME_CONNECTOR[toks[k].w] and not toks[k].pont and not toks[k].opens do k = k + 1 end
+                while k <= #toks and NAME_CONNECTOR[toks[k].w] and not toks[k].punct and not toks[k].opens do k = k + 1 end
                 local nextItem = toks[k]
                 if nextItem and not nextItem.opens and not nextItem.beginning and candidateName(nextItem) and nextItem.w ~= toks[j].w
-                        and (k == j + 1 or not toks[k - 1].pont) then
+                        and (k == j + 1 or not toks[k - 1].punct) then
                     j = k
                 else
                     break
@@ -725,17 +724,17 @@ local function pageNames(toks, dialogue)
             if tk.beginning then d.ini = d.ini + 1 else d.middle = d.middle + 1 end
             local p, pp, n1, n2, n3 = toks[i - 1], toks[i - 2], toks[j + 1], toks[j + 2], toks[j + 3]
             local lastItem = toks[j]
-            local stuck_before = p and not p.pont and not tk.opens
-            local stuck_after = n1 and not lastItem.pont and not n1.opens
+            local stuck_before = p and not p.punct and not tk.opens
+            local stuck_after = n1 and not lastItem.punct and not n1.opens
             local pl = p and lowercased(p.w)
             -- title before ("madama Carlota", "D. Plácida", "Seu Nestor")
-            if p and TITLE_GENDER[pl] ~= nil and not tk.opens and (not p.pont or (p.point and #p.w <= 4)) then
+            if p and TITLE_GENDER[pl] ~= nil and not tk.opens and (not p.punct or (p.point and #p.w <= 4)) then
                 accumulate(d.ev, "titleText")
                 if TITLE_GENDER[pl] then accumulate(d.gen, TITLE_GENDER[pl]) end
             end
             -- who speaks, or does something human right after the name
             -- ("said the Hatter", "disse o Paulo": the speech verb comes before the article)
-            local article_before = stuck_before and (pl == "the" or pl == "o" or pl == "a") and pp and not pp.pont
+            local article_before = stuck_before and (pl == "the" or pl == "o" or pl == "a") and pp and not pp.punct
             if (stuck_before and isSpeech(p.w)) or (stuck_after and isSpeech(n1.w)) or (article_before and isSpeech(pp.w)) then
                 accumulate(d.ev, "speech")
             elseif stuck_after and isPerson(n1.w) and not (stuck_before and PREPOSITION[pl]) then
@@ -748,15 +747,15 @@ local function pageNames(toks, dialogue)
                 accumulate(d.ev, "vocative")
             end
             -- apposition: "Carlota, a cartomante" (not "Amaranta, o coronel Aureliano", which is a list)
-            if ending == "," and n1 and n2 and not n1.pont and (n1.w == "o" or n1.w == "a" or n1.w == "um" or n1.w == "uma")
-                    and PERSON_NAME[lowercased(n2.w)] and not (n3 and not n2.pont and capital(n3.w)) then
+            if ending == "," and n1 and n2 and not n1.punct and (n1.w == "o" or n1.w == "a" or n1.w == "um" or n1.w == "uma")
+                    and PERSON_NAME[lowercased(n2.w)] and not (n3 and not n2.punct and capital(n3.w)) then
                 accumulate(d.ev, "apposition")
                 accumulate(d.gen, (n1.w == "o" or n1.w == "um") and "m" or "f")
             end
             -- article before: only gender ("a Bahia" also takes an article)
             if stuck_before and (pl == "o" or pl == "a") then accumulate(d.gen, pl == "o" and "m" or "f") end
             -- place
-            if stuck_before and pp and not pp.pont and NAME_CONNECTOR[pl] and PLACE_BEFORE[lowercased(pp.w)] then
+            if stuck_before and pp and not pp.punct and NAME_CONNECTOR[pl] and PLACE_BEFORE[lowercased(pp.w)] then
                 accumulate(d.ev, "place")
             elseif stuck_before and PLACE_BEFORE[pl] then
                 accumulate(d.ev, "place")
@@ -764,10 +763,10 @@ local function pageNames(toks, dialogue)
                 accumulate(d.ev, "place")
             elseif stuck_before and (pl == "de" or pl == "from") and stuck_after and (n1.w == "até" or n1.w == "to") then
                 accumulate(d.ev, "route")
-            elseif stuck_before and SANTO[pl] then
-                accumulate(d.ev, "santo")
+            elseif stuck_before and SAINT[pl] then
+                accumulate(d.ev, "saint")
             elseif stuck_before and PLACE_PREP[pl] then
-                accumulate(d.ev, "em")
+                accumulate(d.ev, "locative")
             end
             if stuck_before and (pl == "the" or pl == "os" or pl == "as") then accumulate(d.ev, "thing") end
             per_sentence[sentence] = per_sentence[sentence] or {}
@@ -795,7 +794,7 @@ local function wordsOf(form)
     return out
 end
 
---- Stores the page's names in the book (called by M.digerir).
+--- Stores the page's names in the book (called by M.digest).
 local function storeNames(L, signal, pg)
     L.names, L.box, L.joined = L.names or {}, L.box or {}, L.joined or {}
     L.names_version = (L.names_version or 0) + 1
@@ -835,7 +834,7 @@ local function storeNames(L, signal, pg)
         local c = (signal.minus or {})[lowercased(w)]
         if c then cx.m = cx.m + c end
     end
-    for par, c in pairs(signal.together_prefix or {}) do accumulate(L.joined, par, c) end
+    for pair, c in pairs(signal.together_prefix or {}) do accumulate(L.joined, pair, c) end
     -- cleanup (every 10 pages): a word that only appeared at the start of a sentence and that the book writes more in
     -- lowercase ("É", "Pois", "Quanto") leaves; the capital count stays only for name words
     if L.names_version % 10 == 0 then
@@ -846,9 +845,9 @@ local function storeNames(L, signal, pg)
         local used_ones = {}
         for form in pairs(L.names) do for _, w in ipairs(wordsOf(form)) do used_ones[w] = true end end
         for w in pairs(L.box) do if not used_ones[w] then L.box[w] = nil end end
-        for par in pairs(L.joined) do
-            local a, b = par:match("^(.-)\t(.*)$")
-            if not (L.names[a] and L.names[b]) then L.joined[par] = nil end
+        for pair in pairs(L.joined) do
+            local a, b = pair:match("^(.-)\t(.*)$")
+            if not (L.names[a] and L.names[b]) then L.joined[pair] = nil end
         end
     end
     -- pruning: the saved state does not grow forever
@@ -863,11 +862,11 @@ end
 
 local cache_chars = setmetatable({}, { __mode = "k" })
 
---- Characters of a book by the evidence (L.nomes). Returns the same list as M.charactersInfo, with
+--- Characters of a book by the evidence (L.names). Returns the same list as M.charactersInfo, with
 -- `forms` (all names of the person) and `places` apart.
 local function charactersNew(L, book)
     local c = cache_chars[L]
-    if c and c.pgs == L.pages and c.n == L.names_version then return c.list, c.places end
+    if c and c.pages_seen == L.pages and c.n == L.names_version then return c.list, c.places end
     local N, CX = L.names, L.box or {}
     local titleText = book and lowercased(book) or ""
     -- the words of each name, split once: inside the loops below (name × name), splitting again
@@ -1032,7 +1031,7 @@ local function charactersNew(L, book)
     end
     table.sort(list, function(a, b) return a.times > b.times or (a.times == b.times and a.nameText < b.nameText) end)
     table.sort(places, function(a, b) return a[2] > b[2] or (a[2] == b[2] and a[1] < b[1]) end)
-    cache_chars[L] = { pgs = L.pages, n = L.names_version, list = list, places = places }
+    cache_chars[L] = { pages_seen = L.pages, n = L.names_version, list = list, places = places }
     return list, places
 end
 M._charactersNew = charactersNew
@@ -1048,8 +1047,8 @@ end
 
 --- Reads the signals of a page: themes, events, weather, characters, places, quotations, who speaks,
 -- proof that a name is a person, first person and word size.
--- livro (optional): names that are in the book's title are never treated as a quotation.
--- capitulo (optional): if the page starts with the chapter title ("XXV Na Tijuca Nisto…"), the title words and the
+-- book (optional): names that are in the book's title are never treated as a quotation.
+-- chapter (optional): if the page starts with the chapter title ("XXV Na Tijuca Nisto…"), the title words and the
 -- first one after it count as the start of a sentence (only for the names).
 function M.signals(textValue, book, chapter)
     local signal = { themes = {}, events = {}, subjects = {}, weather = 0, chars = {}, chars_start = {}, places = {}, spoke = {},
@@ -1137,7 +1136,7 @@ function M.signals(textValue, book, chapter)
         local w = raw:gsub("^%p+", ""):gsub("%p+$", "")
         -- pont: the word ends in punctuation (comma, "!", end of speech…)
         if w ~= "" then
-            toks[#toks + 1] = { w = w, beginning = beginning, pont = raw:find("%p$") ~= nil, point = raw:find("%.$") ~= nil,
+            toks[#toks + 1] = { w = w, beginning = beginning, punct = raw:find("%p$") ~= nil, point = raw:find("%.$") ~= nil,
                                 raw = raw, opens = raw:find("^%p") ~= nil }
         end
         -- "Mr." and "D." do not end a sentence; a lone initial ("J.") neither
@@ -1150,8 +1149,8 @@ function M.signals(textValue, book, chapter)
     for i, tk in ipairs(toks) do
         if M.candidate(tk.w, pt) then
             signal.vocab[tk.w] = (signal.vocab[tk.w] or 0) + 1
-            local ant = toks[i - 1]
-            if ant and not ant.pont and DETERMINERS[ant.w:lower()] then
+            local prev_tok = toks[i - 1]
+            if prev_tok and not prev_tok.punct and DETERMINERS[prev_tok.w:lower()] then
                 signal.vocab_art[tk.w] = (signal.vocab_art[tk.w] or 0) + 1
             end
         end
@@ -1177,15 +1176,15 @@ function M.signals(textValue, book, chapter)
         if tk.w:find("^%l") or tk.w:find("^\195[\159-\191]") then accumulate(signal.minus, lowercased(tk.w)) end
     end
     -- all caps (ADVENTURE, DIARY, XXIX) is a title, header or label, not a name
-    local function ehNome(w) return capital(w) and #w >= 3 and not NOT_NAMES[w] and not w:find("^[%u%p]+$") end
+    local function isName(w) return capital(w) and #w >= 3 and not NOT_NAMES[w] and not w:find("^[%u%p]+$") end
     -- a word that also appears in lowercase on the page is a common word ("Let" at the start of the verse, "let" in the middle)
     local in_lowercase = {}
     for _, tk in ipairs(toks) do if tk.w:find("^%l") then in_lowercase[tk.w] = true end end
     -- theatre: speech label in caps at the start of a sentence ("HAMLET.", "LADY MACBETH."); only valid with 2+ on the page
     local labels = {}
     for i, tk in ipairs(toks) do
-        local ant = toks[i - 1]
-        if tk.point and tk.w:find("^%u%u%u+$") and (tk.beginning or (ant and ant.beginning and ant.w:find("^%u+$"))) then
+        local prev_tok = toks[i - 1]
+        if tk.point and tk.w:find("^%u%u%u+$") and (tk.beginning or (prev_tok and prev_tok.beginning and prev_tok.w:find("^%u+$"))) then
             local nameText = tk.w:sub(1, 1) .. tk.w:sub(2):lower()
             if THEATRE_ROLE[nameText] or not NOT_NAMES[nameText] then labels[#labels + 1] = nameText end
         end
@@ -1208,43 +1207,43 @@ function M.signals(textValue, book, chapter)
             and BEFORE_PLACE[a2.w:lower()] or false
     end
     for i, tk in ipairs(toks) do
-        local w, ant, nextItem = tk.w, toks[i - 1], toks[i + 1]
+        local w, prev_tok, nextItem = tk.w, toks[i - 1], toks[i + 1]
         local quotation = REFERENCES[w] and not (book and book:find(w, 1, true))
-        if ehNome(w) and quotation then
+        if isName(w) and quotation then
             accumulate(signal.refs, w)
-        elseif ehNome(w) and (KNOWN_PLACES[w] or (nextItem and AFTER_PLACE[nextItem.w]) or afterPlace(i)) then
+        elseif isName(w) and (KNOWN_PLACES[w] or (nextItem and AFTER_PLACE[nextItem.w]) or afterPlace(i)) then
             accumulate(signal.places, w)
-        elseif ehNome(w) and in_lowercase[w:lower()] and not (ant and TITLES[ant.w]) then
+        elseif isName(w) and in_lowercase[w:lower()] and not (prev_tok and TITLES[prev_tok.w]) then
             -- common word with a capital: not a name
-        elseif tk.beginning and ehNome(w) then
+        elseif tk.beginning and isName(w) then
             accumulate(signal.chars_start, w)  -- only counts if already known as a character
-        elseif not tk.beginning and ehNome(w) then
-            if ant and PLACE_PREP[ant.w:lower()] then
+        elseif not tk.beginning and isName(w) then
+            if prev_tok and PLACE_PREP[prev_tok.w:lower()] then
                 accumulate(signal.places, w)
             else
                 accumulate(signal.chars, w)
-                if ant and not ant.beginning and capital(ant.w) and not NOT_NAMES[ant.w] then
-                    accumulate(signal.pairsList, ant.w .. " " .. w)
+                if prev_tok and not prev_tok.beginning and capital(prev_tok.w) and not NOT_NAMES[prev_tok.w] then
+                    accumulate(signal.pairsList, prev_tok.w .. " " .. w)
                 end
             end
         end
         -- article before the name: "the Nautilus", "the Pequod" (English); "os Tupinambás" (Portuguese, plural).
         -- A person almost never takes an article like this; those who do (the Duchess, the Nurse) usually speak and have proof.
-        if ehNome(w) and ant and not ant.pont then
-            local a = ant.w:lower()
+        if isName(w) and prev_tok and not prev_tok.punct then
+            local a = prev_tok.w:lower()
             if (not pt and a == "the") or (pt and (a == "os" or a == "as")) then accumulate(signal.thing, w) end
         end
         -- proof that a name is a person: title before ("Dona Glória") or person verb after ("Capitu olhou")
-        if ehNome(w) and not quotation and not KNOWN_PLACES[w] then
-            if (ant and TITLES[ant.w]) or (nextItem and PERSON_VERB[nextItem.w:lower()]) then accumulate(signal.proof, w) end
+        if isName(w) and not quotation and not KNOWN_PLACES[w] then
+            if (prev_tok and TITLES[prev_tok.w]) or (nextItem and PERSON_VERB[nextItem.w:lower()]) then accumulate(signal.proof, w) end
         end
         -- who speaks: "disse Capitu" / "said Mr. Bennet" / "Capitu disse". A name stuck to punctuation
         -- ("Overboard!” said", "Mr. Wilson,” said", "—Viu? perguntou") is part of the speech, not who speaks.
         if SPEECH_VERB[w:lower()] then
             local after = nextItem
             if after and TITLES[after.w] then after = toks[i + 2] end
-            if not tk.pont and after and ehNome(after.w) and not REFERENCES[after.w] then accumulate(signal.spoke, after.w)
-            elseif ant and not ant.pont and ehNome(ant.w) and not REFERENCES[ant.w] then accumulate(signal.spoke, ant.w) end
+            if not tk.punct and after and isName(after.w) and not REFERENCES[after.w] then accumulate(signal.spoke, after.w)
+            elseif prev_tok and not prev_tok.punct and isName(prev_tok.w) and not REFERENCES[prev_tok.w] then accumulate(signal.spoke, prev_tok.w) end
         end
     end
     return signal
@@ -1276,7 +1275,7 @@ local function clearSpeech(f)
     return (f:gsub("%s+", " "):gsub("^%s+", ""):gsub("[%s,;—]+$", ""))
 end
 
---- Speech attributed on a page: { {nome =, fala =}, ... } (only speeches of a reasonable size).
+--- Speech attributed on a page: { {nameText =, speech =}, ... } (only speeches of a reasonable size).
 function M.pageSpeeches(textValue)
     local out = {}
     local function store(speech, nameText)
@@ -1284,8 +1283,8 @@ function M.pageSpeeches(textValue)
             out[#out + 1] = { nameText = nameText, speech = speech }
         end
     end
-    for _, par in ipairs({ { OPEN, CLOSE }, { OPEN2, CLOSE2 }, { '"', '"' } }) do
-        local opens, closes, i = par[1], par[2], 1
+    for _, pair in ipairs({ { OPEN, CLOSE }, { OPEN2, CLOSE2 }, { '"', '"' } }) do
+        local opens, closes, i = pair[1], pair[2], 1
         while true do
             local a = textValue:find(opens, i, true)
             if not a then break end
@@ -1339,9 +1338,9 @@ local function storeQuotations(L, speeches)
     end
 end
 
---- A striking line of a character in the book: { nome, fala }, or nil.
+--- A striking line of a character in the book: { nameText, speech }, or nil.
 -- Prefers the protagonist and shorter lines; max_tam limits the size.
-function M.quotation(s, book, draw, max_tam)
+function M.quotation(s, book, draw, max_size)
     local L = book and s.books and s.books[book]
     if not L or not L.quotations then return nil end
     local chars = {}  -- any name of the person ("Cotes" and "Petra Cotes") → their position in the list
@@ -1350,7 +1349,7 @@ function M.quotation(s, book, draw, max_tam)
     end
     local good = {}
     for _, c in ipairs(L.quotations) do
-        if chars[c.nameText] and #c.speech <= (max_tam or SPEECH_MAX) then good[#good + 1] = c end
+        if chars[c.nameText] and #c.speech <= (max_size or SPEECH_MAX) then good[#good + 1] = c end
     end
     if #good == 0 then return nil end
     table.sort(good, function(a, b) return chars[a.nameText] < chars[b.nameText] end)
@@ -1359,7 +1358,7 @@ end
 
 --- Digests a page: updates themes, book, chapter and writes in the diary when something changes.
 -- When the chapter changes, leaves a comment on the chapter that ended (s.pending_comment).
--- contar: false when the page was already counted before (flipped through) and is now only digested: it does not add again
+-- count: false when the page was already counted before (flipped through) and is now only digested: it does not add again
 -- to the pages of the book, chapter and day.
 function M.digest(s, textValue, where, now, count)
     count = count ~= false
@@ -1375,13 +1374,13 @@ function M.digest(s, textValue, where, now, count)
             s.books[book] = L
             local previous = s.current_book ~= book and s.current_book or nil
             -- author who returns, counted by the reviews (memory); otherwise, the usual opening
-            local okLem, Mem = pcall(require, "yomimon_memories")
-            if not (okLem and Mem.bookStart(s, M, book, where, now)) then
+            local okMemories, Memories = pcall(require, "yomimon_memories")
+            if not (okMemories and Memories.bookStart(s, M, book, where, now)) then
                 M.note(s, now, Diary.bookStart(s, M, book, where, previous))
             end
         end
         s.current_book = book
-        -- EPUB genre tags (one per line): only a genre map, in Infl.perfil
+        -- EPUB genre tags (one per line): only a genre map, in Infl.profile
         if not L.tags and type(where.tags) == "string" and where.tags:find("%S") then
             L.tags = {}
             for e in where.tags:gmatch("[^\n]+") do
@@ -1409,8 +1408,8 @@ function M.digest(s, textValue, where, now, count)
     Diary.page(s, book, signal, speeches, now, count)
     -- personality traits: only what you read moves them
     if has_text then
-        local okT, notes = pcall(function() return require("yomimon_traits").digest(s, signal, now, book) end)
-        if okT and notes then for _, grade in ipairs(notes) do M.note(s, now, grade) end end
+        local okTraits, notes = pcall(function() return require("yomimon_traits").digest(s, signal, now, book) end)
+        if okTraits and notes then for _, grade in ipairs(notes) do M.note(s, now, grade) end end
         -- literary influences: the same door (page really read, only once)
         if book and L then pcall(function() require("yomimon_influences").digest(s, book, L) end) end
     end
@@ -1453,7 +1452,7 @@ function M.digest(s, textValue, where, now, count)
             for w, c in pairs(signal.vocab) do accumulate(L.vocab, w, c) end
             for w, c in pairs(signal.vocab_art) do accumulate(L.vocab_art, w, c) end
             for _ in pairs(L.vocab) do n = n + 1 end
-            if n > M.VOCAB_MAX then M.pruneVocab(L, M.VOCAB_PODA) end
+            if n > M.VOCAB_MAX then M.pruneVocab(L, M.VOCAB_PRUNED) end
         end
         local N = L.narrator
         N.firstPersonCount, N.words = N.firstPersonCount + signal.firstPersonCount, N.words + signal.words
@@ -1511,8 +1510,8 @@ function M.digest(s, textValue, where, now, count)
 
     -- memories: anniversary, character who returns, nothing so gloomy since…
     if has_text then
-        local okLem, Mem = pcall(require, "yomimon_memories")
-        if okLem then Mem.page(s, M, L, book, now) end
+        local okMemories, Memories = pcall(require, "yomimon_memories")
+        if okMemories then Memories.page(s, M, L, book, now) end
     end
 
     local strong = M.strongThemes(s)
@@ -1563,19 +1562,19 @@ end
 function M.chapterSubjects(L, C)
     local lit = {}
     if not C or (C.pages or 0) < 1 then return lit end
-    local pgs_before = (L.pages or 0) - C.pages
+    local pages_before = (L.pages or 0) - C.pages
     for as, c in pairs(C.subjects or {}) do
         local before = ((L.subjects or {})[as] or c) - c
-        if pgs_before < 10 then
+        if pages_before < 10 then
             if c >= 3 then lit[as] = true end
-        elseif c >= 2 and c / C.pages >= 2 * before / pgs_before then
+        elseif c >= 2 and c / C.pages >= 2 * before / pages_before then
             lit[as] = true
         end
     end
     return lit
 end
 
---- A chapter started (acabou = false: only the title counts) or ended (title and text): if it talks about a
+--- A chapter started (ended = false: only the title counts) or ended (title and text): if it talks about a
 -- subject, the first card that fits is stored (yomimon_cards.lua). One card per chapter.
 function M.chapterCard(s, L, chapter_name, ended, now, book)
     local C = L.caps and L.caps[chapter_name]
@@ -1584,10 +1583,10 @@ function M.chapterCard(s, L, chapter_name, ended, now, book)
     local subjects = chapter_name:find(" %(%d+%)$") and {} or M.titleSubjects(chapter_name)
     if ended then for as in pairs(M.chapterSubjects(L, C)) do subjects[as] = true end end
     if not next(subjects) then return end
-    local okC, Cards = pcall(require, "yomimon_cards")
-    local okE, State = pcall(require, "yomimon_state")
-    if not (okC and okE) then return end
-    -- {personagem}: who appears most in the chapter (by the most used name of the person)
+    local okCalibration, Cards = pcall(require, "yomimon_cards")
+    local okState, State = pcall(require, "yomimon_state")
+    if not (okCalibration and okState) then return end
+    -- {character}: who appears most in the chapter (by the most used name of the person)
     local person = {}
     for _, p in ipairs(M.charactersInfoOf(L)) do for _, f in ipairs(p.forms or { p.nameText }) do person[f] = p end end
     local nameText = biggestOf(C.chars)
@@ -1599,15 +1598,15 @@ end
 --- The event that stands out most in a chapter, or nil. With little of the book read before, asks for 3+
 -- signals of the event; afterwards, double the frequency of the rest of the book (and 2+ signals).
 function M.chapterEvent(L, C)
-    local pgs_before = (L.pages or 0) - C.pages
+    local pages_before = (L.pages or 0) - C.pages
     local best, grade = nil, 0
     for ev, c in pairs(C.events or {}) do
         local before = ((L.events or {})[ev] or c) - c
         local highlight
-        if pgs_before < 10 then
+        if pages_before < 10 then
             highlight = c >= 3 and c or 0
         else
-            local rate, base = c / C.pages, before / pgs_before
+            local rate, base = c / C.pages, before / pages_before
             highlight = (c >= 2 and rate >= 2 * base) and (rate / math.max(base, 0.01)) or 0
         end
         if highlight > grade then best, grade = ev, highlight end
@@ -1615,7 +1614,7 @@ function M.chapterEvent(L, C)
     return best
 end
 
---- Comment on a chapter that just ended: { texto, evento? } or nil.
+--- Comment on a chapter that just ended: { textValue, event? } or nil.
 function M.chapterComment(s, L, chapter_name, draw)
     draw = draw or math.random
     local C = L.caps[chapter_name]
@@ -1657,9 +1656,9 @@ function M.chapterComment(s, L, chapter_name, draw)
     end
     -- 5) weather compared with the average of the previous ones
     if #earlier >= 1 then
-        local sum, pgs = 0, 0
-        for _, D in ipairs(earlier) do sum, pgs = sum + D.weather, pgs + D.pages end
-        local before = pgs > 0 and sum / pgs or 0
+        local sum, pages_seen = 0, 0
+        for _, D in ipairs(earlier) do sum, pages_seen = sum + D.weather, pages_seen + D.pages end
+        local before = pages_seen > 0 and sum / pages_seen or 0
         local now_c = C.weather / C.pages
         -- limits calibrated on the books (10% of the chapters each); without calibration, ±1
         local lg = (L.pages_pt or 0) * 2 > (L.pages or 0) and "pt" or "en"
@@ -1670,7 +1669,7 @@ function M.chapterComment(s, L, chapter_name, draw)
     return nil
 end
 
---- Who narrates the book: { primeira = true/false, genero = "f"/"m"/nil }, or nil if it is still early.
+--- Who narrates the book: { first = true/false, gender = "f"/"m"/nil }, or nil if it is still early.
 -- First person = more than 2% of the words are "eu/me/meu…" (with at least 1,500 words read).
 function M.narrator(L)
     local N = L and L.narrator
@@ -1683,7 +1682,7 @@ function M.narrator(L)
     return info
 end
 
---- People and works cited in a book, most cited first: { {nome, vezes}, ... }.
+--- People and works cited in a book, most cited first: { {nameText, times}, ... }.
 function M.references(s, book)
     local L = book and s.books and s.books[book]
     local list = {}
@@ -1719,11 +1718,11 @@ end
 -- Phrases that come from the books ------------------------------------------------------
 
 
--- Quotations of the current book ({nome} cited {n} times) and who narrates.
--- A character's line quoted by it ({nome} said {fala}).
+-- Quotations of the current book ({nameText} cited {n} times) and who narrates.
+-- A character's line quoted by it ({nameText} said {speech}).
 
 
---- A phrase influenced by the books, or nil. temperamento (optional): "jovem" or "velha".
+--- A phrase influenced by the books, or nil. temperament (optional): "young" or "old".
 function M.speech(s, draw, temperament)
     draw = draw or math.random
     local a, b = M.ambivalent(s)
@@ -1743,17 +1742,17 @@ function M.speech(s, draw, temperament)
             return (draws(bank, draw):gsub("{nameText}", ref[1]):gsub("{n}", tostring(ref[2])))
         end
     end
-    local cit = M.quotation(s, book, draw, 90)
-    if cit then
+    local quoted = M.quotation(s, book, draw, 90)
+    if quoted then
         local bank = SPEECHES_QUOTATION[temperament == "young" and "young" or "old"]
         options[#options + 1] = function()
-            local t = draws(bank, draw):gsub("{nameText}", cit.nameText):gsub("{speech}", function() return cit.speech end)
+            local t = draws(bank, draw):gsub("{nameText}", quoted.nameText):gsub("{speech}", function() return quoted.speech end)
             return (t:gsub("([%?!])\226\128\157,", "%1\226\128\157"):gsub("%.\226\128\157,", ",\226\128\157"))
         end
     end
-    local narr = M.narrator(L)
-    if narr and narr.first then
-        options[#options + 1] = function() return draws(SPEECHES_NARRATOR[narr.gender or "neutro"], draw) end
+    local narration = M.narrator(L)
+    if narration and narration.first then
+        options[#options + 1] = function() return draws(SPEECHES_NARRATOR[narration.gender or "neutro"], draw) end
     end
     if #options > 0 then return options[draw(#options)]() end
 end
@@ -1796,8 +1795,8 @@ local function textNames(textValue, names)
 end
 
 --- Yomimon's comment on a highlight.
--- item: { texto, nota, capitulo, data ("YYYY-MM-DD HH:MM:SS") }
--- ctx:  { temperamento, livro, personagens = {...}, ordem = n-th of the book, total = n of the book,
+-- item: { textValue, grade, chapter, data ("YYYY-MM-DD HH:MM:SS") }
+-- ctx:  { temperament, book, characters = {...}, order = n-th of the book, total = n of the book,
 --         in_chapter = how many in the same chapter, s = state (for the trait variants) }
 function M.contextComment(item, ctx)
     local textValue = item.textValue or ""
@@ -1819,8 +1818,8 @@ function M.contextComment(item, ctx)
     if #names >= 1 then add(string.format(takes(C.character), names[1])) end
     local theme = M.textTheme(textValue)
     if theme and C.theme[theme] then add(takes(C.theme[theme])) end
-    local n_pal = select(2, textValue:gsub("%S+", ""))
-    if n_pal <= 6 then add(takes(C.short_one)) elseif n_pal >= 70 then add(takes(C.long)) end
+    local n_words = select(2, textValue:gsub("%S+", ""))
+    if n_words <= 6 then add(takes(C.short_one)) elseif n_words >= 70 then add(takes(C.long)) end
     local hour = tonumber((item.data or ""):match(" (%d%d):"))
     if hour and hour >= 0 and hour < 5 then add(string.format(takes(C.small_hours), tostring(hour))) end
     if ctx.order == 1 and ctx.book then add(string.format(takes(C.first_one), ctx.book)) end

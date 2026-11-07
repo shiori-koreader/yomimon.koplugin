@@ -2,14 +2,14 @@
 Yomimon's phrase generator, by stage.
 
 Each phrase = opening + core + closing (each part may be empty). The vocabulary of
-each stage changes the degree of innocence: the ninfa is curious and scared; the jovem, anxious and
-starting to be ironic; the adulta, cultured and cynical; the anciã, bitter, wise and grumpy.
+each stage changes the degree of innocence: the nymph is curious and scared; the young, anxious and
+starting to be ironic; the adult, cultured and cynical; the elder, bitter, wise and grumpy.
 
 Gaps in the cores (filled with what it ate):
-  {livro}       title of the current book
-  {personagem}  a frequent character of the current book
-  {tema}        the obsession of the moment (e.g. "o mar")
-  {palavra}     the last difficult word it ate
+  {book}       title of the current book
+  {character}  a frequent character of the current book
+  {theme}        the obsession of the moment (e.g. "o mar")
+  {word}     the last difficult word it ate
 Cores with gaps that have no data available are skipped.
 ]]
 
@@ -25,8 +25,19 @@ for stage, banks in pairs(Language.content("speech")) do F[stage] = banks end
 
 -- Dreams: what it mutters while sleeping (at night and on the sleep screen), by temperament.
 
--- ninfa uses F.ninfa, jovem F.jovem, adulta F.adulta, anciã F.ancia
+-- nymph uses F.nymph, young F.young, adult F.adult, elder F.elder
 local PER_STAGE = { nymph = F.nymph, young = F.young, adult = F.adult, elder = F.elder }
+
+local function continuesLowercase(opening)
+    local rule = Language.format().lowercase_after or {}
+    for _, ending in ipairs(rule.endings or {}) do
+        if opening:sub(-#ending) == ending then return true end
+    end
+    for _, whole in ipairs(rule.openings or {}) do
+        if opening == whole then return true end
+    end
+    return false
+end
 
 local function gaps(textValue)
     local list = {}
@@ -42,7 +53,7 @@ function F.count(stage)
     return uniques(g.opening) * uniques(g.core) * uniques(g.closing)
 end
 
---- Builds a phrase from a bank { abertura, nucleo, fecho }.
+--- Builds a phrase from a bank { opening, core, closing }.
 -- Returns the phrase and the core used (before filling), which serves to avoid repetition.
 local function generateFrom(g, data, draw)
     local possible = {}
@@ -52,10 +63,10 @@ local function generateFrom(g, data, draw)
         if ok then possible[#possible + 1] = n end
     end
     if #possible == 0 then return nil end
-    -- dados.voz swaps the trait marks and domain words for what applies (yomimon_voice.lua); without it,
+    -- data.voice swaps the trait marks and domain words for what applies (yomimon_voice.lua); without it,
     -- the default text of each mark applies
     local voice = data.voice or function(t) return Voice.resolver(t, nil) end
-    -- dados.escolher: a draw in which the phrase that matches it weighs more (yomimon_voice.lua)
+    -- data.pick: a draw in which the phrase that matches it weighs more (yomimon_voice.lua)
     local pick = data.pick or function(list) return list[draw(#list)] end
     -- the domain vocabulary enters once per phrase: the part that comes after does not use it (less seasoning)
     local core = pick(possible)
@@ -63,15 +74,11 @@ local function generateFrom(g, data, draw)
     local _, already_domain
     core, _, already_domain = voice(core)
     local parts = {}
-    local a, _, dom_a = voice(pick(g.opening, already_domain), already_domain)
-    already_domain = already_domain or dom_a
+    local a, _, new_domain = voice(pick(g.opening, already_domain), already_domain)
+    already_domain = already_domain or new_domain
     if a ~= "" then parts[#parts + 1] = a end
-    -- after "Sabia que…"/"mas"/":" the phrase continues in lowercase (never a proper name,
-    -- nor the English "I")
-    if a ~= "" and not core:match("^{") and not core:match("^I[%s']")
-            and (a:sub(-1) == ":" or a:sub(-3) == "mas" or a:sub(-3) == "but" or a:sub(-1) == ","
-            or a == "Sabia que…" or a == "Acho que…" or a == "Pensei bastante e" or a == "I think…"
-            or a == "I've thought about it and") then
+    -- the core continues in lowercase after a connective opening (never a proper name, nor the English "I")
+    if a ~= "" and not core:match("^{") and not core:match("^I[%s']") and continuesLowercase(a) then
         core = core:gsub("^(%u)", string.lower)
     end
     core = core:gsub("{(%a+)}", function(b) return data[b] end)
@@ -85,14 +92,14 @@ local function generateFrom(g, data, draw)
     return table.concat(parts, " "), template
 end
 
---- Generates a phrase. dados = { livro=, personagem=, tema=, palavra=, voz=, escolher= } (fields may be missing).
+--- Generates a phrase. data = { book=, character=, theme=, word=, voice=, pick= } (fields may be missing).
 function F.generate(stage, data, draw)
     local g = PER_STAGE[stage]
     if not g then return nil end
     return generateFrom(g, data or {}, draw or math.random)
 end
 
---- A dream (a phrase while sleeping). temperamento: "jovem" or "velha".
+--- A dream (a phrase while sleeping). temperament: "young" or "old".
 function F.dream(temperament, data, draw)
     local g = F.dreamPhrase[temperament]
     if not g then return nil end

@@ -14,7 +14,9 @@ yomimon_locales/<code>/
 
 Start by copying `locales/en/` to `yomimon_locales/<code>/` and translating in place.
 
-- **locale.lua** returns `{ name = "Español", format = { clock, months, ordinals, thousands } }`.
+- **locale.lua** returns `{ name = "Español", format = { clock, months, ordinals, thousands, lowercase_after } }`.
+  `lowercase_after = { endings = {...}, openings = {...} }` lists the phrase openings after which the next part starts
+  in lowercase (a connective such as "but", or a whole opening such as "I think…"); it is optional.
 - **ui.lua** returns `{ ["English text"] = "translation" }`. The keys are the English texts used by the code
   (`T"Back"`), so a missing key shows the English text. `lua scripts/check_locales.lua` lists what is untranslated.
 - **content/** and **data/** keep the structure of the English files: only the phrases change. Keep the `%s` and

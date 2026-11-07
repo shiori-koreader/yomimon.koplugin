@@ -9,5 +9,6 @@ return {
                    "novembro", "dezembro" },
         ordinals = { "Segundo", "Terceiro", "Quarto", "Quinto", "Sexto" },
         thousands = ".",
+        lowercase_after = { endings = { ":", ",", "mas" }, openings = { "Sabia que…", "Acho que…", "Pensei bastante e" } },
     },
 }

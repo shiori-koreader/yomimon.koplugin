@@ -10,5 +10,6 @@ return {
                    "November", "December" },
         ordinals = { "Second", "Third", "Fourth", "Fifth", "Sixth" },
         thousands = ",",
+        lowercase_after = { endings = { ":", ",", "but" }, openings = { "I think…", "I've thought about it and" } },
     },
 }

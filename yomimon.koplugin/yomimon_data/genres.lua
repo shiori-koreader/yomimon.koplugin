@@ -3,59 +3,60 @@
 -- on Gutenberg, the Library of Congress subjects ("Detective and mystery stories"); in shops,
 -- the BISAC ones ("FICTION / Mystery & Detective"). A book without tags (MOBI, PDF, almost everything downloaded
 -- around) follows only the text.
--- They only serve as a map: they say which genre the book is (yomimon_influences.lua, Infl.perfil). The influence still
+-- They only serve as a map: they say which genre the book is (yomimon_influences.lua, Infl.profile). The influence still
 -- moves page by page, by what was really read.
 -- Each line: a fragment (lowercase, no accents) and the influences it indicates. In Portuguese, "romance" is
 -- the book's genre, not love: it stays out.
 return {
     -- mystery and investigation
-    { "detective", "misterio" }, { "mystery", "misterio" }, { "private investigator", "misterio" },
+    { "detective", "mystery" }, { "mystery", "mystery" }, { "private investigator", "mystery" },
     -- (without "murder" or "theft": "Murder victims' families" is Hamlet, "Pet theft" is The Call of the Wild)
-    { "police", "misterio" }, { "suspense", "misterio" },
-    { "thriller", "misterio" }, { "policial", "misterio" }, { "investigac", "misterio" }, { "misterio", "misterio" },
+    { "police", "mystery" }, { "suspense", "mystery" },
+    { "thriller", "mystery" }, { "policial", "mystery" }, { "investigac", "mystery" }, { "misterio", "mystery" },
     -- horror and gothic
     { "horror", "horror" }, { "ghost", "horror" }, { "vampire", "horror" }, { "gothic", "horror" },
     { "supernatural", "horror" }, { "paranormal", "horror" }, { "haunted", "horror" }, { "terror", "horror" },
     { "fantasma", "horror" }, { "vampir", "horror" }, { "gotic", "horror" }, { "sobrenatural", "horror" },
     -- adventure and exploration
-    { "adventure", "aventura" }, { "sea stories", "aventura" }, { "voyages", "aventura" }, { "travelers", "aventura" },
-    { "shipwreck", "aventura" }, { "pirates", "aventura" }, { "explor", "aventura" }, { "aventura", "aventura" },
-    { "viagens", "aventura" }, { "pirata", "aventura" }, { "naufragio", "aventura" },
+    { "adventure", "adventure" }, { "sea stories", "adventure" }, { "voyages", "adventure" }, { "travelers", "adventure" },
+    { "shipwreck", "adventure" }, { "pirates", "adventure" }, { "explor", "adventure" }, { "aventura", "adventure" },
+    { "viagens", "adventure" }, { "pirata", "adventure" }, { "naufragio", "adventure" },
     -- epic fantasy
-    { "fantasy", "epica" }, { "epic", "epica" }, { "imaginary wars", "epica" }, { "knights", "epica" },
-    { "fantasia", "epica" }, { "epopeia", "epica" }, { "cavalaria", "epica" },
+    { "fantasy", "epic" }, { "epic", "epic" }, { "imaginary wars", "epic" }, { "knights", "epic" },
+    { "fantasia", "epic" }, { "epopeia", "epic" }, { "cavalaria", "epic" },
     -- myth and folklore
-    { "mytholog", "mito" }, { "legends", "mito" },  -- "legends", não "legend": "(Legendary character)" é Hamlet, Lear { "folklore", "mito" }, { "fairy tales", "mito" },
-    { "mitolog", "mito" }, { "lenda", "mito" }, { "folclore", "mito" }, { "contos de fada", "mito" },
+    -- "legends", not "legend": "(Legendary character)" is Hamlet, Lear
+    { "mytholog", "myth" }, { "legends", "myth" }, { "folklore", "myth" }, { "fairy tales", "myth" },
+    { "mitolog", "myth" }, { "lenda", "myth" }, { "folclore", "myth" }, { "contos de fada", "myth" },
     -- magical and fantastic realism
-    { "magic realism", "magico" }, { "magical realism", "magico" }, { "fantastic fiction", "magico" },
-    { "realismo magico", "magico" }, { "fantastico", "magico" },
+    { "magic realism", "magical" }, { "magical realism", "magical" }, { "fantastic fiction", "magical" },
+    { "realismo magico", "magical" }, { "fantastico", "magical" },
     -- science fiction and dystopia
-    { "science fiction", "ficcao" }, { "dystopia", "ficcao" }, { "utopia", "ficcao" }, { "time travel", "ficcao" },
-    { "interplanetary", "ficcao" }, { "ficcao cientifica", "ficcao" }, { "distopia", "ficcao" },
+    { "science fiction", "science_fiction" }, { "dystopia", "science_fiction" }, { "utopia", "science_fiction" }, { "time travel", "science_fiction" },
+    { "interplanetary", "science_fiction" }, { "ficcao cientifica", "science_fiction" }, { "distopia", "science_fiction" },
     -- romance and emotional drama
     { "love stories", "romance" }, { "romance fiction", "romance" }, { "courtship", "romance" },
     { "first loves", "romance" }, { "man-woman relationships", "romance" }, { "historia de amor", "romance" },
     { "romantic", "romance" }, { "romantico", "romance" },
     -- satire and comedy
-    { "satire", "satira" }, { "humorous", "satira" }, { "humor", "satira" }, { "comed", "satira" },
-    { "satira", "satira" }, { "comedia", "satira" },
+    { "satire", "satire" }, { "humorous", "satire" }, { "humor", "satire" }, { "comed", "satire" },
+    { "satira", "satire" }, { "comedia", "satire" },
     -- tragedy
-    { "traged", "tragedia" }, { "tragedia", "tragedia" },
+    { "traged", "tragedy" }, { "tragedia", "tragedy" },
     -- psychology and introspection
-    { "psychological", "psicologia" }, { "psicologic", "psicologia" },
+    { "psychological", "psychology" }, { "psicologic", "psychology" },
     -- social realism
     { "social classes", "social" }, { "social conditions", "social" }, { "social problems", "social" },
     { "working class", "social" }, { "slums", "social" }, { "poor", "social" }, { "immigrants", "social" },
     { "pobreza", "social" }, { "operari", "social" },
     -- poetry and lyricism
-    { "poetry", "poesia" }, { "poems", "poesia" }, { "sonnets", "poesia" }, { "poesia", "poesia" },
-    { "poema", "poesia" }, { "soneto", "poesia" },
+    { "poetry", "poetry" }, { "poems", "poetry" }, { "sonnets", "poetry" }, { "poesia", "poetry" },
+    { "poema", "poetry" }, { "soneto", "poetry" },
     -- philosophy and metaphysics
-    { "philosophy", "filosofia" }, { "ethics", "filosofia" }, { "metaphysics", "filosofia" },
-    { "filosofia", "filosofia" }, { "metafisica", "filosofia" },
+    { "philosophy", "philosophy" }, { "ethics", "philosophy" }, { "metaphysics", "philosophy" },
+    { "filosofia", "philosophy" }, { "metafisica", "philosophy" },
     -- existentialism and the absurd
-    { "existential", "existencial" }, { "absurd", "existencial" }, { "existencial", "existencial" },
+    { "existential", "existential" }, { "absurd", "existential" }, { "existencial", "existential" },
     -- nihilism and scepticism
-    { "nihilism", "niilismo" }, { "pessimism", "niilismo" }, { "niilismo", "niilismo" }, { "pessimismo", "niilismo" },
+    { "nihilism", "nihilism" }, { "pessimism", "nihilism" }, { "niilismo", "nihilism" }, { "pessimismo", "nihilism" },
 }

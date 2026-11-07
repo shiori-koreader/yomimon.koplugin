@@ -1,32 +1,32 @@
 --[[--
-Yomimon's voice: the only place that understands the variant marks inside phrases (PLANO-VOZ.md).
+Yomimon's voice: the only place that understands the variant marks inside phrases.
 
 Step 1, trait inside the phrase (as in Wildermyth):
 
-    "Achei um ponto final e <amarga:fiquei aliviada|otimista:já quero o próximo|fiquei com medo de acabar>."
+    "Achei um ponto final e <bitter:fiquei aliviada|hopeful:já quero o próximo|fiquei com medo de acabar>."
 
-- The mark starts with an option with a label. Each label is a trait pole: amarga, otimista, medrosa,
-  corajosa, cinica, romantica, popular, erudita, diurna or noturna. The option of the strongest striking pole
+- The mark starts with an option with a label. Each label is a trait pole: bitter, hopeful, fearful,
+  brave, cynical, romantic, popular, erudite, diurnal or nocturnal. The option of the strongest striking pole
   (Traits.STRIKING) among those listed wins; a tie keeps the first.
-- Optional threshold: "medrosa.60:" only applies with the trait at 60 or more.
+- Optional threshold: "fearful.60:" only applies with the trait at 60 or more.
 - The option without a label is the usual phrase: it applies when no listed pole is striking. It may be empty.
-- Gaps {livro}, {personagem}… may go inside the options, the same in all. %s and %d never: string.format
+- Gaps {book}, {character}… may go inside the options, the same in all. %s and %d never: string.format
   counts all the options.
 
 Step 2, vocabulary of what it ate (the domains of Caves of Qud):
 
-    "Lambi a capa. Só tinha {gosto|poeira}."         → "Só tinha sal." (whoever has been reading about the sea)
-    "Ainda mastigando “%s”.<dominio: Tem gosto de {gosto}.|>"
+    "Lambi a capa. Só tinha {taste|poeira}."         → "Só tinha sal." (whoever has been reading about the sea)
+    "Ainda mastigando “%s”.<domain: Tem gosto de {taste}.|>"
 
 - Each theme has a vocabulary (yomimon_locales/<code>/data/domains.lua) with six kinds of word:
-  gosto, cheiro, comparacao, exclamacao, lugar and coisa.
+  taste, smell, comparison, exclamation, place and thing.
 - The domain of a phrase is the current book's or life's, its obsession (s.dominant_theme); when both
   exist and differ, the book's wins 6 times in 10. The book's, after a few pages, is the
   theme it has most ABOVE the average page (yomimon_base_topics.lua): family and time are in almost every
   old novel, so Dracula becomes fear, not time, and Macbeth becomes politics, not family.
-- {gosto|padrão}: the domain's word, or the default when there is no domain. {gosto} without a default only in the
+- {taste|default}: the domain's word, or the default when there is no domain. {taste} without a default only in the
   generator cores, which skips the core when there is no domain.
-- The "dominio:" option of a mark applies when there is a domain and no listed pole won.
+- The "domain:" option of a mark applies when there is a domain and no listed pole won.
 - It prefers words not yet used: it only repeats after going through all of the kind.
 
 Pure logic (no KOReader), testable outside it.
@@ -37,7 +37,7 @@ local Traits = require("yomimon_traits")
 
 local Voice = {}
 
--- pole → axis and direction ("medrosa" → coragem, -1)
+-- pole → axis and direction ("fearful" → courage, -1)
 local POLES = {}
 for _, tr in ipairs(Traits.LIST) do
     POLES[tr.neg] = { axis = tr.id, signal = -1 }
@@ -49,12 +49,12 @@ Voice.POLES = POLES
 Voice.SLOTS = { taste = true, smell = true, comparison = true, exclamation = true, place = true, thing = true }
 
 Voice.BOOK_MIN_PAGES = 10  -- the book only becomes a domain after 10 pages…
-Voice.BOOK_MIN_POINTS = 5    -- …with the theme at 5 points or more (count × theme weight, as in L.temas)
+Voice.BOOK_MIN_POINTS = 5    -- …with the theme at 5 points or more (count × theme weight, as in L.themes)
 Voice.BOOK_CHANCE = 6        -- in 10: the book's domain beats life's
 
--- How much of each theme an average page has, by language (ferramentas/validacao/calcular_base_temas.lua).
-local okB, BASE_THEMES = pcall(require, "yomimon_base_topics")
-Voice.BASE_THEMES = okB and type(BASE_THEMES) == "table" and BASE_THEMES or nil
+-- How much of each theme an average page has, by language.
+local okBase, BASE_THEMES = pcall(require, "yomimon_base_topics")
+Voice.BASE_THEMES = okBase and type(BASE_THEMES) == "table" and BASE_THEMES or nil
 
 local banks = {}
 --- Domain vocabulary in the current language (or nil).
@@ -97,7 +97,7 @@ function Voice.domainAvailable(s)
     return (l and B[l] ~= nil) or (v and B[v] ~= nil) or false
 end
 
---- The domain of a phrase: the book's or life's (sorteio(n) returns from 1 to n).
+--- The domain of a phrase: the book's or life's (draw(n) returns from 1 to n).
 function Voice.domain(s, draw)
     local B = Voice.bank()
     if not B then return nil end
@@ -128,7 +128,7 @@ function Voice.word(theme, slot, draw)
     return p
 end
 
---- The options of a mark, separated by "|" (the "|" inside {gosto|padrão} does not separate).
+--- The options of a mark, separated by "|" (the "|" inside {taste|default} does not separate).
 function Voice.parts(body)
     local out, ini, level = {}, 1, 0
     for i = 1, #body do
@@ -141,7 +141,7 @@ function Voice.parts(body)
     return out
 end
 
---- Options of a group (the text between < and >): { {polo=, limiar=, texto=} | {dominio=true, texto=} | {texto=} }.
+--- Options of a group (the text between < and >): { {pole=, threshold=, textValue=} | {domain=true, textValue=} | {textValue=} }.
 -- Returns nil if no option has a label (it is not a variant mark).
 function Voice.options(body)
     local list, some = {}, false
@@ -161,20 +161,20 @@ function Voice.options(body)
 end
 
 local function pick(list, traits, hasDomain)
-    local best, val, default, dom
+    local best, val, default, dominant
     for _, o in ipairs(list) do
         if o.pole then
             local p = POLES[o.pole]
             local v = (traits[p.axis] or 0) * p.signal
             if v >= o.threshold and (not best or v > val) then best, val = o, v end
         elseif o.domain then
-            dom = dom or o
+            dominant = dominant or o
         elseif not default then
             default = o
         end
     end
     if best then return best.textValue, best.pole end
-    if dom and hasDomain() then return dom.textValue end
+    if dominant and hasDomain() then return dominant.textValue end
     return default and default.textValue or ""
 end
 
@@ -186,12 +186,12 @@ function Voice.resolver(textValue, s, draw, no_domain)
         return textValue, {}, nil
     end
     local traits = s and s.traits or {}
-    local polos, used = {}, nil
-    local dom  -- the phrase's domain, decided once only (false: none)
+    local poles, used = {}, nil
+    local dominant  -- the phrase's domain, decided once only (false: none)
     local function domain()
         if no_domain then return nil end
-        if dom == nil then dom = Voice.domain(s, draw) or false end
-        return dom or nil
+        if dominant == nil then dominant = Voice.domain(s, draw) or false end
+        return dominant or nil
     end
     -- 1) domain words, inside and outside the marks; each one stays between \1 and \2 until the end, to
     --    know whether it survived the choice of the mark
@@ -208,14 +208,14 @@ function Voice.resolver(textValue, s, draw, no_domain)
         local list = Voice.options(body)
         if not list then return nil end  -- not a mark: stays as it is
         local picked_one, pole = pick(list, traits, domain)
-        if pole then polos[#polos + 1] = pole end
+        if pole then poles[#poles + 1] = pole end
         return picked_one
     end)
-    if out:find("\1", 1, true) then used = dom or nil end
+    if out:find("\1", 1, true) then used = dominant or nil end
     out = out:gsub("[\1\2]", "")
     -- an empty option leaves extra space
     out = out:gsub("  +", " "):gsub("^ ", ""):gsub(" $", ""):gsub(" ([%.,!%?])", "%1")
-    return out, polos, used
+    return out, poles, used
 end
 
 -- Step 4, the phrase that matches it wins (Valve, Hades, Emily Short) ----------------------------
@@ -227,15 +227,15 @@ Voice.DOMAIN_WEIGHT = 4   -- how much more a phrase with a domain word weighs, i
 -- of phrases with a clue; with 8 and 4, all pass, without losing variety)
 
 local clues_cache = {}  -- by bank text (the banks are fixed, so the cache does not grow forever)
---- What a phrase can show: { polos = {polo = true}, dominio = bool } (stored by text).
+--- What a phrase can show: { polos = {pole = true}, domain = bool } (stored by text).
 function Voice.clues(textValue)
-    if type(textValue) ~= "string" then return { polos = {}, domain = false } end
+    if type(textValue) ~= "string" then return { poles = {}, domain = false } end
     local p = clues_cache[textValue]
     if p then return p end
-    p = { polos = {}, domain = false }
+    p = { poles = {}, domain = false }
     for body in textValue:gmatch("<([^<>]*)>") do
         for _, o in ipairs(Voice.options(body) or {}) do
-            if o.pole then p.polos[o.pole] = true end
+            if o.pole then p.poles[o.pole] = true end
             if o.domain then p.domain = true end
         end
     end
@@ -250,7 +250,7 @@ function Voice.weight(textValue, s, domainAvailable)
     local p = Voice.clues(textValue)
     local w = 1
     local traits = s and s.traits or {}
-    for pole in pairs(p.polos) do
+    for pole in pairs(p.poles) do
         local q = POLES[pole]
         if (traits[q.axis] or 0) * q.signal >= Traits.STRIKING then w = w + Voice.TRAIT_WEIGHT; break end
     end
@@ -261,15 +261,15 @@ function Voice.weight(textValue, s, domainAvailable)
     return w
 end
 
---- Draws an item from the list, with the weight of each phrase (sorteio(n) returns from 1 to n).
+--- Draws an item from the list, with the weight of each phrase (draw(n) returns from 1 to n).
 -- no_domain (optional): the domain gives no weight (already used in another part of the phrase).
 function Voice.pick(list, s, draw, no_domain)
     draw = draw or math.random
     if not list or #list == 0 then return nil end
-    local dom = not no_domain and Voice.domainAvailable(s)
+    local dominant = not no_domain and Voice.domainAvailable(s)
     local weights, total = {}, 0
     for i, t in ipairs(list) do
-        weights[i] = Voice.weight(t, s, dom)
+        weights[i] = Voice.weight(t, s, dominant)
         total = total + weights[i]
     end
     if total == #list then return list[draw(#list)] end  -- nobody stands out: the usual draw
@@ -282,7 +282,7 @@ function Voice.pick(list, s, draw, no_domain)
 end
 
 --- Cause invented afterwards (Caves of Qud): the bad mood gets a real reason from the current book, the
--- event that stood out most in a recent chapter. temperamento: "jovem" or "velha".
+-- event that stood out most in a recent chapter. temperament: "young" or "old".
 -- Returns the phrase or nil.
 function Voice.cause(s, temperament, draw)
     local B = Voice.bank()

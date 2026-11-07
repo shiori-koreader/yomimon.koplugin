@@ -11,14 +11,14 @@ local MARGIN = 2
 local FITS = Sprite.SIDE - 2 * MARGIN
 
 -- starts from the average in the cell's tone; the rest comes from the darkest pixel, which keeps the outline
-local MEDIA = 0.5
+local MEAN_WEIGHT = 0.5
 
 -- luminance thresholds (0-255) for the tones EE, BB, 88, 55 and black
 local TONES = { { 0xF6, "4" }, { 0xB8, "3" }, { 0x78, "2" }, { 0x3C, "1" } }
 
-local function tone(lum)
+local function tone(luma)
     for _, t in ipairs(TONES) do
-        if lum >= t[1] then return t[2] end
+        if luma >= t[1] then return t[2] end
     end
     return "#"
 end
@@ -27,7 +27,7 @@ end
 -- Without a useful alpha channel (all opaque), the background is the colour of the top left corner.
 function Sprite.convert(w, h, pixel)
     if not w or not h or w < 1 or h < 1 then return nil, "imagem vazia" end
-    local lum, alpha = {}, {}
+    local luma, alpha = {}, {}
     local opaque = true
     for y = 0, h - 1 do
         for x = 0, w - 1 do
@@ -39,7 +39,7 @@ function Sprite.convert(w, h, pixel)
                 opaque = false
                 c = math.min(255, c + (255 - a))
             end
-            lum[i], alpha[i] = c, a
+            luma[i], alpha[i] = c, a
         end
     end
     if opaque then
@@ -67,7 +67,7 @@ function Sprite.convert(w, h, pixel)
     local scale = math.min(FITS / bw, FITS / bh, 1)
     local tw, th = math.max(1, math.floor(bw * scale + 0.5)), math.max(1, math.floor(bh * scale + 0.5))
     local ox, oy = math.floor((Sprite.SIDE - tw) / 2), Sprite.SIDE - MARGIN - th
-    local passo_x, passo_y = bw / tw, bh / th
+    local step_x, step_y = bw / tw, bh / th
     local lines = {}
     for j = 0, Sprite.SIDE - 1 do
         local line = {}
@@ -75,9 +75,9 @@ function Sprite.convert(w, h, pixel)
             local c = " "
             local ti, tj = i - ox, j - oy
             if ti >= 0 and ti < tw and tj >= 0 and tj < th then
-                local sx0, sx1 = x0 + ti * passo_x, x0 + (ti + 1) * passo_x
-                local sy0, sy1 = y0 + tj * passo_y, y0 + (tj + 1) * passo_y
-                local weight, cob, sum, minimum = 0, 0, 0, 255
+                local sx0, sx1 = x0 + ti * step_x, x0 + (ti + 1) * step_x
+                local sy0, sy1 = y0 + tj * step_y, y0 + (tj + 1) * step_y
+                local weight, covered, sum, minimum = 0, 0, 0, 255
                 for sy = math.floor(sy0), math.ceil(sy1) - 1 do
                     local wy = math.min(sy + 1, sy1) - math.max(sy, sy0)
                     for sx = math.floor(sx0), math.ceil(sx1) - 1 do
@@ -87,13 +87,13 @@ function Sprite.convert(w, h, pixel)
                         if sx >= 0 and sx < w and sy >= 0 and sy < h then
                             local k = sy * w + sx + 1
                             local a = alpha[k] / 255
-                            cob = cob + wgt * a
-                            sum = sum + wgt * a * lum[k]
-                            if alpha[k] >= 128 and lum[k] < minimum then minimum = lum[k] end
+                            covered = covered + wgt * a
+                            sum = sum + wgt * a * luma[k]
+                            if alpha[k] >= 128 and luma[k] < minimum then minimum = luma[k] end
                         end
                     end
                 end
-                if weight > 0 and cob / weight >= 0.45 then c = tone(MEDIA * sum / cob + (1 - MEDIA) * minimum) end
+                if weight > 0 and covered / weight >= 0.45 then c = tone(MEAN_WEIGHT * sum / covered + (1 - MEAN_WEIGHT) * minimum) end
             end
             line[#line + 1] = c
         end
@@ -151,14 +151,14 @@ function Sprite.ball()
     return lines
 end
 
-local GRIS = { ["#"] = 0, ["1"] = 0x55, ["2"] = 0x88, ["3"] = 0xBB, ["4"] = 0xEE }
+local GREYS = { ["#"] = 0, ["1"] = 0x55, ["2"] = 0x88, ["3"] = 0xBB, ["4"] = 0xEE }
 
 --- Smallest rectangle that contains the drawing: x, y (from 0), width and height; nil if empty.
 function Sprite.box(lines)
     local x0, y0, x1, y1 = Sprite.SIDE, Sprite.SIDE, -1, -1
     for j, l in ipairs(lines) do
         for i = 1, #l do
-            if GRIS[l:sub(i, i)] then
+            if GREYS[l:sub(i, i)] then
                 x0, x1 = math.min(x0, i - 1), math.max(x1, i - 1)
                 y0, y1 = math.min(y0, j - 1), math.max(y1, j - 1)
             end
@@ -170,7 +170,7 @@ end
 
 --- Grey tone (0-255) of a drawing character, or nil for background.
 function Sprite.grey(c)
-    return GRIS[c]
+    return GREYS[c]
 end
 
 return Sprite

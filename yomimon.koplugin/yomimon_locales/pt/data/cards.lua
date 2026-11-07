@@ -1,6 +1,5 @@
 --[[--
 Card box (Portuguese). Phrases written by you; nothing enters here without approval.
-Source: the document "Yomimon — Batch 1" (2026-10-28).
 
 Each card:
   id      short, fixed name (the state stores the cards already said by it)
@@ -21,28 +20,28 @@ states what the chapter does not have. They come back when the lists have strong
 
 return {
     {
-        id = "pressagio",
+        id = "omen",
         speech = "Cartas na mesa, sorte de {character}. A minha? Ninguém lê e todo mundo sabe.",
-        when = { screen = "home", subject = "pressagio" },
+        when = { screen = "home", subject = "omen" },
         turned_off = true,
     },
     {
-        id = "alexandria_ancia",
+        id = "alexandria_elder",
         speech = "Já te contei de Alexandria? A família inteira. Num dia só.",
-        when = { screen = "home", subject = "antepassados", stored = "contou de Alexandria", stage = "elder" },
+        when = { screen = "home", subject = "ancestors", stored = "told_of_alexandria", stage = "elder" },
     },
     {
         id = "alexandria",
         speech = "Falaram de antepassados. Os meus morreram no incêndio em Alexandria. Minha avó contou.",
-        when = { screen = "home", subject = "antepassados" },
-        records = "contou de Alexandria",
+        when = { screen = "home", subject = "ancestors" },
+        records = "told_of_alexandria",
         once = true,
     },
     {
-        id = "pai",
+        id = "father",
         speech = "Pai dando conselho. Meu pai? Não conheci. Morreu atropelado por uma enciclopédia Barsa. "
             .. "Morreu fazendo o que amava: tentando chegar à letra M.",
-        when = { screen = "home", subject = "pai" },
+        when = { screen = "home", subject = "father" },
         records = "contou do pai",
         once = true,
         turned_off = true,

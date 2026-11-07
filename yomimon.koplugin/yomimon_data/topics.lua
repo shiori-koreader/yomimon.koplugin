@@ -10,18 +10,18 @@ itself ("great-grandfather") counts as that word.
 ]]
 
 return {
-    pressagio = {
+    omen = {
         "cartas", "baralho", "sorte", "destino", "profecia", "presságio", "agouro", "cartomante", "vidente", "sina",
         "previsão",
         "cards", "deck", "fortune", "fate", "prophecy", "omen", "foretell", "fortune-teller", "seer", "destiny",
     },
-    antepassados = {
+    ancestors = {
         "antepassado", "avô", "bisavô", "linhagem", "genealogia", "descendência", "herança", "sobrenome", "brasão",
         "ancestral",
         "ancestor", "grandfather", "great-grandfather", "lineage", "genealogy", "descent", "heritage", "surname",
         "coat of arms", "forefather",
     },
-    pai = {
+    father = {
         "pai", "papai", "filho", "conselho", "herdeiro", "paterno", "bênção",
         "father", "dad", "son", "advice", "heir", "paternal", "blessing",
     },

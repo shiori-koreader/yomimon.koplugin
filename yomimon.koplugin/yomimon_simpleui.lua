@@ -59,7 +59,7 @@ local function countLines(textValue, face, widthPx)
     return ok and n or math.huge
 end
 
--- linhas(texto): how many lines the phrase takes in the balloon. Returns the text and the lines.
+-- lines(textValue): how many lines the phrase takes in the balloon. Returns the text and the lines.
 local function cardText(plugin, lines)
     local s, now = plugin.state, os.time()
     local e = State.expression(s, now)
@@ -73,8 +73,8 @@ local function cardText(plugin, lines)
 end
 
 -- The UI font, like the other Simple UI widgets; the pixel font stays inside the Yomimon screens.
-local function font(tam_px)
-    return Font:getFace("cfont", tam_px / (Screen:scaleBySize(1000) / 1000))
+local function font(size_px)
+    return Font:getFace("cfont", size_px / (Screen:scaleBySize(1000) / 1000))
 end
 
 -- Card: Yomimon on the left and a pixel balloon (tail pointing at it) on the right.
@@ -102,7 +102,7 @@ function Card:paintTo(bb, x, y)
     local bw = math.floor((self.widthPx - (bx - x) - 2 * u) * 0.72)  -- does not take the whole width
     local bh = math.floor(self.heightPx * 0.62)
     local by = y + math.floor((self.heightPx - bh) / 2)
-    local function r(rx, ry, rw, rh, cor) bb:paintRect(rx, ry, rw, rh, cor) end
+    local function r(rx, ry, rw, rh, color) bb:paintRect(rx, ry, rw, rh, color) end
     -- shadow, background and border with clipped corners
     r(bx + 3 * u, by + 2 * u, bw - 2 * u, bh, BLACK)
     r(bx + 2 * u, by + 3 * u, bw, bh - 2 * u, BLACK)
@@ -253,8 +253,8 @@ local function recordSprite(plugin, folder)
     local bb = Blitbuffer.new(w2, heightPx, Blitbuffer.TYPE_BBRGB32)
     -- Light mode draws the alpha channel over black, so the background is opaque white there; night mode keeps it
     -- transparent because Simple UI undoes the screen inversion for the critter.
-    local noite = Screen.night_mode
-    bb:fill(noite and Blitbuffer.ColorRGB32(0, 0, 0, 0) or Blitbuffer.ColorRGB32(255, 255, 255, 255))
+    local night = Screen.night_mode
+    bb:fill(night and Blitbuffer.ColorRGB32(0, 0, 0, 0) or Blitbuffer.ColorRGB32(255, 255, 255, 255))
     for y = 0, h2 - 1 do
         local line = lines[y0 + math.floor(y * h / h2) + 1]
         for x = 0, w2 - 1 do
@@ -313,9 +313,9 @@ function Integration.syncCritter(plugin, force)
         recordSprite(plugin, folder)
         recordPhrases(plugin, folder)
         local SUISettings = require("infra/sui_store")
-        if force or not G_reader_settings:isTrue("yomimon_critter_escolhido") then
+        if force or not G_reader_settings:isTrue("yomimon_critter_chosen") then
             SUISettings:set("simpleui_critter_cfg_pick", "yomimon")
-            G_reader_settings:saveSetting("yomimon_critter_escolhido", true)
+            G_reader_settings:saveSetting("yomimon_critter_chosen", true)
         end
         local engine = package.loaded["engines/sui_screen_engine"]
         if engine then engine.refreshAllLiveImmediate(false) end

@@ -10,12 +10,13 @@ local TextBoxWidget = require("ui/widget/textboxwidget")
 local TextWidget = require("ui/widget/textwidget")
 local Widget = require("ui/widget/widget")
 local Screen = Device.screen
+local T = require("yomimon_language").t
 
 local State = require("yomimon_state")
 local Download = require("yomimon_download")
 local Sprite = require("yomimon_sprite")
 
--- "p<dex>" is the species' downloaded sprite; "bola" is the fallback while it does not exist.
+-- "p<dex>" is the species' downloaded sprite; "ball" is the fallback while it does not exist.
 local Sprites = { ball = Sprite.ball() }
 setmetatable(Sprites, { __index = function(_, nameText)
     local dex = type(nameText) == "string" and nameText:match("^p(%d+)$")
@@ -90,7 +91,7 @@ end
 
 --- Paints the sprite `nameText` with each pixel becoming a square of `scale` px.
 -- In night mode KOReader inverts the whole screen; the sprite is drawn already inverted to keep its usual
--- look (white card) instead of becoming a negative. Does not apply when recording images (Drawing.gravando).
+-- look (white card) instead of becoming a negative. Does not apply when recording images (Drawing.recording).
 function Drawing.paintSprite(bb, nameText, x, y, scale)
     local lines = Sprites[Drawing.resolver(nameText)]
     if not lines then return end
@@ -105,9 +106,9 @@ function Drawing.paintSprite(bb, nameText, x, y, scale)
             local c = line:sub(i, i)
             local k = i
             while k < n and line:sub(k + 1, k + 1) == c do k = k + 1 end
-            local cor = COLOURS[c]
-            if cor then
-                bb:paintRect(x + (i - 1) * scale, y + (j - 1) * scale, (k - i + 1) * scale, scale, cor)
+            local color = COLOURS[c]
+            if color then
+                bb:paintRect(x + (i - 1) * scale, y + (j - 1) * scale, (k - i + 1) * scale, scale, color)
             end
             i = k + 1
         end
@@ -161,10 +162,10 @@ local function centeredText(bb, textValue, face, screen_width, y, max_width)
         width = max_width,
         alignment = "center",
     }
-    local tam = w:getSize()
-    w:paintTo(bb, math.floor((screen_width - tam.w) / 2), y)
+    local size = w:getSize()
+    w:paintTo(bb, math.floor((screen_width - size.w) / 2), y)
     w:free()
-    return tam.h
+    return size.h
 end
 
 local function thousands(n)  -- 1.234 or 1,234, by language
@@ -196,16 +197,16 @@ function Drawing.generateSleepScreen(s, path, now)
     y = y + math.floor(h * 0.04)
 
     local face_label = Font:getFace("cfont", 20)
-    local barra_w = math.floor((w - 2 * margin) * 0.62)
-    local barra_h = math.floor(h * 0.022)
-    for _, item in ipairs({ { "Barriga", s.belly }, { "Humor", s.mood } }) do
+    local bar_w = math.floor((w - 2 * margin) * 0.62)
+    local bar_h = math.floor(h * 0.022)
+    for _, item in ipairs({ { T"Belly", s.belly }, { T"Mood", s.mood } }) do
         local label = TextWidget:new{ text = item[1], face = face_label }
         local rw = label:getSize()
-        local x0 = math.floor((w - (barra_w + rw.w + margin / 2)) / 2)
-        label:paintTo(bb, x0, y + math.floor((barra_h - rw.h) / 2))
+        local x0 = math.floor((w - (bar_w + rw.w + margin / 2)) / 2)
+        label:paintTo(bb, x0, y + math.floor((bar_h - rw.h) / 2))
         label:free()
-        paintBar(bb, x0 + rw.w + math.floor(margin / 2), y, barra_w, barra_h, item[2] / 100)
-        y = y + barra_h + math.floor(h * 0.02)
+        paintBar(bb, x0 + rw.w + math.floor(margin / 2), y, bar_w, bar_h, item[2] / 100)
+        y = y + bar_h + math.floor(h * 0.02)
     end
 
     local stage = State.stage(s)

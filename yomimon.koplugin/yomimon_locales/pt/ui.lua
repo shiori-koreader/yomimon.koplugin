@@ -31,6 +31,8 @@ return {
     ["ARCHIVE"] = "ARQUIVO",
     ["BACK"] = "VOLTAR",
     ["BELLY"] = "BARRIGA",
+    ["Belly"] = "Barriga",
+    ["Mood"] = "Humor",
     ["BIBLIOPHAGE"] = "BIBLIÓFAGA",
     ["BITTER"] = "AMARGURA",
     ["BOLD"] = "CORAGEM",

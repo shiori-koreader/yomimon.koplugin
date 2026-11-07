@@ -29,7 +29,7 @@ local Traits = require("yomimon_traits")
 local FRAME_SECONDS = 1.2      -- time between animation frames
 local ANIMATION_MINUTES = 5       -- the normal animation stops by itself after this
 
-local WIDE, ALT = 618, 824       -- size of the Figma frame
+local FRAME_W, FRAME_H = 618, 824       -- size of the Figma frame
 
 local BLACK = Blitbuffer.COLOR_BLACK
 local WHITE = Blitbuffer.COLOR_WHITE
@@ -72,12 +72,12 @@ function YomimonScreen:init()
         self.ges_events.Hold = { GestureRange:new{ ges = "hold", range = function() return self.dimen end } }
     end
     self.covers_fullscreen = true
-    local tam = Screen:getSize()
-    self.dimen = Geom:new{ x = 0, y = 0, w = tam.w, h = tam.h }
+    local size = Screen:getSize()
+    self.dimen = Geom:new{ x = 0, y = 0, w = size.w, h = size.h }
     -- Figma-to-screen scale, and margin to centre when the proportion does not match
-    self.k = math.min(tam.w / WIDE, tam.h / ALT)
-    self.ox = math.floor((tam.w - WIDE * self.k) / 2)
-    self.oy = math.floor((tam.h - ALT * self.k) / 2)
+    self.k = math.min(size.w / FRAME_W, size.h / FRAME_H)
+    self.ox = math.floor((size.w - FRAME_W * self.k) / 2)
+    self.oy = math.floor((size.h - FRAME_H * self.k) / 2)
     -- factor KOReader applies to font sizes; compensated in face()
     self.font_factor = Screen:scaleBySize(1000) / 1000
     self.faces = {}
@@ -93,31 +93,31 @@ function YomimonScreen:px(v)
 end
 
 --- Silkscreen face with height `tam` in Figma points.
-function YomimonScreen:face(negrito, tam)
-    local lookupKey = (negrito and "b" or "r") .. tam
+function YomimonScreen:face(bold, size)
+    local lookupKey = (bold and "b" or "r") .. size
     if not self.faces[lookupKey] then
-        local file_path = negrito and "Silkscreen-Bold.ttf" or "Silkscreen-Regular.ttf"
+        local file_path = bold and "Silkscreen-Bold.ttf" or "Silkscreen-Regular.ttf"
         local path = Drawing.fontPath(file_path)
-        local ok, f = pcall(Font.getFace, Font, path, tam * self.k / self.font_factor)
-        if not ok or not f then f = Font:getFace("cfont", tam * self.k / self.font_factor) end
+        local ok, f = pcall(Font.getFace, Font, path, size * self.k / self.font_factor)
+        if not ok or not f then f = Font:getFace("cfont", size * self.k / self.font_factor) end
         self.faces[lookupKey] = f
     end
     return self.faces[lookupKey]
 end
 
-function YomimonScreen:ret(bb, x, y, w, h, cor)
+function YomimonScreen:ret(bb, x, y, w, h, color)
     local x0, y0 = self.ox + self:px(x), self.oy + self:px(y)
     local x1, y1 = self.ox + self:px(x + w), self.oy + self:px(y + h)
-    if x1 > x0 and y1 > y0 then bb:paintRect(x0, y0, x1 - x0, y1 - y0, cor) end
+    if x1 > x0 and y1 > y0 then bb:paintRect(x0, y0, x1 - x0, y1 - y0, color) end
 end
 
-function YomimonScreen:rectangles(bb, list, dx, dy, cor)
-    for _, r in ipairs(list) do self:ret(bb, dx + r[1], dy + r[2], r[3], r[4], cor) end
+function YomimonScreen:rectangles(bb, list, dx, dy, color)
+    for _, r in ipairs(list) do self:ret(bb, dx + r[1], dy + r[2], r[3], r[4], color) end
 end
 
 --- Text in the pixel font. Returns the width in Figma points.
-function YomimonScreen:textValue(bb, str, x, y, negrito, tam, cor, center_x)
-    local w = TextWidget:new{ text = str, face = self:face(negrito, tam), fgcolor = cor or BLACK, padding = 0 }
+function YomimonScreen:textValue(bb, str, x, y, bold, size, color, center_x)
+    local w = TextWidget:new{ text = str, face = self:face(bold, size), fgcolor = color or BLACK, padding = 0 }
     local tw = w:getSize().w
     local px_x = center_x and (self.ox + self:px(center_x) - math.floor(tw / 2)) or (self.ox + self:px(x))
     w:paintTo(bb, px_x, self.oy + self:px(y))
@@ -126,8 +126,8 @@ function YomimonScreen:textValue(bb, str, x, y, negrito, tam, cor, center_x)
 end
 
 --- Width of a text in Figma points, without painting.
-function YomimonScreen:textWidth(str, negrito, tam)
-    local w = TextWidget:new{ text = str, face = self:face(negrito, tam), padding = 0 }
+function YomimonScreen:textWidth(str, bold, size)
+    local w = TextWidget:new{ text = str, face = self:face(bold, size), padding = 0 }
     local tw = w:getSize().w
     w:free()
     return tw / self.k
@@ -138,11 +138,11 @@ end
 -- LV: the L is empty on the top right and the V thins at the bottom; without adjustment the gap is doubled.
 local KERNING = { LV = 1 }
 
-function YomimonScreen:tightText(bb, str, x, y, negrito, tam, tightness)
+function YomimonScreen:tightText(bb, str, x, y, bold, size, tightness)
     local cx, previous = x, nil
     for letter in str:gmatch("[%z\1-\127\194-\244][\128-\191]*") do
-        if previous then cx = cx - (KERNING[previous .. letter] or 0) * tam / 8 end
-        cx = cx + self:textValue(bb, letter, cx, y, negrito, tam) - tightness
+        if previous then cx = cx - (KERNING[previous .. letter] or 0) * size / 8 end
+        cx = cx + self:textValue(bb, letter, cx, y, bold, size) - tightness
         previous = letter
     end
 end
@@ -160,10 +160,10 @@ function YomimonScreen:card(bb, x, y, w, h, shadow)
     self:ret(bb, x + w - 3, y + 3, 3, h - 6, BLACK)
 end
 
-function YomimonScreen:dots(bb, x, y, fulls)
+function YomimonScreen:dots(bb, x, y, full_dots)
     for i = 0, 3 do
         local bx = x + 32 * i
-        if i < fulls then
+        if i < full_dots then
             self:ret(bb, bx + 3, y, 20, 26, BLACK)
             self:ret(bb, bx, y + 3, 26, 20, BLACK)
             self:ret(bb, bx + 6, y + 6, 3, 3, WHITE)
@@ -179,8 +179,8 @@ end
 local function capitals(s)
     local ok, Utf8Proc = pcall(require, "ffi/utf8proc")
     if ok and Utf8Proc and Utf8Proc.uppercase then
-        local ok2, r = pcall(Utf8Proc.uppercase, s)
-        if ok2 and r then return r end
+        local okUpper, r = pcall(Utf8Proc.uppercase, s)
+        if okUpper and r then return r end
     end
     return s:upper()
 end
@@ -213,14 +213,14 @@ function YomimonScreen:measureBalloon(speech)
 end
 
 --- Main balloon (Figma 28:5911): border of 3, pixel shadow, tail in the middle at the bottom.
--- topo: y of the balloon; without it, the tail tip is at y = 234. m: measure already done (optional).
+-- top: y of the balloon; without it, the tail tip is at y = 234. m: measure already done (optional).
 function YomimonScreen:balloon(bb, speech, bx, top, m)
     m = m or self:measureBalloon(speech)
     local W, H = m.W, m.H
-    bx = bx or ((WIDE - (W + 6)) / 2)        -- centred counting the shadow of 6
+    bx = bx or ((FRAME_W - (W + 6)) / 2)        -- centred counting the shadow of 6
     local by = top or (234 - (H + 15))
     local t = math.floor(W / 2) - 7          -- start of the tail
-    local function r(x, y, w, h, cor) self:ret(bb, bx + x, by + y, w, h, cor) end
+    local function r(x, y, w, h, color) self:ret(bb, bx + x, by + y, w, h, color) end
     r(3, 3, W - 6, H - 3, WHITE)            -- background
     r(6, 0, W - 12, 3, BLACK)                -- top
     r(3, 3, 3, 3, BLACK); r(W - 6, 3, 3, 3, BLACK)
@@ -309,14 +309,14 @@ function YomimonScreen:header(bb)
     -- close
     self:card(bb, 555, 16, 42, 39, true)
     self:textValue(bb, "X", 0, 12, true, 32, BLACK, 576)
-    self:target(550, 6, 64, 60, function() self:onClose(); return "fechou" end)
-    self.layer = "conteudo"
+    self:target(550, 6, 64, 60, function() self:onClose(); return "closed" end)
+    self.layer = "content"
 end
 
 -- ARCHIVE menu ------------------------------------------------------------------
 
 local MENU_ITEMS = {
-    { "casa", T"YOMIMON", T"YOUR CURRENT POKÉMON" },
+    { "home", T"YOMIMON", T"YOUR CURRENT POKÉMON" },
     { "notebook", T"NOTEBOOK", T"THE PASSAGES YOU MARKED" },
     { "diary", T"DIARY", T"WHAT IT REMEMBERS OF YOUR READING" },
     { "achievements", T"ACHIEVEMENTS", T"MILESTONES AND BOOKS READ" },
@@ -331,7 +331,7 @@ function YomimonScreen:paintMenu(bb)
     self:card(bb, x, y, w, h, true)
     local iy = y + 12
     for _, item in ipairs(MENU_ITEMS) do
-        local current = (self.mode or "casa") == item[1]
+        local current = (self.mode or "home") == item[1]
         if current then
             self:ret(bb, x + 12, iy + 4, 6, 6, BLACK)
             self:ret(bb, x + 12, iy + 10, 6, 6, BLACK)
@@ -350,7 +350,7 @@ function YomimonScreen:paintMenu(bb)
 end
 
 function YomimonScreen:enter(mode)
-    self.mode = mode ~= "casa" and mode or nil
+    self.mode = mode ~= "home" and mode or nil
     self.pg = 1
     self.message = nil
     if mode == "notebook" then
@@ -403,14 +403,14 @@ end
 
 --- Balloon with the tail on the left (Figma 37:7072): same border and shadow as the
 -- main balloon; the height grows with the text and the balloon is centred on `center_y`.
-function YomimonScreen:sideBalloon(bb, textValue, bx, W, center_y, tam)
+function YomimonScreen:sideBalloon(bb, textValue, bx, W, center_y, size)
     local box = TextBoxWidget:new{
-        text = capitals(textValue), face = self:face(false, tam or 13), width = self:px(W - 56),
+        text = capitals(textValue), face = self:face(false, size or 13), width = self:px(W - 56),
     }
     local th = box:getSize().h / self.k
     local H = th + 35
     local by = center_y - H / 2
-    local function r(x, y, w, h, cor) self:ret(bb, bx + x, by + y, w, h, cor) end
+    local function r(x, y, w, h, color) self:ret(bb, bx + x, by + y, w, h, color) end
     r(3, 3, W - 6, H - 3, WHITE)                         -- background
     r(6, 0, W - 12, 3, BLACK)                             -- top
     r(3, 3, 3, 3, BLACK); r(W - 6, 3, 3, 3, BLACK)
@@ -436,7 +436,7 @@ function YomimonScreen:footerSpeech(bb, s, textValue, y)
     local scale = math.max(1, math.floor(110 * self.k / Drawing.WIDTH))
     Drawing.paintSprite(bb, State.stage(s).nameText, self.ox + self:px(14), self.oy + self:px(y), scale)
     local side = scale * Drawing.WIDTH / self.k
-    self:sideBalloon(bb, textValue, 14 + side + 16, WIDE - (14 + side + 16) - 20, y + side / 2)
+    self:sideBalloon(bb, textValue, 14 + side + 16, FRAME_W - (14 + side + 16) - 20, y + side / 2)
 end
 
 -- Notebook: KOReader's highlights and notes, organised by book ---------------
@@ -561,12 +561,12 @@ function YomimonScreen:paintHighlight(bb, s, L)
     end
 
     -- comment with context
-    local no_cap = 0
-    for _, it in ipairs(L.items) do if it.chapter and it.chapter == item.chapter then no_cap = no_cap + 1 end end
+    local chapter_count = 0
+    for _, it in ipairs(L.items) do if it.chapter and it.chapter == item.chapter then chapter_count = chapter_count + 1 end end
     local chars = Memory.characters(s, L.book, 10)
     local comment = Memory.contextComment(item, {
         s = s, temperament = State.stage(s).temperament, book = L.book, characters = chars,
-        order = self.pg, total = total, in_chapter = no_cap,
+        order = self.pg, total = total, in_chapter = chapter_count,
     })
     self:footerSpeech(bb, s, comment, 560)
     self:navigation(bb, total)
@@ -625,7 +625,7 @@ end
 function YomimonScreen:statusCards(bb, s, now)
     -- status card: belly and mood
     -- the two cards (380 + 20 of space + 174, plus 6 of shadow) centred on the screen
-    local cx, cy = (WIDE - 580) / 2, 696
+    local cx, cy = (FRAME_W - 580) / 2, 696
     self:card(bb, cx, cy, 380, 104, true)
     self:rectangles(bb, ICON_BOOK, cx, cy, BLACK)
     self:rectangles(bb, ICON_FACE, cx, cy, BLACK)
@@ -643,13 +643,13 @@ function YomimonScreen:statusCards(bb, s, now)
     local pf = State.stageProgress(s)
     self:textValue(bb, capitals(pf.stage.titleText), ix + 14, iy + 8, true, 16)
     local target = pf.nextForm and capitals(pf.nextForm.titleText) or T"FINAL FORM"
-    local linha1 = pf.nextForm and (pf.pages == 1 and T"PAGE TO" or T"PAGES TO") or T"REACHED"
-    local label = math.max(self:textWidth(linha1, false, 10), self:textWidth(target, true, 10))
+    local line1 = pf.nextForm and (pf.pages == 1 and T"PAGE TO" or T"PAGES TO") or T"REACHED"
+    local label = math.max(self:textWidth(line1, false, 10), self:textWidth(target, true, 10))
     local num = pf.nextForm and Drawing.thousands(pf.pages) or "OK"
     local size_num = 28
     while size_num > 16 and self:textWidth(num, true, size_num) + 6 + label > wid do size_num = size_num - 4 end
     local nw = self:textValue(bb, num, ix + 14, iy + 26, true, size_num)
-    self:textValue(bb, linha1, ix + 14 + nw + 6, iy + 30, false, 10, GREY_55)
+    self:textValue(bb, line1, ix + 14 + nw + 6, iy + 30, false, 10, GREY_55)
     self:textValue(bb, target, ix + 14 + nw + 6, iy + 43, true, 10)
     -- bar: grey track and the progress in black
     self:ret(bb, ix + 14, iy + 64, wid, 6, GREY_BB)
@@ -662,16 +662,16 @@ end
 --- Sleep screen: the balloon and Yomimon asleep, alone, in the middle of the screen (no cards since 29/10/2026:
 -- the image is drawn when the Kindle sleeps, and in the morning belly, mood and "pages today" would already be yesterday's).
 -- Paints on an image and saves it as PNG; KOReader shows it when the Kindle sleeps.
--- escolher = true only when the Kindle goes to sleep: the phrase is chosen now (State.restSpeech); in the other
+-- pick = true only when the Kindle goes to sleep: the phrase is chosen now (State.restSpeech); in the other
 -- redraws, it repeats the last one.
 function YomimonScreen.generateSleepScreen(s, path, now, pick)
     local sw, sh = Screen:getWidth(), Screen:getHeight()
     local w, h = math.min(sw, sh), math.max(sw, sh)  -- always portrait
     local bb = Blitbuffer.new(w, h, Blitbuffer.TYPE_BB8)
     bb:fill(WHITE)
-    local k = math.min(w / WIDE, h / ALT)
+    local k = math.min(w / FRAME_W, h / FRAME_H)
     local p = setmetatable({
-        k = k, ox = math.floor((w - WIDE * k) / 2), oy = math.floor((h - ALT * k) / 2),
+        k = k, ox = math.floor((w - FRAME_W * k) / 2), oy = math.floor((h - FRAME_H * k) / 2),
         font_factor = Screen:scaleBySize(1000) / 1000, faces = {},
     }, { __index = YomimonScreen })
     -- the sleeping creature: the sprite of the current form with the "z"s (or the ball, if the sprite was not downloaded).
@@ -686,10 +686,10 @@ function YomimonScreen.generateSleepScreen(s, path, now, pick)
     local speech = State.restSpeech(s, now, pick)
     local m = p:measureBalloon(speech)
     local group = m.H + 15 + 30 + alt_real / k
-    local top = math.max(20, (ALT - group) / 2)
+    local top = math.max(20, (FRAME_H - group) / 2)
     p:balloon(bb, speech, nil, top, m)
     local head = p.oy + p:px(top + m.H + 15 + 30)
-    Drawing.paintSprite(bb, nameText, p.ox + p:px(WIDE / 2) - math.floor(wid / 2), head - real_top, scale)
+    Drawing.paintSprite(bb, nameText, p.ox + p:px(FRAME_W / 2) - math.floor(wid / 2), head - real_top, scale)
     local ok, err = pcall(bb.writePNG, bb, path)
     bb:free()
     return ok, err
@@ -848,8 +848,8 @@ end
 -- Text cards ---------------------------------------------------------------------
 
 --- Height (in Figma points) a text takes at a width, with the pixel font.
-function YomimonScreen:textHeight(textValue, negrito, tam, widthPx)
-    local t = TextBoxWidget:new{ text = textValue, face = self:face(negrito, tam), width = self:px(widthPx) }
+function YomimonScreen:textHeight(textValue, bold, size, widthPx)
+    local t = TextBoxWidget:new{ text = textValue, face = self:face(bold, size), width = self:px(widthPx) }
     local h = t:getSize().h / self.k
     t:free()
     return h
@@ -892,31 +892,31 @@ function YomimonScreen:exportScreens(folder)
         end)
         if ok then n = n + 1 else failures = failures + 1 end
     end
-    photo("casa", function() self.mode = nil; self.message = nil end)
+    photo("home", function() self.mode = nil; self.message = nil end)
     photo("menu", function() self.mode = nil; self.menu_open = true end)
     photo("diary", function() self:enter("diary") end)
-    photo("diario-2", function() self.pg = 2 end)
+    photo("diary-2", function() self.pg = 2 end)
     photo("notebook", function() self:enter("notebook") end)
-    photo("caderno-trecho", function() self.open_book = 1; self.pg = 1 end)
+    photo("notebook-passage", function() self.open_book = 1; self.pg = 1 end)
     photo("achievements", function() self:enter("achievements") end)
-    photo("conquistas-2", function() self.pg = 2 end)
+    photo("achievements-2", function() self.pg = 2 end)
     photo("shelf", function() self.pg = 3 end)
     photo("perception", function() self:enter("perception") end)
     -- demo: phrases and dreams chosen (dev_speeches and dev_dreams, put in the simulated state), one screen
     -- for each, in place of the drawn ones
     for i, f in ipairs(s.dev_speeches or {}) do
-        photo("casa-" .. i, function() self:enter("casa"); self.message = nil; self.speech = f end)
+        photo("home-" .. i, function() self:enter("home"); self.message = nil; self.speech = f end)
     end
     bb:free()
-    if pcall(YomimonScreen.generateSleepScreen, s, string.format("%s/%02d-descanso.png", folder, n + 1), os.time()) then n = n + 1 end
+    if pcall(YomimonScreen.generateSleepScreen, s, string.format("%s/%02d-rest.png", folder, n + 1), os.time()) then n = n + 1 end
     for i, f in ipairs(s.dev_dreams or {}) do
         s.rest_speech = f
-        if pcall(YomimonScreen.generateSleepScreen, s, string.format("%s/%02d-descanso-%d.png", folder, n + 1, i), os.time(), false) then
+        if pcall(YomimonScreen.generateSleepScreen, s, string.format("%s/%02d-rest-%d.png", folder, n + 1, i), os.time(), false) then
             n = n + 1
         end
     end
     self.exporting = false
-    self:enter("casa")
+    self:enter("home")
     return n, folder, failures
 end
 
@@ -957,8 +957,8 @@ end
 
 -- Dev panel: what it noticed about the current book ----------------------------------------
 
-local EVENT_NAMES = { morte = T"DEATH", casamento = T"WEDDING", viagem = T"JOURNEY", carta = T"LETTER",
-    tempestade = T"STORM", doenca = T"ILLNESS", festa = T"PARTY", briga = T"FIGHT", fuga = T"ESCAPE", crime = T"CRIME" }
+local EVENT_NAMES = { death = T"DEATH", wedding = T"WEDDING", travel = T"JOURNEY", letter = T"LETTER",
+    storm = T"STORM", illness = T"ILLNESS", party = T"PARTY", quarrel = T"FIGHT", escape = T"ESCAPE", crime = T"CRIME" }
 
 function YomimonScreen:paintPerception(bb, s)
     local book = s.last_book
@@ -972,19 +972,19 @@ function YomimonScreen:paintPerception(bb, s)
         if i > 8 then break end
         lines[#lines + 1] = string.format("  %s%s  %d · %d · %d", p.protagonist and "★ " or "", capitals(p.nameText), p.times, p.speeches, p.chapters)
     end
-    local lug = {}
-    for i, l in ipairs(P.places) do if i <= 6 then lug[#lug + 1] = capitals(l[1]) end end
+    local place_names = {}
+    for i, l in ipairs(P.places) do if i <= 6 then place_names[#place_names + 1] = capitals(l[1]) end end
     lines[#lines + 1] = ""
-    lines[#lines + 1] = T"PLACES: " .. (#lug > 0 and table.concat(lug, ", ") or "—")
+    lines[#lines + 1] = T"PLACES: " .. (#place_names > 0 and table.concat(place_names, ", ") or "—")
     local has = {}
     for i, t in ipairs(P.themes) do if i <= 4 then has[#has + 1] = string.format("%s %d", capitals(Memory.theme(t[1])), math.floor(t[2] + 0.5)) end end
     lines[#lines + 1] = T"THEMES: " .. (#has > 0 and table.concat(has, " · ") or "—")
     local refs = {}
     for i, r in ipairs(P.references or {}) do if i <= 4 then refs[#refs + 1] = string.format("%s %d", capitals(r[1]), r[2]) end end
     lines[#lines + 1] = T"QUOTED: " .. (#refs > 0 and table.concat(refs, " · ") or "—")
-    local narr = P.narrator
-    lines[#lines + 1] = T"NARRATOR: " .. (not narr and "?" or not narr.first and T"THIRD PERSON"
-        or (T"FIRST PERSON" .. (narr.gender == "f" and (" · " .. T"WOMAN") or narr.gender == "m" and (" · " .. T"MAN") or "")))
+    local narration = P.narrator
+    lines[#lines + 1] = T"NARRATOR: " .. (not narration and "?" or not narration.first and T"THIRD PERSON"
+        or (T"FIRST PERSON" .. (narration.gender == "f" and (" · " .. T"WOMAN") or narration.gender == "m" and (" · " .. T"MAN") or "")))
     local tr = {}
     for _, t in ipairs(Traits.LIST) do
         local v = (s.traits or {})[t.id] or 0
@@ -1071,8 +1071,8 @@ function YomimonScreen:onTap(_, ges)
     local targets = self.targets or {}
     for i = #targets, 1, -1 do  -- the ones drawn last (menu) take priority
         local a = targets[i]
-        if (not self.menu_open or a.layer ~= "conteudo") and pos:intersectWith(a.rect) then
-            if a.action() ~= "fechou" then self:refresh() end
+        if (not self.menu_open or a.layer ~= "content") and pos:intersectWith(a.rect) then
+            if a.action() ~= "closed" then self:refresh() end
             return true
         end
     end
@@ -1251,8 +1251,8 @@ function YomimonScreen:menuDev(close_previous)
 end
 
 function YomimonScreen.devOn()
-    local okV, Version = pcall(require, "yomimon_version")
-    if okV and type(Version) == "table" and Version.public then return false end  -- community version: never
+    local okVersion, Version = pcall(require, "yomimon_version")
+    if okVersion and type(Version) == "table" and Version.public then return false end  -- community version: never
     local lfs = require("libs/libkoreader-lfs")
     local DataStorage = require("datastorage")
     return lfs.attributes(DataStorage:getDataDir() .. "/yomimon/dev", "mode") == "file"

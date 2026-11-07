@@ -27,9 +27,9 @@ local YomimonScreen = require("yomimon_screen")
 
 local okKit, Kit = pcall(require, "lib/bookshelf_module_kit")
 local has_bookshelf = okKit and type(Kit) == "table" and Kit.setOnHomeShelf ~= nil
-local MODULO_BOOKSHELF = "yomimon"
+local BOOKSHELF_MODULE = "yomimon"
 
-local WIDE, ALT = 618, 824
+local FRAME_W, FRAME_H = 618, 824
 local BLACK, WHITE = Blitbuffer.COLOR_BLACK, Blitbuffer.COLOR_WHITE
 local GREY_55, GREY_BB = Blitbuffer.Color8(0x55), Blitbuffer.Color8(0xBB)
 
@@ -58,7 +58,7 @@ end
 
 local Welcome = InputContainer:extend{
     plugin = nil,
-    passo = 1,
+    step = 1,
     page = 1,
     choice = nil,      -- list item picked (screen 2)
     pick_only = false, -- only switch Pokémon: ends on screen 2, without the install questions
@@ -78,11 +78,11 @@ function Welcome:init()
         self.key_events.Close = { { Device.input.group.Back } }
     end
     self.covers_fullscreen = true
-    local tam = Screen:getSize()
-    self.dimen = Geom:new{ x = 0, y = 0, w = tam.w, h = tam.h }
-    self.k = math.min(tam.w / WIDE, tam.h / ALT)
-    self.ox = math.floor((tam.w - WIDE * self.k) / 2)
-    self.oy = math.floor((tam.h - ALT * self.k) / 2)
+    local size = Screen:getSize()
+    self.dimen = Geom:new{ x = 0, y = 0, w = size.w, h = size.h }
+    self.k = math.min(size.w / FRAME_W, size.h / FRAME_H)
+    self.ox = math.floor((size.w - FRAME_W * self.k) / 2)
+    self.oy = math.floor((size.h - FRAME_H * self.k) / 2)
     self.font_factor = Screen:scaleBySize(1000) / 1000
     self.faces = {}
     self.items = sortedList()
@@ -92,7 +92,7 @@ function Welcome:init()
         begin = G_reader_settings:isTrue("yomimon_open_at_startup"),
         gesture = G_reader_settings:isTrue("yomimon_gesture"),
         card = self.plugin:simpleUICard(),
-        shelf = has_bookshelf and Kit.onHomeShelf and Kit.onHomeShelf(MODULO_BOOKSHELF) or false,
+        shelf = has_bookshelf and Kit.onHomeShelf and Kit.onHomeShelf(BOOKSHELF_MODULE) or false,
     }
 end
 
@@ -100,7 +100,7 @@ end
 function Welcome:sprite(bb, nameText, speech, center_y, size)
     local scale = math.max(1, math.floor(size * self.k / Drawing.WIDTH))
     local side = scale * Drawing.WIDTH
-    local x = self.ox + self:px(WIDE / 2) - math.floor(side / 2)
+    local x = self.ox + self:px(FRAME_W / 2) - math.floor(side / 2)
     local y = self.oy + self:px(center_y) - math.floor(side / 2)
     Drawing.paintSprite(bb, nameText, x, y, scale)
     local head = (y - self.oy) / self.k + Drawing.realTop(nameText) * scale / self.k
@@ -111,7 +111,7 @@ end
 --- Big button (card with shadow) with centred text.
 function Welcome:button(bb, textValue, y, action)
     self:card(bb, 20, y, 578, 80, true)
-    self:textValue(bb, textValue, 0, y + 24, true, 24, BLACK, WIDE / 2)
+    self:textValue(bb, textValue, 0, y + 24, true, 24, BLACK, FRAME_W / 2)
     self:target(14, y - 6, 590, 92, action)
 end
 
@@ -124,9 +124,9 @@ function Welcome:option(bb, y, titleText, detail, switched_on, action, disabled)
         self:ret(bb, cx, cy + 3, 26, 20, BLACK)
         self:ret(bb, cx + 6, cy + 6, 3, 3, WHITE)
     else
-        local cor = disabled and GREY_BB or BLACK
-        self:ret(bb, cx + 3, cy, 20, 3, cor); self:ret(bb, cx + 3, cy + 23, 20, 3, cor)
-        self:ret(bb, cx, cy + 3, 3, 20, cor); self:ret(bb, cx + 23, cy + 3, 3, 20, cor)
+        local color = disabled and GREY_BB or BLACK
+        self:ret(bb, cx + 3, cy, 20, 3, color); self:ret(bb, cx + 3, cy + 23, 20, 3, color)
+        self:ret(bb, cx, cy + 3, 3, 20, color); self:ret(bb, cx + 23, cy + 3, 3, 20, color)
     end
     self:textValue(bb, titleText, 86, y + 16, true, 15, disabled and GREY_BB or BLACK)
     self:textValue(bb, detail, 86, y + 42, false, 10, disabled and GREY_BB or GREY_55)
@@ -154,10 +154,10 @@ function Welcome:filterLetter(letter)
 end
 
 function Welcome:paintList(bb)
-    self:textValue(bb, T"PICK YOUR POKÉMON", 0, 22, true, 24, BLACK, WIDE / 2)
+    self:textValue(bb, T"PICK YOUR POKÉMON", 0, 22, true, 24, BLACK, FRAME_W / 2)
     for i, letter in ipairs(LETTERS) do
-        local col, lin = (i - 1) % 13, math.floor((i - 1) / 13)
-        local lx, ly = 21 + col * 44, 70 + lin * 44
+        local col, row = (i - 1) % 13, math.floor((i - 1) / 13)
+        local lx, ly = 21 + col * 44, 70 + row * 44
         local has = self.letters_with[letter]
         local picked = self.letter == letter
         self:card(bb, lx, ly, 40, 38, false)
@@ -176,7 +176,7 @@ function Welcome:paintList(bb)
         if it.final then
             self:textValue(bb, "> " .. it.final, 590 - self:textWidth("> " .. it.final, false, 12), y + 22, false, 12, GREY_55)
         end
-        self:target(14, y - 4, 590, 66, function() self.choice, self.passo = it, 2 end)
+        self:target(14, y - 4, 590, 66, function() self.choice, self.step = it, 2 end)
     end
     local ny = 730
     if self.pick_only then
@@ -190,7 +190,7 @@ function Welcome:paintList(bb)
     self:card(bb, 508, ny, 90, 52, true)
     self:textValue(bb, ">", 0, ny + 10, true, 28, BLACK, 553)
     self:target(502, ny - 6, 102, 64, function() self.page = math.min(self:totalPages(), self.page + 1) end)
-    self:textValue(bb, string.format("%d/%d", self.page, self:totalPages()), 0, self.pick_only and ny + 62 or ny + 16, false, 16, BLACK, WIDE / 2)
+    self:textValue(bb, string.format("%d/%d", self.page, self:totalPages()), 0, self.pick_only and ny + 62 or ny + 16, false, 16, BLACK, FRAME_W / 2)
 end
 
 --- Pokédex description in a card, wrapped to at most 4 lines (the last ends in "..." if it does not fit).
@@ -235,7 +235,7 @@ function Welcome:paintConfirmation(bb)
     self:button(bb, T"PICK THIS ONE", 690, function() self:pick() end)
     self:card(bb, 20, 760, 120, 40, true)
     self:textValue(bb, T"BACK", 0, 770, true, 14, BLACK, 80)
-    self:target(14, 754, 132, 52, function() self.passo = 1 end)
+    self:target(14, 754, 132, 52, function() self.step = 1 end)
 end
 
 function Welcome:spriteDownloaded(it)
@@ -274,18 +274,18 @@ function Welcome:pick()
         if self.on_finish then self.on_finish() end
         return
     end
-    self.passo = 3
+    self.step = 3
 end
 
 function Welcome:paintTo(bb, x, y)
     self.dimen.x, self.dimen.y = x, y
     bb:paintRect(x, y, self.dimen.w, self.dimen.h, WHITE)
     self.targets = {}
-    self.layer = "conteudo"
-    if self.passo == 1 then
+    self.layer = "content"
+    if self.step == 1 then
         self:paintList(bb)
 
-    elseif self.passo == 2 then
+    elseif self.step == 2 then
         self:paintConfirmation(bb)
 
     else
@@ -313,7 +313,7 @@ function Welcome:finish()
     G_reader_settings:saveSetting("yomimon_gesture", self.op.gesture or nil)
     self.plugin:applyGesture()
     if self.plugin:hasSimpleUI() then self.plugin:simpleUICard(self.op.card) end
-    if has_bookshelf then pcall(Kit.setOnHomeShelf, MODULO_BOOKSHELF, self.op.shelf) end
+    if has_bookshelf then pcall(Kit.setOnHomeShelf, BOOKSHELF_MODULE, self.op.shelf) end
     self.plugin:save(false)
     self.targets = nil
     UIManager:close(self)
